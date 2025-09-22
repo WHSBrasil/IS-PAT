@@ -6,7 +6,7 @@ const connectionConfig = {
   user: process.env.PGUSER || 'sotech',
   password: process.env.PGPASSWORD || 'SthNox@2022',
   database: process.env.PGDATABASE || 'dbapr',
-  ssl: false, // Adjust based on your DB requirements
+  ssl: true, // Required for external database
   schema: 'sotech'
 };
 

@@ -147,11 +147,11 @@ export default function TransferenciaModal({ isOpen, onClose, editingItem }: Tra
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                 <div>
                   <span className="text-muted-foreground">Unidade: </span>
-                  <span className="text-foreground">{origemUnidade?.nome || "Não informado"}</span>
+                  <span className="text-foreground">{origemUnidade?.unidadesaude || origemUnidade?.nome || "Não informado"}</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Setor: </span>
-                  <span className="text-foreground">{origemSetor?.nome || "Não informado"}</span>
+                  <span className="text-foreground">{origemSetor?.setor || origemSetor?.nome || "Não informado"}</span>
                 </div>
               </div>
             </div>
@@ -175,7 +175,7 @@ export default function TransferenciaModal({ isOpen, onClose, editingItem }: Tra
                     .filter((u: any) => u.pkunidadesaude.toString() !== formData.fkunidadesaude_origem)
                     .map((unidade: any) => (
                     <SelectItem key={unidade.pkunidadesaude} value={unidade.pkunidadesaude.toString()}>
-                      {unidade.nome}
+                      {unidade.unidadesaude || unidade.nome}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -196,7 +196,7 @@ export default function TransferenciaModal({ isOpen, onClose, editingItem }: Tra
                 <SelectContent>
                   {setores.map((setor: any) => (
                     <SelectItem key={setor.pksetor} value={setor.pksetor.toString()}>
-                      {setor.nome}
+                      {setor.setor || setor.nome}
                     </SelectItem>
                   ))}
                 </SelectContent>

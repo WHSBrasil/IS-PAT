@@ -29,7 +29,8 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
 
   const { data: tombamentos = [] } = useTombamentos();
   const { data: unidadesSaude = [] } = useUnidadesSaude();
-  const { data: setores = [] } = useSetores();
+  const { data: setoresData } = useSetores();
+  const setores = Array.isArray(setoresData) ? setoresData : [];
   const createAlocacao = useCreateAlocacao();
   const updateAlocacao = useUpdateAlocacao();
 
@@ -152,7 +153,7 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
                 <SelectContent>
                   {availableTombamentos.map((tombamento: any) => (
                     <SelectItem key={tombamento.pktombamento} value={tombamento.pktombamento.toString()}>
-                      {tombamento.tombamento} - {tombamento.produto?.descricao || tombamento.produto?.nome || "Produto"}
+                      {tombamento.tombamento} - {tombamento.produto?.nome || tombamento.produto?.descricao || "Produto"}
                     </SelectItem>
                   ))}
                 </SelectContent>

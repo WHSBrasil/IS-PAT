@@ -128,7 +128,7 @@ export class DatabaseStorage implements IStorage {
 
   // Produto methods
   async getProdutos(): Promise<Produto[]> {
-    const result = await query('SELECT * FROM sotech.est_produto WHERE ativo = true ORDER BY descricao');
+    const result = await query('SELECT * FROM sotech.est_produto WHERE ativo = true ORDER BY produto');
     return result.rows;
   }
 
@@ -140,7 +140,7 @@ export class DatabaseStorage implements IStorage {
   // Tombamento methods
   async getTombamentos(): Promise<Tombamento[]> {
     const result = await query(`
-      SELECT t.*, p.descricao as produto_nome, p.descricao as produto_descricao
+      SELECT t.*, p.produto as produto_nome, p.produto as produto_descricao
       FROM sotech.pat_tombamento t
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
       WHERE t.ativo = true 
@@ -159,7 +159,7 @@ export class DatabaseStorage implements IStorage {
 
   async getTombamento(id: number): Promise<Tombamento | undefined> {
     const result = await query(`
-      SELECT t.*, p.descricao as produto_nome, p.descricao as produto_descricao
+      SELECT t.*, p.produto as produto_nome, p.produto as produto_descricao
       FROM sotech.pat_tombamento t
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
       WHERE t.pktombamento = $1
@@ -470,7 +470,7 @@ export class DatabaseStorage implements IStorage {
     const result = await query(`
       SELECT m.*, 
              t.tombamento,
-             p.descricao as produto_nome
+             p.produto as produto_nome
       FROM sotech.pat_manutencao m
       LEFT JOIN sotech.pat_tombamento t ON m.fktombamento = t.pktombamento
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto

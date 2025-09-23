@@ -1,20 +1,37 @@
+
 import { useState, useMemo } from "react";
-import { useTombamentos } from "@/hooks/usePatrimonio";
+import { useTombamentos, useCreateTombamento, useUpdateTombamento, useProdutos } from "@/hooks/usePatrimonio";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import TombamentoModal from "@/components/modals/TombamentoModal";
-import { Plus, Search, Eye, Pencil, Trash2, Image } from "lucide-react";
+import { SearchInput } from "@/components/ui/search-input";
+import { Plus, Search, Eye, Pencil, Trash2, Image, ArrowLeft, Upload, X } from "lucide-react";
 
 export default function Tombamento() {
-  const [showModal, setShowModal] = useState(false);
+  const [viewMode, setViewMode] = useState<"list" | "form">("list");
   const [editingItem, setEditingItem] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [searchProduto, setSearchProduto] = useState("");
+
+  // Form state
+  const [formData, setFormData] = useState({
+    fkproduto: "",
+    tombamento: "",
+    serial: "",
+    responsavel: "",
+    status: "disponivel",
+  });
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   const { data: tombamentos = [], isLoading } = useTombamentos();
+  const { data: produtos = [] } = useProdutos();
+  const createTombamento = useCreateTombamento();
+  const updateTombamento = useUpdateTombamento();
 
   const filteredTombamentos = useMemo(() => {
     if (!searchTerm.trim()) return tombamentos;
@@ -26,14 +43,111 @@ export default function Tombamento() {
     );
   }, [tombamentos, searchTerm]);
 
-  const handleEdit = (item: any) => {
-    setEditingItem(item);
-    setShowModal(true);
+  const filteredProdutos = useMemo(() => {
+    if (!searchProduto.trim()) return produtos;
+    return produtos.filter((produto: any) =>
+      produto.produto?.toLowerCase().includes(searchProduto.toLowerCase())
+    );
+  }, [produtos, searchProduto]);
+
+  const handleNewTombamento = () => {
+    setEditingItem(null);
+    setFormData({
+      fkproduto: "",
+      tombamento: "",
+      serial: "",
+      responsavel: "",
+      status: "disponivel",
+    });
+    setSelectedFiles([]);
+    setPreviewUrls([]);
+    setViewMode("form");
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
+  const handleEdit = (item: any) => {
+    setEditingItem(item);
+    setFormData({
+      fkproduto: item.fkproduto?.toString() || "",
+      tombamento: item.tombamento || "",
+      serial: item.serial || "",
+      responsavel: item.responsavel || "",
+      status: item.status || "disponivel",
+    });
+    setSelectedFiles([]);
+    setPreviewUrls([]);
+    setViewMode("form");
+  };
+
+  const handleBackToList = () => {
+    setViewMode("list");
     setEditingItem(null);
+    setFormData({
+      fkproduto: "",
+      tombamento: "",
+      serial: "",
+      responsavel: "",
+      status: "disponivel",
+    });
+    setSelectedFiles([]);
+    previewUrls.forEach(url => URL.revokeObjectURL(url));
+    setPreviewUrls([]);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const validFiles = files.filter(file => {
+      const isValidType = file.type.startsWith('image/');
+      const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB
+      return isValidType && isValidSize;
+    });
+
+    setSelectedFiles(prev => [...prev, ...validFiles]);
+    
+    validFiles.forEach(file => {
+      const url = URL.createObjectURL(file);
+      setPreviewUrls(prev => [...prev, url]);
+    });
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setPreviewUrls(prev => {
+      const newUrls = prev.filter((_, i) => i !== index);
+      URL.revokeObjectURL(prev[index]);
+      return newUrls;
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.fkproduto || !formData.tombamento) {
+      return;
+    }
+
+    try {
+      const submitFormData = new FormData();
+      
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value) {
+          submitFormData.append(key, value);
+        }
+      });
+
+      selectedFiles.forEach(file => {
+        submitFormData.append('photos', file);
+      });
+
+      if (editingItem) {
+        await updateTombamento.mutateAsync({ id: editingItem.pktombamento, formData: submitFormData });
+      } else {
+        await createTombamento.mutateAsync(submitFormData);
+      }
+      
+      handleBackToList();
+    } catch (error) {
+      console.error("Error saving tombamento:", error);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -48,6 +162,219 @@ export default function Tombamento() {
         return <Badge variant="secondary">{status}</Badge>;
     }
   };
+
+  const isLoading = createTombamento.isPending || updateTombamento.isPending;
+
+  if (viewMode === "form") {
+    return (
+      <div className="p-6" data-testid="tombamento-form">
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBackToList}
+                className="flex items-center space-x-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Voltar</span>
+              </Button>
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">
+                  {editingItem ? "Editar Tombamento" : "Novo Tombamento"}
+                </h2>
+                <p className="text-muted-foreground">
+                  {editingItem ? "Edite as informações do tombamento" : "Registre um novo item com número de tombamento e fotos"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Informações do Tombamento</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="fkproduto" className="text-sm font-medium text-foreground">
+                      Produto *
+                    </Label>
+                    <Select
+                      value={formData.fkproduto}
+                      onValueChange={(value) => setFormData({ ...formData, fkproduto: value })}
+                      required
+                    >
+                      <SelectTrigger data-testid="select-produto">
+                        <SelectValue placeholder="Selecione um produto" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[200px]">
+                        <div className="sticky top-0 bg-background p-2 border-b">
+                          <SearchInput
+                            value={searchProduto}
+                            onChange={setSearchProduto}
+                            placeholder="Pesquisar produto..."
+                            data-testid="search-produto"
+                            className="h-8"
+                          />
+                        </div>
+                        {filteredProdutos.length > 0 ? (
+                          filteredProdutos.map((produto: any) => (
+                            <SelectItem key={produto.pkproduto} value={produto.pkproduto.toString()}>
+                              {produto.produto}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <div className="p-2 text-sm text-muted-foreground">
+                            {searchProduto ? "Nenhum produto encontrado" : "Carregando produtos..."}
+                          </div>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="tombamento" className="text-sm font-medium text-foreground">
+                      Número de Tombamento *
+                    </Label>
+                    <Input
+                      id="tombamento"
+                      type="text"
+                      value={formData.tombamento}
+                      onChange={(e) => setFormData({ ...formData, tombamento: e.target.value })}
+                      placeholder="Ex: TB-001234"
+                      required
+                      data-testid="input-tombamento"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="serial" className="text-sm font-medium text-foreground">
+                      Número Serial
+                    </Label>
+                    <Input
+                      id="serial"
+                      type="text"
+                      value={formData.serial}
+                      onChange={(e) => setFormData({ ...formData, serial: e.target.value })}
+                      placeholder="Ex: LG24MK430H-B"
+                      data-testid="input-serial"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="responsavel" className="text-sm font-medium text-foreground">
+                      Responsável
+                    </Label>
+                    <Input
+                      id="responsavel"
+                      type="text"
+                      value={formData.responsavel}
+                      onChange={(e) => setFormData({ ...formData, responsavel: e.target.value })}
+                      placeholder="Nome do responsável"
+                      data-testid="input-responsavel"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="status" className="text-sm font-medium text-foreground">
+                      Status
+                    </Label>
+                    <Select
+                      value={formData.status}
+                      onValueChange={(value) => setFormData({ ...formData, status: value })}
+                    >
+                      <SelectTrigger data-testid="select-status">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="disponivel">Disponível</SelectItem>
+                        <SelectItem value="alocado">Alocado</SelectItem>
+                        <SelectItem value="manutencao">Manutenção</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium text-foreground mb-2 block">
+                    Fotos do Item
+                  </Label>
+                  <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      id="photo-upload"
+                      data-testid="file-input"
+                    />
+                    <label htmlFor="photo-upload" className="cursor-pointer">
+                      <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground">
+                        <span className="font-medium text-primary hover:text-primary/80">Clique para fazer upload</span> ou arraste as fotos aqui
+                      </p>
+                      <p className="text-xs text-muted-foreground">PNG, JPG, WEBP até 10MB cada</p>
+                    </label>
+                  </div>
+
+                  {previewUrls.length > 0 && (
+                    <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {previewUrls.map((url, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={url}
+                            alt={`Preview ${index + 1}`}
+                            className="w-full h-20 object-cover rounded-lg"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 opacity-0 group-hover:opacity-100"
+                            onClick={() => removeFile(index)}
+                            data-testid={`remove-photo-${index}`}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleBackToList}
+                    disabled={isLoading}
+                    data-testid="button-cancel"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isLoading || !formData.fkproduto || !formData.tombamento}
+                    data-testid="button-save"
+                  >
+                    {isLoading ? "Salvando..." : editingItem ? "Atualizar Tombamento" : "Criar Tombamento"}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -71,7 +398,7 @@ export default function Tombamento() {
             <p className="text-muted-foreground">Registre novos itens com número de tombamento e fotos</p>
           </div>
           <Button
-            onClick={() => setShowModal(true)}
+            onClick={handleNewTombamento}
             className="flex items-center space-x-2"
             data-testid="button-new-tombamento"
           >
@@ -145,17 +472,6 @@ export default function Tombamento() {
                     data-testid="search-tombamentos"
                   />
                 </div>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Filtrar por status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos os status</SelectItem>
-                    <SelectItem value="disponivel">Disponível</SelectItem>
-                    <SelectItem value="alocado">Alocado</SelectItem>
-                    <SelectItem value="manutencao">Manutenção</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </div>
           </CardHeader>
@@ -249,14 +565,6 @@ export default function Tombamento() {
           </CardContent>
         </Card>
       </div>
-
-      {showModal && (
-        <TombamentoModal
-          isOpen={showModal}
-          onClose={handleCloseModal}
-          editingItem={editingItem}
-        />
-      )}
     </div>
   );
 }

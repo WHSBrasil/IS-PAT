@@ -1,27 +1,62 @@
+
 import { useState, useMemo } from "react";
-import { useClassificacoes, useDeleteClassificacao } from "@/hooks/usePatrimonio";
+import { useClassificacoes, useCreateClassificacao, useUpdateClassificacao, useDeleteClassificacao } from "@/hooks/usePatrimonio";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import ClassificacaoModal from "@/components/modals/ClassificacaoModal";
-import { Pencil, Trash2, Plus, Search } from "lucide-react";
+import { Pencil, Trash2, Plus, Search, ArrowLeft } from "lucide-react";
 
 export default function Classificacoes() {
-  const [showModal, setShowModal] = useState(false);
+  const [viewMode, setViewMode] = useState<"list" | "form">("list");
   const [editingItem, setEditingItem] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Form state
+  const [formData, setFormData] = useState({
+    classificacao: "",
+    ativo: true,
+  });
+
   const { data: classificacoes = [], isLoading } = useClassificacoes();
+  const createClassificacao = useCreateClassificacao();
+  const updateClassificacao = useUpdateClassificacao();
   const deleteClassificacao = useDeleteClassificacao();
 
-  const filteredClassificacoes = classificacoes.filter((item: any) =>
-    item.classificacao.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredClassificacoes = useMemo(() => {
+    if (!searchTerm.trim()) return classificacoes;
+    return classificacoes.filter((item: any) =>
+      item.classificacao.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [classificacoes, searchTerm]);
+
+  const handleNewClassificacao = () => {
+    setEditingItem(null);
+    setFormData({
+      classificacao: "",
+      ativo: true,
+    });
+    setViewMode("form");
+  };
 
   const handleEdit = (item: any) => {
     setEditingItem(item);
-    setShowModal(true);
+    setFormData({
+      classificacao: item.classificacao || "",
+      ativo: item.ativo ?? true,
+    });
+    setViewMode("form");
+  };
+
+  const handleBackToList = () => {
+    setViewMode("list");
+    setEditingItem(null);
+    setFormData({
+      classificacao: "",
+      ativo: true,
+    });
   };
 
   const handleDelete = async (id: number) => {
@@ -30,10 +65,114 @@ export default function Classificacoes() {
     }
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setEditingItem(null);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.classificacao.trim()) {
+      return;
+    }
+
+    try {
+      if (editingItem) {
+        await updateClassificacao.mutateAsync({
+          id: editingItem.pkclassificacao,
+          data: formData,
+        });
+      } else {
+        await createClassificacao.mutateAsync(formData);
+      }
+      handleBackToList();
+    } catch (error) {
+      console.error("Error saving classificacao:", error);
+    }
   };
+
+  const isLoadingForm = createClassificacao.isPending || updateClassificacao.isPending;
+
+  if (viewMode === "form") {
+    return (
+      <div className="p-6" data-testid="classificacao-form">
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBackToList}
+                className="flex items-center space-x-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Voltar</span>
+              </Button>
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">
+                  {editingItem ? "Editar Classificação" : "Nova Classificação"}
+                </h2>
+                <p className="text-muted-foreground">
+                  {editingItem ? "Edite as informações da classificação" : "Cadastre uma nova classificação de patrimônio"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Informações da Classificação</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <Label htmlFor="classificacao" className="text-sm font-medium text-foreground">
+                    Nome da Classificação *
+                  </Label>
+                  <Input
+                    id="classificacao"
+                    type="text"
+                    value={formData.classificacao}
+                    onChange={(e) => setFormData({ ...formData, classificacao: e.target.value })}
+                    placeholder="Ex: Equipamentos Médicos"
+                    required
+                    data-testid="input-classificacao"
+                  />
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="ativo"
+                    checked={formData.ativo}
+                    onCheckedChange={(checked) => setFormData({ ...formData, ativo: !!checked })}
+                    data-testid="checkbox-ativo"
+                  />
+                  <Label htmlFor="ativo" className="text-sm text-foreground">
+                    Classificação ativa
+                  </Label>
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleBackToList}
+                    disabled={isLoadingForm}
+                    data-testid="button-cancel"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isLoadingForm || !formData.classificacao.trim()}
+                    data-testid="button-save"
+                  >
+                    {isLoadingForm ? "Salvando..." : editingItem ? "Atualizar Classificação" : "Criar Classificação"}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -57,7 +196,7 @@ export default function Classificacoes() {
             <p className="text-muted-foreground">Gerencie as categorias de classificação do patrimônio</p>
           </div>
           <Button
-            onClick={() => setShowModal(true)}
+            onClick={handleNewClassificacao}
             className="flex items-center space-x-2"
             data-testid="button-new-classification"
           >
@@ -148,7 +287,6 @@ export default function Classificacoes() {
               </table>
             </div>
 
-            {/* Pagination */}
             <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
               <div className="text-sm text-muted-foreground">
                 Mostrando <span className="font-medium">1</span> a{" "}
@@ -159,14 +297,6 @@ export default function Classificacoes() {
           </CardContent>
         </Card>
       </div>
-
-      {showModal && (
-        <ClassificacaoModal
-          isOpen={showModal}
-          onClose={handleCloseModal}
-          editingItem={editingItem}
-        />
-      )}
     </div>
   );
 }

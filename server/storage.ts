@@ -629,12 +629,13 @@ export class DatabaseStorage implements IStorage {
         p.datapedido,
         tp.pktipopedido as tipo_pedido,
         tp.tipo as tipo_texto,
+        pi.pkpedidoitem,
         pi.quantidadeentrada,
         (
           SELECT COUNT(*)
           FROM sotech.pat_tombamento t
           WHERE t.fkpedidoitem = pi.pkpedidoitem AND t.ativo = true
-        ) as tombados
+        ) as quantidade_tombada
       FROM sotech.est_pedido p
       INNER JOIN sotech.est_pedidoitem pi ON p.pkpedido = pi.fkpedido
       INNER JOIN sotech.est_tipopedido tp ON p.fktipopedido = tp.pktipopedido
@@ -652,7 +653,11 @@ export class DatabaseStorage implements IStorage {
     console.log(`Searching for product entries with fkproduto: ${fkproduto}`);
     console.log(`Found ${result.rows.length} entries:`, result.rows);
 
-    return result.rows;
+    // Calculate quantidade_disponivel for each entry
+    return result.rows.map(row => ({
+      ...row,
+      quantidade_disponivel: parseFloat(row.quantidadeentrada) - (row.quantidade_tombada || 0)
+    }));
   }
 
   // Dashboard methods

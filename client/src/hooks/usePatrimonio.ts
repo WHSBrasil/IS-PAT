@@ -382,3 +382,14 @@ export function useSetores() {
     },
   });
 }
+
+export function useHistoricoMovimentacao(fktombamento: number) {
+  return useQuery({
+    queryKey: ["/api/tombamentos", fktombamento, "historico"],
+    queryFn: async () => {
+      const response = await fetch(`/api/tombamentos/${fktombamento}/historico`);
+      return response.json();
+    },
+    enabled: !!fktombamento,
+  });
+}

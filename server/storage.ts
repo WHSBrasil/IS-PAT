@@ -354,6 +354,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createTransferencia(transferencia: InsertTransferencia): Promise<Transferencia> {
+    // First, deactivate the current allocation
+    if (transferencia.fkunidadesaude_origem) {
+      await query(`
+        UPDATE sotech.pat_alocacao 
+        SET ativo = false 
+        WHERE fktombamento = $1 AND fkunidadesaude = $2 AND ativo = true
+      `, [transferencia.fktombamento, transferencia.fkunidadesaude_origem]);
+    }
+
+    // Insert the transfer record
     const result = await query(`
       INSERT INTO sotech.pat_transferencia 
       (fktombamento, fkunidadesaude_origem, fkunidadesaude_destino, fksetor_origem, fksetor_destino, responsavel_destino, datatasnferencia, responsavel, fkuser) 
@@ -368,6 +378,21 @@ export class DatabaseStorage implements IStorage {
       transferencia.responsavel_destino,
       transferencia.datatasnferencia,
       transferencia.responsavel,
+      transferencia.fkuser || 0
+    ]);
+
+    // Create new allocation at destination
+    await query(`
+      INSERT INTO sotech.pat_alocacao 
+      (fktombamento, fkunidadesaude, fksetor, responsavel_unidade, dataalocacao, responsavel, fkuser) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `, [
+      transferencia.fktombamento,
+      transferencia.fkunidadesaude_destino,
+      transferencia.fksetor_destino ? parseInt(transferencia.fksetor_destino) : null,
+      transferencia.responsavel_destino || 'Transferência Automática',
+      transferencia.datatasnferencia,
+      transferencia.responsavel || 'Sistema',
       transferencia.fkuser || 0
     ]);
 
@@ -399,6 +424,45 @@ export class DatabaseStorage implements IStorage {
   async deleteTransferencia(id: number): Promise<boolean> {
     const result = await query('UPDATE sotech.pat_transferencia SET ativo = false WHERE pktransferencia = $1', [id]);
     return (result.rowCount || 0) > 0;
+  }
+
+  async getHistoricoMovimentacao(fktombamento: number): Promise<any[]> {
+    const result = await query(`
+      SELECT 
+        'alocacao' as tipo,
+        a.dataalocacao as data,
+        a.responsavel_unidade as responsavel,
+        u.nome as unidade,
+        s.nome as setor,
+        a.termo,
+        a.ativo
+      FROM sotech.pat_alocacao a
+      LEFT JOIN sotech.cdg_unidadesaude u ON a.fkunidadesaude = u.pkunidadesaude
+      LEFT JOIN sotech.cdg_setor s ON a.fksetor = s.pksetor
+      WHERE a.fktombamento = $1
+      
+      UNION ALL
+      
+      SELECT 
+        'transferencia' as tipo,
+        t.datatasnferencia as data,
+        t.responsavel,
+        CONCAT(uo.nome, ' → ', ud.nome) as unidade,
+        CASE 
+          WHEN t.fksetor_destino IS NOT NULL THEN t.fksetor_destino
+          ELSE NULL 
+        END as setor,
+        NULL as termo,
+        t.ativo
+      FROM sotech.pat_transferencia t
+      LEFT JOIN sotech.cdg_unidadesaude uo ON t.fkunidadesaude_origem = uo.pkunidadesaude
+      LEFT JOIN sotech.cdg_unidadesaude ud ON t.fkunidadesaude_destino = ud.pkunidadesaude
+      WHERE t.fktombamento = $1
+      
+      ORDER BY data DESC
+    `, [fktombamento]);
+    
+    return result.rows;
   }
 
   // Manutencao methods

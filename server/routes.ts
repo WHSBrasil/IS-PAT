@@ -418,6 +418,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/tombamentos/:id/historico", async (req, res) => {
+    try {
+      const fktombamento = parseInt(req.params.id);
+      const historico = await storage.getHistoricoMovimentacao(fktombamento);
+      res.json(historico);
+    } catch (error) {
+      console.error('Error fetching movement history:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

@@ -5,11 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AlocacaoModal from "@/components/modals/AlocacaoModal";
-import { Plus, Search, Eye, ArrowRightLeft, Pencil, Trash2 } from "lucide-react";
+import TransferenciaModal from "@/components/modals/TransferenciaModal";
+import HistoricoModal from "@/components/modals/HistoricoModal";
+import { Plus, Search, Eye, ArrowRightLeft, Pencil, Trash2, History } from "lucide-react";
 
 export default function Alocacao() {
   const [showModal, setShowModal] = useState(false);
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [showHistoricoModal, setShowHistoricoModal] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
+  const [selectedTombamento, setSelectedTombamento] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [unidadeFilter, setUnidadeFilter] = useState("all");
 
@@ -39,6 +44,26 @@ export default function Alocacao() {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingItem(null);
+  };
+
+  const handleCloseTransferModal = () => {
+    setShowTransferModal(false);
+    setSelectedTombamento(null);
+  };
+
+  const handleCloseHistoricoModal = () => {
+    setShowHistoricoModal(false);
+    setSelectedTombamento(null);
+  };
+
+  const handleTransfer = (item: any) => {
+    setSelectedTombamento(item);
+    setShowTransferModal(true);
+  };
+
+  const handleShowHistory = (item: any) => {
+    setSelectedTombamento(item);
+    setShowHistoricoModal(true);
   };
 
   const handleDelete = async (item: any) => {
@@ -211,6 +236,17 @@ export default function Alocacao() {
                             <Button
                               variant="ghost"
                               size="sm"
+                              onClick={() => handleShowHistory(item)}
+                              className="text-blue-600 hover:text-blue-800"
+                              title="Histórico de movimentação"
+                              data-testid={`button-history-${item.pkalocacao}`}
+                            >
+                              <History className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleTransfer(item)}
                               className="text-accent hover:text-accent"
                               title="Transferir"
                               data-testid={`button-transfer-${item.pkalocacao}`}
@@ -253,6 +289,27 @@ export default function Alocacao() {
           isOpen={showModal}
           onClose={handleCloseModal}
           editingItem={editingItem}
+        />
+      )}
+
+      {showTransferModal && selectedTombamento && (
+        <TransferenciaModal
+          isOpen={showTransferModal}
+          onClose={handleCloseTransferModal}
+          editingItem={{
+            fktombamento: selectedTombamento.fktombamento,
+            fkunidadesaude_origem: selectedTombamento.fkunidadesaude,
+            fksetor_origem: selectedTombamento.fksetor
+          }}
+        />
+      )}
+
+      {showHistoricoModal && selectedTombamento && (
+        <HistoricoModal
+          isOpen={showHistoricoModal}
+          onClose={handleCloseHistoricoModal}
+          fktombamento={selectedTombamento.fktombamento}
+          tombamento={selectedTombamento.tombamento?.tombamento}
         />
       )}
     </div>

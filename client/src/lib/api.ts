@@ -62,5 +62,11 @@ export const api = {
 
   // Support data
   getUnidadesSaude: () => apiRequest("GET", "/api/unidades-saude"),
-  getSetores: () => apiRequest("GET", "/api/setores"),
+  async getSetores() {
+    return fetch('/api/setores');
+  },
+
+  async getHistoricoMovimentacao(fktombamento: number) {
+    return fetch(`/api/tombamentos/${fktombamento}/historico`);
+  }
 };

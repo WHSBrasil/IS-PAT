@@ -128,7 +128,7 @@ export class DatabaseStorage implements IStorage {
 
   // Produto methods
   async getProdutos(): Promise<Produto[]> {
-    const result = await query('SELECT * FROM sotech.est_produto WHERE ativo = true ORDER BY nome');
+    const result = await query('SELECT * FROM sotech.est_produto WHERE ativo = true ORDER BY descricao');
     return result.rows;
   }
 
@@ -140,7 +140,7 @@ export class DatabaseStorage implements IStorage {
   // Tombamento methods
   async getTombamentos(): Promise<Tombamento[]> {
     const result = await query(`
-      SELECT t.*, p.nome as produto_nome, p.descricao as produto_descricao
+      SELECT t.*, p.descricao as produto_nome, p.descricao as produto_descricao
       FROM sotech.pat_tombamento t
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
       WHERE t.ativo = true 
@@ -159,7 +159,7 @@ export class DatabaseStorage implements IStorage {
 
   async getTombamento(id: number): Promise<Tombamento | undefined> {
     const result = await query(`
-      SELECT t.*, p.nome as produto_nome, p.descricao as produto_descricao
+      SELECT t.*, p.descricao as produto_nome, p.descricao as produto_descricao
       FROM sotech.pat_tombamento t
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
       WHERE t.pktombamento = $1
@@ -232,9 +232,9 @@ export class DatabaseStorage implements IStorage {
     const result = await query(`
       SELECT a.*, 
              t.tombamento, t.serial,
-             p.nome as produto_nome,
-             u.nome as unidade_nome,
-             s.nome as setor_nome
+             p.descricao as produto_nome,
+             u.descricao as unidade_nome,
+             s.descricao as setor_nome
       FROM sotech.pat_alocacao a
       LEFT JOIN sotech.pat_tombamento t ON a.fktombamento = t.pktombamento
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
@@ -325,9 +325,9 @@ export class DatabaseStorage implements IStorage {
     const result = await query(`
       SELECT tr.*, 
              t.tombamento,
-             p.nome as produto_nome,
-             uo.nome as unidade_origem_nome,
-             ud.nome as unidade_destino_nome
+             p.descricao as produto_nome,
+             uo.descricao as unidade_origem_nome,
+             ud.descricao as unidade_destino_nome
       FROM sotech.pat_transferencia tr
       LEFT JOIN sotech.pat_tombamento t ON tr.fktombamento = t.pktombamento
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
@@ -432,8 +432,8 @@ export class DatabaseStorage implements IStorage {
         'alocacao' as tipo,
         a.dataalocacao as data,
         a.responsavel_unidade as responsavel,
-        u.nome as unidade,
-        s.nome as setor,
+        u.descricao as unidade,
+        s.descricao as setor,
         a.termo,
         a.ativo
       FROM sotech.pat_alocacao a
@@ -447,7 +447,7 @@ export class DatabaseStorage implements IStorage {
         'transferencia' as tipo,
         t.datatasnferencia as data,
         t.responsavel,
-        CONCAT(uo.nome, ' → ', ud.nome) as unidade,
+        CONCAT(uo.descricao, ' → ', ud.descricao) as unidade,
         CASE 
           WHEN t.fksetor_destino IS NOT NULL THEN t.fksetor_destino
           ELSE NULL 
@@ -470,7 +470,7 @@ export class DatabaseStorage implements IStorage {
     const result = await query(`
       SELECT m.*, 
              t.tombamento,
-             p.nome as produto_nome
+             p.descricao as produto_nome
       FROM sotech.pat_manutencao m
       LEFT JOIN sotech.pat_tombamento t ON m.fktombamento = t.pktombamento
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
@@ -549,12 +549,12 @@ export class DatabaseStorage implements IStorage {
 
   // Support data methods
   async getUnidadesSaude(): Promise<UnidadeSaude[]> {
-    const result = await query('SELECT * FROM sotech.cdg_unidadesaude WHERE ativo = true ORDER BY nome');
+    const result = await query('SELECT * FROM sotech.cdg_unidadesaude WHERE ativo = true ORDER BY descricao');
     return result.rows;
   }
 
   async getSetores(): Promise<Setor[]> {
-    const result = await query('SELECT * FROM sotech.cdg_setor WHERE ativo = true ORDER BY nome');
+    const result = await query('SELECT * FROM sotech.cdg_setor WHERE ativo = true ORDER BY descricao');
     return result.rows;
   }
 

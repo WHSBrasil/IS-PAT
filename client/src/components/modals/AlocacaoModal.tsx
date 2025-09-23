@@ -152,7 +152,7 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
                 <SelectContent>
                   {availableTombamentos.map((tombamento: any) => (
                     <SelectItem key={tombamento.pktombamento} value={tombamento.pktombamento.toString()}>
-                      {tombamento.tombamento} - {tombamento.produto?.nome || "Produto"}
+                      {tombamento.tombamento} - {tombamento.produto?.descricao || tombamento.produto?.nome || "Produto"}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -174,7 +174,7 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
                 <SelectContent>
                   {(Array.isArray(unidadesSaude) ? unidadesSaude : []).map((unidade: any) => (
                     <SelectItem key={unidade.pkunidadesaude} value={unidade.pkunidadesaude.toString()}>
-                      {unidade.nome}
+                      {unidade.descricao || unidade.nome}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -195,9 +195,9 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
                   <SelectValue placeholder="Selecione um setor (opcional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  {setores.map((setor: any) => (
+                  {(Array.isArray(setores) ? setores : []).map((setor: any) => (
                     <SelectItem key={setor.pksetor} value={setor.pksetor.toString()}>
-                      {setor.nome}
+                      {setor.descricao || setor.nome}
                     </SelectItem>
                   ))}
                 </SelectContent>

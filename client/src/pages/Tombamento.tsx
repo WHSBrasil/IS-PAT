@@ -22,7 +22,6 @@ export default function Tombamento() {
   // Form state
   const [formData, setFormData] = useState({
     fkproduto: "",
-    fkpedidoitem: "",
     tombamento: "",
     serial: "",
     responsavel: "",
@@ -144,11 +143,7 @@ export default function Tombamento() {
       return;
     }
 
-    // Validar seleção de entrada quando há múltiplas
-    if (produtoEntradas.length > 1 && !formData.fkpedidoitem) {
-      alert('Por favor, selecione a entrada da qual será feito o tombamento.');
-      return;
-    }
+    // Validation removed as we're no longer tracking specific entries
 
     try {
       const submitFormData = new FormData();

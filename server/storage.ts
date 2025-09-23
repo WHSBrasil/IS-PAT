@@ -34,7 +34,6 @@ interface InsertClassificacao {
 
 interface InsertTombamento {
   fkproduto: number;
-  fkpedidoitem?: number;
   tombamento: string;
   serial?: string;
   photos?: any[];
@@ -46,7 +45,6 @@ interface InsertTombamento {
 interface Tombamento {
   pktombamento: number;
   fkproduto: number;
-  fkpedidoitem?: number;
   tombamento: string;
   serial?: string;
   photos?: string;
@@ -243,12 +241,11 @@ export class DatabaseStorage implements IStorage {
   async createTombamento(tombamento: InsertTombamento): Promise<Tombamento> {
     const result = await query(`
       INSERT INTO sotech.pat_tombamento 
-      (fkproduto, fkpedidoitem, tombamento, serial, photos, responsavel, status, fkuser) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+      (fkproduto, tombamento, serial, photos, responsavel, status, fkuser) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7) 
       RETURNING *
     `, [
       tombamento.fkproduto,
-      tombamento.fkpedidoitem,
       tombamento.tombamento,
       tombamento.serial,
       tombamento.photos ? JSON.stringify(tombamento.photos) : null,
@@ -644,37 +641,12 @@ export class DatabaseStorage implements IStorage {
     console.log(`Searching for product entries with fkproduto: ${fkproduto}`);
     console.log(`Found ${result.rows.length} entries:`, result.rows);
 
-    // For each entry, calculate the tombamentos count separately
-    const entriesWithCount = [];
-    for (const row of result.rows) {
-      try {
-        const tombamentoCount = await query(`
-          SELECT COUNT(*) as count
-          FROM sotech.pat_tombamento t
-          WHERE t.fkpedidoitem = $1 AND t.ativo = true
-        `, [row.pkpedidoitem]);
-
-        const quantidade_tombada = parseInt(tombamentoCount.rows[0]?.count || 0);
-        const quantidade_disponivel = parseFloat(row.quantidadeentrada) - quantidade_tombada;
-
-        // Only include entries that still have available quantity
-        if (quantidade_disponivel > 0) {
-          entriesWithCount.push({
-            ...row,
-            quantidade_tombada,
-            quantidade_disponivel
-          });
-        }
-      } catch (error) {
-        console.error(`Error counting tombamentos for pkpedidoitem ${row.pkpedidoitem}:`, error);
-        // If there's an error, assume no tombamentos yet
-        entriesWithCount.push({
-          ...row,
-          quantidade_tombada: 0,
-          quantidade_disponivel: parseFloat(row.quantidadeentrada)
-        });
-      }
-    }
+    // For now, return all entries with full quantity available (since we can't track used quantities)
+    const entriesWithCount = result.rows.map(row => ({
+      ...row,
+      quantidade_tombada: 0,
+      quantidade_disponivel: parseFloat(row.quantidadeentrada)
+    }));
 
     console.log(`Entries with available quantity: ${entriesWithCount.length}`);
     return entriesWithCount;

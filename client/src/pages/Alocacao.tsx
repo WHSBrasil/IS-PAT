@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useAlocacoes } from "@/hooks/usePatrimonio";
+import { useAlocacoes, useDeleteAlocacao } from "@/hooks/usePatrimonio";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AlocacaoModal from "@/components/modals/AlocacaoModal";
-import { Plus, Search, Eye, ArrowRightLeft, Pencil } from "lucide-react";
+import { Plus, Search, Eye, ArrowRightLeft, Pencil, Trash2 } from "lucide-react";
 
 export default function Alocacao() {
   const [showModal, setShowModal] = useState(false);
@@ -14,6 +14,7 @@ export default function Alocacao() {
   const [unidadeFilter, setUnidadeFilter] = useState("all");
 
   const { data: alocacoes = [], isLoading } = useAlocacoes();
+  const deleteAlocacao = useDeleteAlocacao();
 
   const filteredAlocacoes = alocacoes.filter((item: any) => {
     const matchesSearch = 
@@ -38,6 +39,16 @@ export default function Alocacao() {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingItem(null);
+  };
+
+  const handleDelete = async (item: any) => {
+    if (window.confirm(`Tem certeza que deseja excluir a alocação do tombamento ${item.tombamento?.tombamento}?`)) {
+      try {
+        await deleteAlocacao.mutateAsync(item.pkalocacao);
+      } catch (error) {
+        console.error('Erro ao excluir alocação:', error);
+      }
+    }
   };
 
   // Calculate statistics
@@ -214,6 +225,16 @@ export default function Alocacao() {
                               data-testid={`button-edit-${item.pkalocacao}`}
                             >
                               <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(item)}
+                              className="text-destructive hover:text-destructive"
+                              title="Excluir"
+                              data-testid={`button-delete-${item.pkalocacao}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
                         </td>

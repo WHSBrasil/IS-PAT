@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useCreateAlocacao, useTombamentos, useUnidadesSaude, useSetores } from "@/hooks/usePatrimonio";
+import { useCreateAlocacao, useUpdateAlocacao, useTombamentos, useUnidadesSaude, useSetores } from "@/hooks/usePatrimonio";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,9 +31,12 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
   const { data: unidades = [] } = useUnidadesSaude();
   const { data: setores = [] } = useSetores();
   const createAlocacao = useCreateAlocacao();
+  const updateAlocacao = useUpdateAlocacao();
 
-  // Filter available tombamentos (only disponivel status)
-  const availableTombamentos = tombamentos.filter((t: any) => t.status === "disponivel");
+  // Filter available tombamentos (only disponivel status) + current tombamento if editing
+  const availableTombamentos = editingItem 
+    ? tombamentos.filter((t: any) => t.status === "disponivel" || t.pktombamento === editingItem.fktombamento)
+    : tombamentos.filter((t: any) => t.status === "disponivel");
 
   useEffect(() => {
     if (editingItem) {
@@ -105,7 +108,11 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
         submitFormData.append('photos', file);
       });
 
-      await createAlocacao.mutateAsync(submitFormData);
+      if (editingItem) {
+        await updateAlocacao.mutateAsync({ id: editingItem.pkalocacao, formData: submitFormData });
+      } else {
+        await createAlocacao.mutateAsync(submitFormData);
+      }
       onClose();
       
       // Clean up preview URLs
@@ -117,7 +124,7 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
     }
   };
 
-  const isLoading = createAlocacao.isPending;
+  const isLoading = createAlocacao.isPending || updateAlocacao.isPending;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -321,7 +328,7 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
               disabled={isLoading || !formData.fktombamento || !formData.fkunidadesaude || !formData.responsavel_unidade || !formData.dataalocacao}
               data-testid="button-save"
             >
-              {isLoading ? "Salvando..." : "Criar Alocação"}
+              {isLoading ? "Salvando..." : editingItem ? "Atualizar Alocação" : "Criar Alocação"}
             </Button>
           </div>
         </form>

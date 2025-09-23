@@ -226,6 +226,65 @@ export function useCreateAlocacao() {
   });
 }
 
+export function useUpdateAlocacao() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, formData }: { id: number, formData: FormData }) => {
+      const response = await api.updateAlocacao(id, formData);
+      if (!response.ok) {
+        throw new Error("Erro ao atualizar alocação");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/alocacoes"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tombamentos"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      toast({
+        title: "Sucesso",
+        description: "Alocação atualizada com sucesso",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar alocação",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useDeleteAlocacao() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const response = await api.deleteAlocacao(id);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/alocacoes"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/tombamentos"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      toast({
+        title: "Sucesso",
+        description: "Alocação excluída com sucesso",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao excluir alocação",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
 // Transferencias hooks
 export function useTransferencias() {
   return useQuery({

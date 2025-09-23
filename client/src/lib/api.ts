@@ -43,6 +43,14 @@ export const api = {
       credentials: "include",
     });
   },
+  updateAlocacao: (id: number, formData: FormData) => {
+    return fetch(`/api/alocacoes/${id}`, {
+      method: "PUT",
+      body: formData,
+      credentials: "include",
+    });
+  },
+  deleteAlocacao: (id: number) => apiRequest("DELETE", `/api/alocacoes/${id}`),
 
   // Transferencias
   getTransferencias: () => apiRequest("GET", "/api/transferencias"),

@@ -279,6 +279,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/alocacoes/:id", upload.array('photos'), async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updates = { ...req.body };
+      
+      // Handle uploaded photos
+      if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+        updates.photos = (req.files as Express.Multer.File[]).map(file => ({
+          originalName: file.originalname,
+          filename: file.filename,
+          mimetype: file.mimetype,
+          size: file.size
+        }));
+      }
+
+      // Convert string fields to proper types
+      if (updates.fktombamento) updates.fktombamento = parseInt(updates.fktombamento);
+      if (updates.fkunidadesaude) updates.fkunidadesaude = parseInt(updates.fkunidadesaude);
+      if (updates.fksetor) updates.fksetor = parseInt(updates.fksetor);
+      if (updates.dataalocacao) updates.dataalocacao = new Date(updates.dataalocacao);
+
+      const updatedAlocacao = await storage.updateAlocacao(id, updates);
+      res.json(updatedAlocacao);
+    } catch (error) {
+      console.error('Error updating alocacao:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  app.delete("/api/alocacoes/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteAlocacao(id);
+      
+      if (success) {
+        res.json({ message: 'Alocação excluída com sucesso' });
+      } else {
+        res.status(404).json({ error: 'Alocação não encontrada' });
+      }
+    } catch (error) {
+      console.error('Error deleting alocacao:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
   // Transferencia routes
   app.get("/api/transferencias", async (req, res) => {
     try {

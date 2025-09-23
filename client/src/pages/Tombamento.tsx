@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { useTombamentos, useCreateTombamento, useUpdateTombamento, useProdutos, useProdutoEntradas } from "@/hooks/usePatrimonio";
 import { Button } from "@/components/ui/button";
@@ -105,7 +104,7 @@ export default function Tombamento() {
     });
 
     setSelectedFiles(prev => [...prev, ...validFiles]);
-    
+
     validFiles.forEach(file => {
       const url = URL.createObjectURL(file);
       setPreviewUrls(prev => [...prev, url]);
@@ -123,14 +122,14 @@ export default function Tombamento() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.fkproduto || !formData.tombamento) {
       return;
     }
 
     try {
       const submitFormData = new FormData();
-      
+
       Object.entries(formData).forEach(([key, value]) => {
         if (value) {
           submitFormData.append(key, value);
@@ -146,7 +145,7 @@ export default function Tombamento() {
       } else {
         await createTombamento.mutateAsync(submitFormData);
       }
-      
+
       handleBackToList();
     } catch (error) {
       console.error("Error saving tombamento:", error);
@@ -206,13 +205,15 @@ export default function Tombamento() {
                       Produto *
                     </Label>
                     <Select
-                      value={formData.fkproduto}
-                      onValueChange={(value) => {
-                        setFormData({ ...formData, fkproduto: value });
-                        setSelectedProdutoId(parseInt(value));
-                      }}
-                      required
-                    >
+                        value={formData.fkproduto}
+                        onValueChange={(value) => {
+                          console.log('Product selected:', value);
+                          setFormData({ ...formData, fkproduto: value });
+                          setSelectedProdutoId(parseInt(value));
+                          console.log('Selected product ID set to:', parseInt(value));
+                        }}
+                        required
+                      >
                       <SelectTrigger data-testid="select-produto">
                         <SelectValue placeholder="Selecione um produto" />
                       </SelectTrigger>
@@ -295,7 +296,7 @@ export default function Tombamento() {
                       data-testid="input-tombamento"
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="serial" className="text-sm font-medium text-foreground">
                       Número Serial
@@ -325,7 +326,7 @@ export default function Tombamento() {
                       data-testid="input-responsavel"
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="status" className="text-sm font-medium text-foreground">
                       Status

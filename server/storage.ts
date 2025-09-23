@@ -576,18 +576,17 @@ export class DatabaseStorage implements IStorage {
   async getProdutoEntradas(fkproduto: number): Promise<any[]> {
     const result = await query(`
       SELECT 
-        p.codigo,
-        p.data,
-        p.hora,
-        tp.tipo as tipo_pedido,
+        p.pkpedido,
+        p.datapedido,
+        tp.pktipopedido as tipo_pedido,
         pi.quantidadeentrada
       FROM sotech.est_pedido p
       LEFT JOIN sotech.est_pedidoitem pi ON p.pkpedido = pi.fkpedido
       LEFT JOIN sotech.est_tipopedido tp ON p.fktipopedido = tp.pktipopedido
-      WHERE pi.fkproduto = $1 
+      WHERE pi.fkproduto = $1
         AND tp.tipo = 'E' 
         AND p.estado = 'F'
-      ORDER BY p.data DESC, p.hora DESC
+      ORDER BY 2 DESC
     `, [fkproduto]);
 
     return result.rows;

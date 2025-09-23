@@ -251,21 +251,19 @@ export default function Tombamento() {
                           <Table>
                             <TableHeader>
                               <TableRow>
-                                <TableHead className="text-xs">Código</TableHead>
-                                <TableHead className="text-xs">Data</TableHead>
-                                <TableHead className="text-xs">Hora</TableHead>
-                                <TableHead className="text-xs">Tipo</TableHead>
+                                <TableHead className="text-xs">Código Pedido</TableHead>
+                                <TableHead className="text-xs">Data Pedido</TableHead>
+                                <TableHead className="text-xs">Tipo Pedido</TableHead>
                                 <TableHead className="text-xs">Quantidade</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
                               {produtoEntradas.map((entrada: any, index: number) => (
                                 <TableRow key={index}>
-                                  <TableCell className="text-xs">{entrada.codigo}</TableCell>
+                                  <TableCell className="text-xs">{entrada.pkpedido}</TableCell>
                                   <TableCell className="text-xs">
-                                    {entrada.data ? new Date(entrada.data).toLocaleDateString('pt-BR') : '-'}
+                                    {entrada.datapedido ? new Date(entrada.datapedido).toLocaleDateString('pt-BR') : '-'}
                                   </TableCell>
-                                  <TableCell className="text-xs">{entrada.hora || '-'}</TableCell>
                                   <TableCell className="text-xs">{entrada.tipo_pedido}</TableCell>
                                   <TableCell className="text-xs">{entrada.quantidadeentrada}</TableCell>
                                 </TableRow>

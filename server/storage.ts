@@ -128,7 +128,7 @@ export class DatabaseStorage implements IStorage {
 
   // Produto methods
   async getProdutos(): Promise<Produto[]> {
-    const result = await query('SELECT * FROM sotech.est_produto WHERE ativo = true ORDER BY produto');
+    const result = await query('SELECT pkproduto, produto as nome, produto, descricao, ativo FROM sotech.est_produto WHERE ativo = true ORDER BY produto');
     return result.rows;
   }
 

@@ -140,7 +140,7 @@ export default function TombamentoModal({ isOpen, onClose, editingItem }: Tombam
                 <SelectContent>
                   {produtos.map((produto: any) => (
                     <SelectItem key={produto.pkproduto} value={produto.pkproduto.toString()}>
-                      {produto.nome}
+                      {produto.produto || produto.nome || produto.descricao}
                     </SelectItem>
                   ))}
                 </SelectContent>

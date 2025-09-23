@@ -143,8 +143,6 @@ export default function Tombamento() {
       return;
     }
 
-    // Validation removed as we're no longer tracking specific entries
-
     try {
       const submitFormData = new FormData();
 
@@ -160,11 +158,23 @@ export default function Tombamento() {
 
       if (editingItem) {
         await updateTombamento.mutateAsync({ id: editingItem.pktombamento, formData: submitFormData });
+        handleBackToList();
       } else {
         await createTombamento.mutateAsync(submitFormData);
+        
+        // Clear form but stay on screen for new entries
+        setFormData({
+          fkproduto: formData.fkproduto, // Keep selected product
+          fkpedidoitem: formData.fkpedidoitem, // Keep selected entry
+          tombamento: "",
+          serial: "",
+          responsavel: "",
+          status: "disponivel",
+        });
+        setSelectedFiles([]);
+        previewUrls.forEach(url => URL.revokeObjectURL(url));
+        setPreviewUrls([]);
       }
-
-      handleBackToList();
     } catch (error) {
       console.error("Error saving tombamento:", error);
     }

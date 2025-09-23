@@ -168,7 +168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/tombamentos", upload.array('photos'), async (req, res) => {
     try {
-      const { fkproduto, tombamento, serial, responsavel, status = 'disponivel' } = req.body;
+      const { fkproduto, fkpedidoitem, tombamento, serial, responsavel, status = 'disponivel' } = req.body;
       
       if (!fkproduto || !tombamento) {
         return res.status(400).json({ error: 'Produto e número de tombamento são obrigatórios' });
@@ -187,6 +187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const newTombamento = await storage.createTombamento({
         fkproduto: parseInt(fkproduto),
+        fkpedidoitem: fkpedidoitem ? parseInt(fkpedidoitem) : undefined,
         tombamento,
         serial,
         photos,

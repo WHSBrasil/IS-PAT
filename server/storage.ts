@@ -34,6 +34,7 @@ interface InsertClassificacao {
 
 interface InsertTombamento {
   fkproduto: number;
+  fkpedidoitem?: number;
   tombamento: string;
   serial?: string;
   photos?: any[];
@@ -241,11 +242,12 @@ export class DatabaseStorage implements IStorage {
   async createTombamento(tombamento: InsertTombamento): Promise<Tombamento> {
     const result = await query(`
       INSERT INTO sotech.pat_tombamento 
-      (fkproduto, tombamento, serial, photos, responsavel, status, fkuser) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7) 
+      (fkproduto, fkpedidoitem, tombamento, serial, photos, responsavel, status, fkuser) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
       RETURNING *
     `, [
       tombamento.fkproduto,
+      tombamento.fkpedidoitem || null,
       tombamento.tombamento,
       tombamento.serial,
       tombamento.photos ? JSON.stringify(tombamento.photos) : null,
@@ -620,7 +622,6 @@ export class DatabaseStorage implements IStorage {
 
   // Product entries methods
   async getProdutoEntradas(fkproduto: number): Promise<any[]> {
-    // First, let's get the basic product entries without the tombamento count
     const result = await query(`
       SELECT 
         p.pkpedido,
@@ -628,7 +629,12 @@ export class DatabaseStorage implements IStorage {
         tp.pktipopedido as tipo_pedido,
         tp.tipo as tipo_texto,
         pi.pkpedidoitem,
-        pi.quantidadeentrada
+        pi.quantidadeentrada,
+        (
+          SELECT COUNT(*)
+          FROM sotech.pat_tombamento t
+          WHERE t.fkpedidoitem = pi.pkpedidoitem AND t.ativo = true
+        ) as quantidade_tombada
       FROM sotech.est_pedido p
       INNER JOIN sotech.est_pedidoitem pi ON p.pkpedido = pi.fkpedido
       INNER JOIN sotech.est_tipopedido tp ON p.fktipopedido = tp.pktipopedido
@@ -641,15 +647,11 @@ export class DatabaseStorage implements IStorage {
     console.log(`Searching for product entries with fkproduto: ${fkproduto}`);
     console.log(`Found ${result.rows.length} entries:`, result.rows);
 
-    // For now, return all entries with full quantity available (since we can't track used quantities)
-    const entriesWithCount = result.rows.map(row => ({
+    // Calculate quantidade_disponivel for each entry
+    return result.rows.map(row => ({
       ...row,
-      quantidade_tombada: 0,
-      quantidade_disponivel: parseFloat(row.quantidadeentrada)
+      quantidade_disponivel: parseFloat(row.quantidadeentrada) - (row.quantidade_tombada || 0)
     }));
-
-    console.log(`Entries with available quantity: ${entriesWithCount.length}`);
-    return entriesWithCount;
   }
 
   // Dashboard methods

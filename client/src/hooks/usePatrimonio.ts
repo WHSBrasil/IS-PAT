@@ -151,6 +151,8 @@ export function useCreateTombamento() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tombamentos"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      // Invalidate all produto-entradas queries to update available quantities
+      queryClient.invalidateQueries({ queryKey: ['produto-entradas'] });
       toast({
         title: "Sucesso",
         description: "Tombamento criado com sucesso",

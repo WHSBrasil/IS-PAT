@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useCreateTombamento, useProdutos } from "@/hooks/usePatrimonio";
+import { useCreateTombamento, useUpdateTombamento, useProdutos } from "@/hooks/usePatrimonio";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,7 @@ export default function TombamentoModal({ isOpen, onClose, editingItem }: Tombam
 
   const { data: produtos = [] } = useProdutos();
   const createTombamento = useCreateTombamento();
+  const updateTombamento = useUpdateTombamento();
 
   useEffect(() => {
     if (editingItem) {
@@ -95,7 +96,11 @@ export default function TombamentoModal({ isOpen, onClose, editingItem }: Tombam
         submitFormData.append('photos', file);
       });
 
-      await createTombamento.mutateAsync(submitFormData);
+      if (editingItem) {
+        await updateTombamento.mutateAsync({ id: editingItem.pktombamento, formData: submitFormData });
+      } else {
+        await createTombamento.mutateAsync(submitFormData);
+      }
       onClose();
       
       // Clean up preview URLs
@@ -107,7 +112,7 @@ export default function TombamentoModal({ isOpen, onClose, editingItem }: Tombam
     }
   };
 
-  const isLoading = createTombamento.isPending;
+  const isLoading = createTombamento.isPending || updateTombamento.isPending;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -271,7 +276,7 @@ export default function TombamentoModal({ isOpen, onClose, editingItem }: Tombam
               disabled={isLoading || !formData.fkproduto || !formData.tombamento}
               data-testid="button-save"
             >
-              {isLoading ? "Salvando..." : "Criar Tombamento"}
+              {isLoading ? "Salvando..." : editingItem ? "Atualizar Tombamento" : "Criar Tombamento"}
             </Button>
           </div>
         </form>

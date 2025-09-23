@@ -154,6 +154,36 @@ export function useCreateTombamento() {
   });
 }
 
+export function useUpdateTombamento() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, formData }: { id: number, formData: FormData }) => {
+      const response = await api.updateTombamento(id, formData);
+      if (!response.ok) {
+        throw new Error("Erro ao atualizar tombamento");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tombamentos"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      toast({
+        title: "Sucesso",
+        description: "Tombamento atualizado com sucesso",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar tombamento",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
 // Alocacoes hooks
 export function useAlocacoes() {
   return useQuery({

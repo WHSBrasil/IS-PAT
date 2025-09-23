@@ -623,6 +623,7 @@ export class DatabaseStorage implements IStorage {
 
   // Product entries methods
   async getProdutoEntradas(fkproduto: number): Promise<any[]> {
+    // First, let's get the basic product entries without the tombamento count
     const result = await query(`
       SELECT 
         p.pkpedido,
@@ -630,34 +631,53 @@ export class DatabaseStorage implements IStorage {
         tp.pktipopedido as tipo_pedido,
         tp.tipo as tipo_texto,
         pi.pkpedidoitem,
-        pi.quantidadeentrada,
-        (
-          SELECT COUNT(*)
-          FROM sotech.pat_tombamento t
-          WHERE t.fkpedidoitem = pi.pkpedidoitem AND t.ativo = true
-        ) as quantidade_tombada
+        pi.quantidadeentrada
       FROM sotech.est_pedido p
       INNER JOIN sotech.est_pedidoitem pi ON p.pkpedido = pi.fkpedido
       INNER JOIN sotech.est_tipopedido tp ON p.fktipopedido = tp.pktipopedido
       WHERE pi.fkproduto = $1
         AND tp.tipo = 'E' 
         AND p.estado = 'F'
-        AND pi.quantidadeentrada > (
-          SELECT COUNT(*)
-          FROM sotech.pat_tombamento t
-          WHERE t.fkpedidoitem = pi.pkpedidoitem AND t.ativo = true
-        )
       ORDER BY p.datapedido DESC
     `, [fkproduto]);
 
     console.log(`Searching for product entries with fkproduto: ${fkproduto}`);
     console.log(`Found ${result.rows.length} entries:`, result.rows);
 
-    // Calculate quantidade_disponivel for each entry
-    return result.rows.map(row => ({
-      ...row,
-      quantidade_disponivel: parseFloat(row.quantidadeentrada) - (row.quantidade_tombada || 0)
-    }));
+    // For each entry, calculate the tombamentos count separately
+    const entriesWithCount = [];
+    for (const row of result.rows) {
+      try {
+        const tombamentoCount = await query(`
+          SELECT COUNT(*) as count
+          FROM sotech.pat_tombamento t
+          WHERE t.fkpedidoitem = $1 AND t.ativo = true
+        `, [row.pkpedidoitem]);
+
+        const quantidade_tombada = parseInt(tombamentoCount.rows[0]?.count || 0);
+        const quantidade_disponivel = parseFloat(row.quantidadeentrada) - quantidade_tombada;
+
+        // Only include entries that still have available quantity
+        if (quantidade_disponivel > 0) {
+          entriesWithCount.push({
+            ...row,
+            quantidade_tombada,
+            quantidade_disponivel
+          });
+        }
+      } catch (error) {
+        console.error(`Error counting tombamentos for pkpedidoitem ${row.pkpedidoitem}:`, error);
+        // If there's an error, assume no tombamentos yet
+        entriesWithCount.push({
+          ...row,
+          quantidade_tombada: 0,
+          quantidade_disponivel: parseFloat(row.quantidadeentrada)
+        });
+      }
+    }
+
+    console.log(`Entries with available quantity: ${entriesWithCount.length}`);
+    return entriesWithCount;
   }
 
   // Dashboard methods

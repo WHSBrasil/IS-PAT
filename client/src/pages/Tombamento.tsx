@@ -17,10 +17,12 @@ export default function Tombamento() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchProduto, setSearchProduto] = useState("");
   const [selectedProdutoId, setSelectedProdutoId] = useState<number | null>(null);
+  const [selectedPedidoitem, setSelectedPedidoitem] = useState<number | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
     fkproduto: "",
+    fkpedidoitem: "",
     tombamento: "",
     serial: "",
     responsavel: "",
@@ -62,11 +64,14 @@ export default function Tombamento() {
     setEditingItem(null);
     setFormData({
       fkproduto: "",
+      fkpedidoitem: "",
       tombamento: "",
       serial: "",
       responsavel: "",
       status: "disponivel",
     });
+    setSelectedProdutoId(null);
+    setSelectedPedidoitem(null);
     setSelectedFiles([]);
     setPreviewUrls([]);
     setViewMode("form");
@@ -76,11 +81,14 @@ export default function Tombamento() {
     setEditingItem(item);
     setFormData({
       fkproduto: item.fkproduto?.toString() || "",
+      fkpedidoitem: item.fkpedidoitem?.toString() || "",
       tombamento: item.tombamento || "",
       serial: item.serial || "",
       responsavel: item.responsavel || "",
       status: item.status || "disponivel",
     });
+    setSelectedProdutoId(item.fkproduto || null);
+    setSelectedPedidoitem(item.fkpedidoitem || null);
     setSelectedFiles([]);
     setPreviewUrls([]);
     setViewMode("form");
@@ -91,11 +99,14 @@ export default function Tombamento() {
     setEditingItem(null);
     setFormData({
       fkproduto: "",
+      fkpedidoitem: "",
       tombamento: "",
       serial: "",
       responsavel: "",
       status: "disponivel",
     });
+    setSelectedProdutoId(null);
+    setSelectedPedidoitem(null);
     setSelectedFiles([]);
     previewUrls.forEach(url => URL.revokeObjectURL(url));
     setPreviewUrls([]);
@@ -130,6 +141,12 @@ export default function Tombamento() {
     e.preventDefault();
 
     if (!formData.fkproduto || !formData.tombamento) {
+      return;
+    }
+
+    // Validar seleção de entrada quando há múltiplas
+    if (produtoEntradas.length > 1 && !formData.fkpedidoitem) {
+      alert('Por favor, selecione a entrada da qual será feito o tombamento.');
       return;
     }
 
@@ -214,8 +231,9 @@ export default function Tombamento() {
                         value={formData.fkproduto}
                         onValueChange={(value) => {
                           console.log('Product selected:', value);
-                          setFormData({ ...formData, fkproduto: value });
+                          setFormData({ ...formData, fkproduto: value, fkpedidoitem: "" });
                           setSelectedProdutoId(parseInt(value));
+                          setSelectedPedidoitem(null);
                           console.log('Selected product ID set to:', parseInt(value));
                         }}
                         required
@@ -258,31 +276,71 @@ export default function Tombamento() {
                           <Table>
                             <TableHeader>
                               <TableRow>
+                                {produtoEntradas.length > 1 && (
+                                  <TableHead className="text-xs w-12">Selecionar</TableHead>
+                                )}
                                 <TableHead className="text-xs">Código Pedido</TableHead>
                                 <TableHead className="text-xs">Data Pedido</TableHead>
-                                <TableHead className="text-xs">Tipo Pedido</TableHead>
-                                <TableHead className="text-xs">Quantidade</TableHead>
+                                <TableHead className="text-xs">Qtd Entrada</TableHead>
+                                <TableHead className="text-xs">Qtd Tombada</TableHead>
+                                <TableHead className="text-xs">Qtd Disponível</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
                               {produtoEntradas.map((entrada: any, index: number) => (
-                                <TableRow key={index}>
+                                <TableRow 
+                                  key={index}
+                                  className={`${
+                                    produtoEntradas.length === 1 || selectedPedidoitem === entrada.pkpedidoitem 
+                                      ? 'bg-accent/20' 
+                                      : 'cursor-pointer hover:bg-muted/50'
+                                  }`}
+                                  onClick={() => {
+                                    if (produtoEntradas.length > 1) {
+                                      setSelectedPedidoitem(entrada.pkpedidoitem);
+                                      setFormData({ ...formData, fkpedidoitem: entrada.pkpedidoitem.toString() });
+                                    }
+                                  }}
+                                >
+                                  {produtoEntradas.length > 1 && (
+                                    <TableCell className="text-xs">
+                                      <input
+                                        type="radio"
+                                        name="pedidoitem"
+                                        checked={selectedPedidoitem === entrada.pkpedidoitem}
+                                        onChange={() => {
+                                          setSelectedPedidoitem(entrada.pkpedidoitem);
+                                          setFormData({ ...formData, fkpedidoitem: entrada.pkpedidoitem.toString() });
+                                        }}
+                                        className="h-3 w-3"
+                                      />
+                                    </TableCell>
+                                  )}
                                   <TableCell className="text-xs">{entrada.pkpedido}</TableCell>
                                   <TableCell className="text-xs">
                                     {entrada.datapedido ? new Date(entrada.datapedido).toLocaleDateString('pt-BR') : '-'}
                                   </TableCell>
-                                  <TableCell className="text-xs">{entrada.tipo_pedido}</TableCell>
-                                  <TableCell className="text-xs">{entrada.quantidadeentrada}</TableCell>
+                                  <TableCell className="text-xs">{parseFloat(entrada.quantidadeentrada).toFixed(0)}</TableCell>
+                                  <TableCell className="text-xs">{entrada.quantidade_tombada || 0}</TableCell>
+                                  <TableCell className="text-xs font-medium text-primary">
+                                    {entrada.quantidade_disponivel || parseFloat(entrada.quantidadeentrada)}
+                                  </TableCell>
                                 </TableRow>
                               ))}
                             </TableBody>
                           </Table>
                         ) : (
                           <div className="p-4 text-center text-sm text-muted-foreground">
-                            Não foram encontradas entradas para o produto selecionado
+                            Não foram encontradas entradas disponíveis para o produto selecionado
                           </div>
                         )}
                       </div>
+                      
+                      {produtoEntradas.length > 1 && (
+                        <div className="mt-2 text-xs text-muted-foreground">
+                          * Selecione a entrada da qual será feito o tombamento
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

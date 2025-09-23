@@ -18,6 +18,51 @@ import {
   DashboardStats
 } from "@shared/schema";
 
+// Types
+interface Classificacao {
+  pkclassificacao: number;
+  classificacao: string;
+  ativo: boolean;
+  fkuser: number;
+}
+
+interface InsertClassificacao {
+  classificacao: string;
+  ativo?: boolean;
+  fkuser: number;
+}
+
+interface InsertTombamento {
+  fkproduto: number;
+  fkpedidoitem?: number;
+  tombamento: string;
+  serial?: string;
+  photos?: any[];
+  responsavel?: string;
+  status?: string;
+  fkuser?: number;
+}
+
+interface Tombamento {
+  pktombamento: number;
+  fkproduto: number;
+  fkpedidoitem?: number;
+  tombamento: string;
+  serial?: string;
+  photos?: string;
+  responsavel?: string;
+  status: string;
+  ativo: boolean;
+  fkuser: number;
+  created_at: Date;
+  version: number;
+  produto?: {
+    pkproduto: number;
+    nome?: string;
+    descricao?: string;
+  };
+}
+
 export interface IStorage {
   // User methods
   getUser(id: string): Promise<User | undefined>;
@@ -66,6 +111,9 @@ export interface IStorage {
   // Support data methods
   getUnidadesSaude(): Promise<UnidadeSaude[]>;
   getSetores(): Promise<Setor[]>;
+
+  // Product entries methods
+  getProdutoEntradas(fkproduto: number): Promise<any[]>;
 
   // Dashboard methods
   getDashboardStats(): Promise<DashboardStats>;
@@ -195,11 +243,12 @@ export class DatabaseStorage implements IStorage {
   async createTombamento(tombamento: InsertTombamento): Promise<Tombamento> {
     const result = await query(`
       INSERT INTO sotech.pat_tombamento 
-      (fkproduto, tombamento, serial, photos, responsavel, status, fkuser) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7) 
+      (fkproduto, fkpedidoitem, tombamento, serial, photos, responsavel, status, fkuser) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
       RETURNING *
     `, [
       tombamento.fkproduto,
+      tombamento.fkpedidoitem,
       tombamento.tombamento,
       tombamento.serial,
       tombamento.photos ? JSON.stringify(tombamento.photos) : null,
@@ -580,13 +629,23 @@ export class DatabaseStorage implements IStorage {
         p.datapedido,
         tp.pktipopedido as tipo_pedido,
         tp.tipo as tipo_texto,
-        pi.quantidadeentrada
+        pi.quantidadeentrada,
+        (
+          SELECT COUNT(*)
+          FROM sotech.pat_tombamento t
+          WHERE t.fkpedidoitem = pi.pkpedidoitem AND t.ativo = true
+        ) as tombados
       FROM sotech.est_pedido p
       INNER JOIN sotech.est_pedidoitem pi ON p.pkpedido = pi.fkpedido
       INNER JOIN sotech.est_tipopedido tp ON p.fktipopedido = tp.pktipopedido
       WHERE pi.fkproduto = $1
         AND tp.tipo = 'E' 
         AND p.estado = 'F'
+        AND pi.quantidadeentrada > (
+          SELECT COUNT(*)
+          FROM sotech.pat_tombamento t
+          WHERE t.fkpedidoitem = pi.pkpedidoitem AND t.ativo = true
+        )
       ORDER BY p.datapedido DESC
     `, [fkproduto]);
 

@@ -168,10 +168,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/tombamentos", upload.array('photos'), async (req, res) => {
     try {
-      const { fkproduto, tombamento, serial, responsavel, status = 'disponivel' } = req.body;
+      const { fkproduto, fkpedidoitem, tombamento, serial, responsavel, status = 'disponivel' } = req.body;
       
       if (!fkproduto || !tombamento) {
         return res.status(400).json({ error: 'Produto e número de tombamento são obrigatórios' });
+      }
+
+      let selectedPedidoitem = fkpedidoitem ? parseInt(fkpedidoitem) : null;
+
+      // Se não foi especificado um pedidoitem, verificar se há apenas uma entrada disponível
+      if (!selectedPedidoitem) {
+        const entradas = await storage.getProdutoEntradas(parseInt(fkproduto));
+        
+        if (entradas.length === 0) {
+          return res.status(400).json({ error: 'Não há entradas disponíveis para este produto' });
+        }
+        
+        if (entradas.length === 1) {
+          selectedPedidoitem = entradas[0].pkpedidoitem;
+        } else {
+          return res.status(400).json({ 
+            error: 'Há múltiplas entradas disponíveis. É necessário especificar qual entrada será utilizada.',
+            entradas 
+          });
+        }
       }
 
       // Handle uploaded photos
@@ -187,6 +207,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const newTombamento = await storage.createTombamento({
         fkproduto: parseInt(fkproduto),
+        fkpedidoitem: selectedPedidoitem,
         tombamento,
         serial,
         photos,

@@ -579,15 +579,19 @@ export class DatabaseStorage implements IStorage {
         p.pkpedido,
         p.datapedido,
         tp.pktipopedido as tipo_pedido,
+        tp.tipo as tipo_texto,
         pi.quantidadeentrada
       FROM sotech.est_pedido p
-      LEFT JOIN sotech.est_pedidoitem pi ON p.pkpedido = pi.fkpedido
-      LEFT JOIN sotech.est_tipopedido tp ON p.fktipopedido = tp.pktipopedido
+      INNER JOIN sotech.est_pedidoitem pi ON p.pkpedido = pi.fkpedido
+      INNER JOIN sotech.est_tipopedido tp ON p.fktipopedido = tp.pktipopedido
       WHERE pi.fkproduto = $1
         AND tp.tipo = 'E' 
         AND p.estado = 'F'
-      ORDER BY 2 DESC
+      ORDER BY p.datapedido DESC
     `, [fkproduto]);
+
+    console.log(`Searching for product entries with fkproduto: ${fkproduto}`);
+    console.log(`Found ${result.rows.length} entries:`, result.rows);
 
     return result.rows;
   }

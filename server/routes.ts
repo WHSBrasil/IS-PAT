@@ -127,7 +127,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/produtos/:id/entradas", async (req, res) => {
     try {
       const fkproduto = parseInt(req.params.id);
+      console.log(`API call - Getting entries for product ID: ${fkproduto}`);
+      
       const entradas = await storage.getProdutoEntradas(fkproduto);
+      console.log(`API response - Found ${entradas.length} entries for product ${fkproduto}`);
+      
       res.json(entradas);
     } catch (error) {
       console.error('Error fetching product entries:', error);

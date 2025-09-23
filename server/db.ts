@@ -7,7 +7,9 @@ const connectionConfig = {
   user: 'sotech',
   password: 'SthNox@2022',
   database: 'dbapr',
-  ssl: true,
+  ssl: {
+    rejectUnauthorized: false
+  },
   schema: 'sotech'
 };
 

@@ -28,13 +28,13 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   const { data: tombamentos = [] } = useTombamentos();
-  const { data: unidades = [] } = useUnidadesSaude();
+  const { data: unidadesSaude = [] } = useUnidadesSaude();
   const { data: setores = [] } = useSetores();
   const createAlocacao = useCreateAlocacao();
   const updateAlocacao = useUpdateAlocacao();
 
   // Filter available tombamentos (only disponivel status) + current tombamento if editing
-  const availableTombamentos = editingItem 
+  const availableTombamentos = editingItem
     ? tombamentos.filter((t: any) => t.status === "disponivel" || t.pktombamento === editingItem.fktombamento)
     : tombamentos.filter((t: any) => t.status === "disponivel");
 
@@ -72,7 +72,7 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
     });
 
     setSelectedFiles(prev => [...prev, ...validFiles]);
-    
+
     validFiles.forEach(file => {
       const url = URL.createObjectURL(file);
       setPreviewUrls(prev => [...prev, url]);
@@ -90,14 +90,14 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.fktombamento || !formData.fkunidadesaude || !formData.responsavel_unidade || !formData.dataalocacao) {
       return;
     }
 
     try {
       const submitFormData = new FormData();
-      
+
       Object.entries(formData).forEach(([key, value]) => {
         if (value) {
           submitFormData.append(key, value);
@@ -114,7 +114,7 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
         await createAlocacao.mutateAsync(submitFormData);
       }
       onClose();
-      
+
       // Clean up preview URLs
       previewUrls.forEach(url => URL.revokeObjectURL(url));
       setPreviewUrls([]);
@@ -134,7 +134,7 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
             {editingItem ? "Editar Alocação" : "Nova Alocação"}
           </DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -158,7 +158,7 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label htmlFor="fkunidadesaude" className="text-sm font-medium text-foreground">
                 Unidade de Saúde *
@@ -172,7 +172,7 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
                   <SelectValue placeholder="Selecione uma unidade" />
                 </SelectTrigger>
                 <SelectContent>
-                  {unidades.map((unidade: any) => (
+                  {(Array.isArray(unidadesSaude) ? unidadesSaude : []).map((unidade: any) => (
                     <SelectItem key={unidade.pkunidadesaude} value={unidade.pkunidadesaude.toString()}>
                       {unidade.nome}
                     </SelectItem>

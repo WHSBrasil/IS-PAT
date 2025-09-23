@@ -292,46 +292,56 @@ export default function Tombamento() {
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {produtoEntradas.map((entrada: any, index: number) => (
-                                <TableRow 
-                                  key={index}
-                                  className={`${
-                                    produtoEntradas.length === 1 || selectedPedidoitem === entrada.pkpedidoitem 
-                                      ? 'bg-accent/20' 
-                                      : 'cursor-pointer hover:bg-muted/50'
-                                  }`}
-                                  onClick={() => {
-                                    if (produtoEntradas.length > 1) {
-                                      setSelectedPedidoitem(entrada.pkpedidoitem);
-                                      setFormData({ ...formData, fkpedidoitem: entrada.pkpedidoitem.toString() });
-                                    }
-                                  }}
-                                >
-                                  {produtoEntradas.length > 1 && (
+                              {produtoEntradas.map((entrada: any, index: number) => {
+                                // Auto-select if there's only one entry
+                                if (produtoEntradas.length === 1 && !selectedPedidoitem) {
+                                  setTimeout(() => {
+                                    setSelectedPedidoitem(entrada.pkpedidoitem);
+                                    setFormData(prev => ({ ...prev, fkpedidoitem: entrada.pkpedidoitem.toString() }));
+                                  }, 0);
+                                }
+                                
+                                return (
+                                  <TableRow 
+                                    key={index}
+                                    className={`${
+                                      produtoEntradas.length === 1 || selectedPedidoitem === entrada.pkpedidoitem 
+                                        ? 'bg-accent/20' 
+                                        : 'cursor-pointer hover:bg-muted/50'
+                                    }`}
+                                    onClick={() => {
+                                      if (produtoEntradas.length > 1) {
+                                        setSelectedPedidoitem(entrada.pkpedidoitem);
+                                        setFormData({ ...formData, fkpedidoitem: entrada.pkpedidoitem.toString() });
+                                      }
+                                    }}
+                                  >
+                                    {produtoEntradas.length > 1 && (
+                                      <TableCell className="text-xs">
+                                        <input
+                                          type="radio"
+                                          name="pedidoitem"
+                                          checked={selectedPedidoitem === entrada.pkpedidoitem}
+                                          onChange={() => {
+                                            setSelectedPedidoitem(entrada.pkpedidoitem);
+                                            setFormData({ ...formData, fkpedidoitem: entrada.pkpedidoitem.toString() });
+                                          }}
+                                          className="h-3 w-3"
+                                        />
+                                      </TableCell>
+                                    )}
+                                    <TableCell className="text-xs">{entrada.pkpedido}</TableCell>
                                     <TableCell className="text-xs">
-                                      <input
-                                        type="radio"
-                                        name="pedidoitem"
-                                        checked={selectedPedidoitem === entrada.pkpedidoitem}
-                                        onChange={() => {
-                                          setSelectedPedidoitem(entrada.pkpedidoitem);
-                                          setFormData({ ...formData, fkpedidoitem: entrada.pkpedidoitem.toString() });
-                                        }}
-                                        className="h-3 w-3"
-                                      />
+                                      {entrada.datapedido ? new Date(entrada.datapedido).toLocaleDateString('pt-BR') : '-'}
                                     </TableCell>
-                                  )}
-                                  <TableCell className="text-xs">{entrada.pkpedido}</TableCell>
-                                  <TableCell className="text-xs">
-                                    {entrada.datapedido ? new Date(entrada.datapedido).toLocaleDateString('pt-BR') : '-'}
-                                  </TableCell>
-                                  <TableCell className="text-xs">{parseFloat(entrada.quantidadeentrada).toFixed(0)}</TableCell>
-                                  <TableCell className="text-xs">{entrada.quantidade_tombada || 0}</TableCell>
-                                  <TableCell className="text-xs font-medium text-primary">
-                                    {entrada.quantidade_disponivel || parseFloat(entrada.quantidadeentrada)}
-                                  </TableCell>
-                                </TableRow>
-                              ))}
+                                    <TableCell className="text-xs">{parseFloat(entrada.quantidadeentrada).toFixed(0)}</TableCell>
+                                    <TableCell className="text-xs">{entrada.quantidade_tombada || 0}</TableCell>
+                                    <TableCell className="text-xs font-medium text-primary">
+                                      {entrada.quantidade_disponivel}
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })}
                             </TableBody>
                           </Table>
                         ) : (

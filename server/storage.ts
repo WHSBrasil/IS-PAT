@@ -647,11 +647,13 @@ export class DatabaseStorage implements IStorage {
     console.log(`Searching for product entries with fkproduto: ${fkproduto}`);
     console.log(`Found ${result.rows.length} entries:`, result.rows);
 
-    // Calculate quantidade_disponivel for each entry
-    return result.rows.map(row => ({
-      ...row,
-      quantidade_disponivel: parseFloat(row.quantidadeentrada) - (row.quantidade_tombada || 0)
-    }));
+    // Filter out entries where all items are already tombados and calculate quantidade_disponivel
+    return result.rows
+      .map(row => ({
+        ...row,
+        quantidade_disponivel: parseFloat(row.quantidadeentrada) - (row.quantidade_tombada || 0)
+      }))
+      .filter(row => row.quantidade_disponivel > 0);
   }
 
   // Dashboard methods

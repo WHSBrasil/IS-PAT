@@ -113,7 +113,7 @@ export class DatabaseStorage implements IStorage {
   async updateClassificacao(id: number, classificacao: Partial<InsertClassificacao>): Promise<Classificacao> {
     const setClause = Object.keys(classificacao).map((key, index) => `${key} = $${index + 2}`).join(', ');
     const values = Object.values(classificacao);
-    
+
     const result = await query(
       `UPDATE sotech.pat_classificacao SET ${setClause}, version = version + 1 WHERE pkclassificacao = $1 RETURNING *`,
       [id, ...values]
@@ -146,7 +146,7 @@ export class DatabaseStorage implements IStorage {
       WHERE t.ativo = true 
       ORDER BY t.created_at DESC
     `);
-    
+
     return result.rows.map(row => ({
       ...row,
       produto: row.produto_nome ? {
@@ -164,9 +164,9 @@ export class DatabaseStorage implements IStorage {
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
       WHERE t.pktombamento = $1
     `, [id]);
-    
+
     if (!result.rows[0]) return undefined;
-    
+
     const row = result.rows[0];
     return {
       ...row,
@@ -218,7 +218,7 @@ export class DatabaseStorage implements IStorage {
       WHERE pktombamento = $1 
       RETURNING *
     `, [id, ...values]);
-    
+
     return result.rows[0];
   }
 
@@ -232,9 +232,9 @@ export class DatabaseStorage implements IStorage {
     const result = await query(`
       SELECT a.*, 
              t.tombamento, t.serial,
-             p.descricao as produto_nome,
-             u.descricao as unidade_nome,
-             s.descricao as setor_nome
+             p.produto as produto_nome,
+             u.unidadesaude as unidade_nome,
+             s.setor as setor_nome
       FROM sotech.pat_alocacao a
       LEFT JOIN sotech.pat_tombamento t ON a.fktombamento = t.pktombamento
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
@@ -243,7 +243,7 @@ export class DatabaseStorage implements IStorage {
       WHERE a.ativo = true 
       ORDER BY a.created_at DESC
     `);
-    
+
     return result.rows.map(row => ({
       ...row,
       tombamento: row.tombamento ? {
@@ -304,7 +304,7 @@ export class DatabaseStorage implements IStorage {
       WHERE pkalocacao = $1 
       RETURNING *
     `, [id, ...values]);
-    
+
     return result.rows[0];
   }
 
@@ -325,9 +325,9 @@ export class DatabaseStorage implements IStorage {
     const result = await query(`
       SELECT tr.*, 
              t.tombamento,
-             p.descricao as produto_nome,
-             uo.descricao as unidade_origem_nome,
-             ud.descricao as unidade_destino_nome
+             p.produto as produto_nome,
+             uo.unidadesaude as unidade_origem_nome,
+             ud.unidadesaude as unidade_destino_nome
       FROM sotech.pat_transferencia tr
       LEFT JOIN sotech.pat_tombamento t ON tr.fktombamento = t.pktombamento
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
@@ -336,7 +336,7 @@ export class DatabaseStorage implements IStorage {
       WHERE tr.ativo = true 
       ORDER BY tr.created_at DESC
     `);
-    
+
     return result.rows.map(row => ({
       ...row,
       tombamento: row.tombamento ? {
@@ -417,7 +417,7 @@ export class DatabaseStorage implements IStorage {
       WHERE pktransferencia = $1 
       RETURNING *
     `, [id, ...values]);
-    
+
     return result.rows[0];
   }
 
@@ -432,22 +432,22 @@ export class DatabaseStorage implements IStorage {
         'alocacao' as tipo,
         a.dataalocacao as data,
         a.responsavel_unidade as responsavel,
-        u.descricao as unidade,
-        s.descricao as setor,
+        u.unidadesaude as unidade,
+        s.setor as setor,
         a.termo,
         a.ativo
       FROM sotech.pat_alocacao a
       LEFT JOIN sotech.cdg_unidadesaude u ON a.fkunidadesaude = u.pkunidadesaude
       LEFT JOIN sotech.cdg_setor s ON a.fksetor = s.pksetor
       WHERE a.fktombamento = $1
-      
+
       UNION ALL
-      
+
       SELECT 
         'transferencia' as tipo,
         t.datatasnferencia as data,
         t.responsavel,
-        CONCAT(uo.descricao, ' → ', ud.descricao) as unidade,
+        CONCAT(uo.unidadesaude, ' → ', ud.unidadesaude) as unidade,
         CASE 
           WHEN t.fksetor_destino IS NOT NULL THEN t.fksetor_destino
           ELSE NULL 
@@ -458,10 +458,10 @@ export class DatabaseStorage implements IStorage {
       LEFT JOIN sotech.cdg_unidadesaude uo ON t.fkunidadesaude_origem = uo.pkunidadesaude
       LEFT JOIN sotech.cdg_unidadesaude ud ON t.fkunidadesaude_destino = ud.pkunidadesaude
       WHERE t.fktombamento = $1
-      
+
       ORDER BY data DESC
     `, [fktombamento]);
-    
+
     return result.rows;
   }
 
@@ -477,7 +477,7 @@ export class DatabaseStorage implements IStorage {
       WHERE m.ativo = true 
       ORDER BY m.created_at DESC
     `);
-    
+
     return result.rows.map(row => ({
       ...row,
       tombamento: row.tombamento ? {
@@ -531,7 +531,7 @@ export class DatabaseStorage implements IStorage {
       WHERE pkmanutencao = $1 
       RETURNING *
     `, [id, ...values]);
-    
+
     return result.rows[0];
   }
 
@@ -549,12 +549,12 @@ export class DatabaseStorage implements IStorage {
 
   // Support data methods
   async getUnidadesSaude(): Promise<UnidadeSaude[]> {
-    const result = await query('SELECT * FROM sotech.cdg_unidadesaude WHERE ativo = true ORDER BY descricao');
+    const result = await query('SELECT * FROM sotech.cdg_unidadesaude WHERE ativo = true ORDER BY unidadesaude');
     return result.rows;
   }
 
   async getSetores(): Promise<Setor[]> {
-    const result = await query('SELECT * FROM sotech.cdg_setor WHERE ativo = true ORDER BY descricao');
+    const result = await query('SELECT * FROM sotech.cdg_setor WHERE ativo = true ORDER BY setor');
     return result.rows;
   }
 

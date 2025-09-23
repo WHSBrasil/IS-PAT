@@ -174,7 +174,7 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
                 <SelectContent>
                   {(Array.isArray(unidadesSaude) ? unidadesSaude : []).map((unidade: any) => (
                     <SelectItem key={unidade.pkunidadesaude} value={unidade.pkunidadesaude.toString()}>
-                      {unidade.descricao || unidade.nome}
+                      {unidade.unidadesaude || unidade.nome || unidade.descricao}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -197,7 +197,7 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
                 <SelectContent>
                   {(Array.isArray(setores) ? setores : []).map((setor: any) => (
                     <SelectItem key={setor.pksetor} value={setor.pksetor.toString()}>
-                      {setor.descricao || setor.nome}
+                      {setor.setor || setor.nome || setor.descricao}
                     </SelectItem>
                   ))}
                 </SelectContent>

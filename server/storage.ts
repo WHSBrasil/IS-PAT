@@ -128,10 +128,12 @@ export class DatabaseStorage implements IStorage {
 
   // Produto methods
   async getProdutos(): Promise<Produto[]> {
-    const result = await query('SELECT pkproduto, produto, ativo FROM sotech.est_produto WHERE ativo = true ORDER BY produto');
+    const result = await query('SELECT pkproduto, produto, ativo FROM sotech.ext_produto WHERE ativo = true ORDER BY produto');
     return result.rows.map(row => ({
-      ...row,
-      nome: row.produto // Add nome property for compatibility
+      pkproduto: row.pkproduto,
+      produto: row.produto,
+      nome: row.produto, // Add nome property for compatibility
+      ativo: row.ativo
     }));
   }
 

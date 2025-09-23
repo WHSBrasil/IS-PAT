@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useAlocacoes, useDeleteAlocacao } from "@/hooks/usePatrimonio";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,17 +21,22 @@ export default function Alocacao() {
   const { data: alocacoes = [], isLoading } = useAlocacoes();
   const deleteAlocacao = useDeleteAlocacao();
 
-  const filteredAlocacoes = alocacoes.filter((item: any) => {
-    const matchesSearch = 
-      (item.tombamento?.tombamento && item.tombamento.tombamento.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (item.tombamento?.produto?.nome && item.tombamento.produto.nome.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (item.unidadesaude?.nome && item.unidadesaude.nome.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesUnidade = unidadeFilter === "all" || 
-      (item.unidadesaude?.nome && item.unidadesaude.nome === unidadeFilter);
-    
-    return matchesSearch && matchesUnidade;
-  });
+  const filteredAlocacoes = useMemo(() => {
+    if (!searchTerm.trim() && unidadeFilter === "all") {
+      return alocacoes;
+    }
+    return alocacoes.filter((item: any) => {
+      const matchesSearch =
+        (item.tombamento?.tombamento && item.tombamento.tombamento.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.tombamento?.produto?.nome && item.tombamento.produto.nome.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.unidadesaude?.nome && item.unidadesaude.nome.toLowerCase().includes(searchTerm.toLowerCase()));
+
+      const matchesUnidade = unidadeFilter === "all" ||
+        (item.unidadesaude?.nome && item.unidadesaude.nome === unidadeFilter);
+
+      return matchesSearch && matchesUnidade;
+    });
+  }, [alocacoes, searchTerm, unidadeFilter]);
 
   // Get unique unidades for filter
   const unidades = Array.from(new Set(alocacoes.map((item: any) => item.unidadesaude?.nome).filter(Boolean))) as string[];
@@ -130,13 +135,13 @@ export default function Alocacao() {
                     <p className="text-xs text-muted-foreground">itens alocados</p>
                   </div>
                   <div className={`p-2 rounded-lg ${
-                    index === 0 ? 'bg-primary/10' : 
-                    index === 1 ? 'bg-accent/10' : 
+                    index === 0 ? 'bg-primary/10' :
+                    index === 1 ? 'bg-accent/10' :
                     'bg-secondary/10'
                   }`}>
                     <svg className={`w-6 h-6 ${
-                      index === 0 ? 'text-primary' : 
-                      index === 1 ? 'text-accent' : 
+                      index === 0 ? 'text-primary' :
+                      index === 1 ? 'text-accent' :
                       'text-secondary'
                     }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>

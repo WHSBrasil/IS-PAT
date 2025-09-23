@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTombamentos } from "@/hooks/usePatrimonio";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,16 +16,15 @@ export default function Tombamento() {
 
   const { data: tombamentos = [], isLoading } = useTombamentos();
 
-  const filteredTombamentos = tombamentos.filter((item: any) => {
-    const matchesSearch = 
-      item.tombamento.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.serial && item.serial.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (item.produto?.nome && item.produto.nome.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesStatus = statusFilter === "all" || item.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
+  const filteredTombamentos = useMemo(() => {
+    if (!searchTerm.trim()) return tombamentos;
+    return tombamentos.filter((item: any) =>
+      item.tombamento?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.serial?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.responsavel?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.produto?.nome?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [tombamentos, searchTerm]);
 
   const handleEdit = (item: any) => {
     setEditingItem(item);

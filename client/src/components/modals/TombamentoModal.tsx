@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useCreateTombamento, useUpdateTombamento, useProdutos } from "@/hooks/usePatrimonio";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, X, Image } from "lucide-react";
+import { SearchInput } from "@/components/ui/search-input";
+import { Upload, X } from "lucide-react";
 
 interface TombamentoModalProps {
   isOpen: boolean;
@@ -23,8 +24,17 @@ export default function TombamentoModal({ isOpen, onClose, editingItem }: Tombam
   });
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [searchProduto, setSearchProduto] = useState("");
 
   const { data: produtos = [] } = useProdutos();
+
+  // Filter products based on search
+  const filteredProdutos = useMemo(() => {
+    if (!searchProduto.trim()) return produtos;
+    return produtos.filter((produto: any) =>
+      produto.produto?.toLowerCase().includes(searchProduto.toLowerCase())
+    );
+  }, [produtos, searchProduto]);
   const createTombamento = useCreateTombamento();
   const updateTombamento = useUpdateTombamento();
 
@@ -129,22 +139,36 @@ export default function TombamentoModal({ isOpen, onClose, editingItem }: Tombam
               <Label htmlFor="fkproduto" className="text-sm font-medium text-foreground">
                 Produto *
               </Label>
-              <Select
-                value={formData.fkproduto}
-                onValueChange={(value) => setFormData({ ...formData, fkproduto: value })}
-                required
-              >
-                <SelectTrigger data-testid="select-produto">
-                  <SelectValue placeholder="Selecione um produto" />
-                </SelectTrigger>
-                <SelectContent>
-                  {produtos.map((produto: any) => (
-                    <SelectItem key={produto.pkproduto} value={produto.pkproduto.toString()}>
-                      {produto.produto || produto.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <SearchInput
+                  value={searchProduto}
+                  onChange={setSearchProduto}
+                  placeholder="Pesquisar produto..."
+                  data-testid="search-produto"
+                />
+                <Select
+                  value={formData.fkproduto}
+                  onValueChange={(value) => setFormData({ ...formData, fkproduto: value })}
+                  required
+                >
+                  <SelectTrigger data-testid="select-produto">
+                    <SelectValue placeholder="Selecione um produto" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[200px]">
+                    {filteredProdutos.length > 0 ? (
+                      filteredProdutos.map((produto: any) => (
+                        <SelectItem key={produto.pkproduto} value={produto.pkproduto.toString()}>
+                          {produto.produto}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <div className="p-2 text-sm text-muted-foreground">
+                        Nenhum produto encontrado
+                      </div>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             
             <div>

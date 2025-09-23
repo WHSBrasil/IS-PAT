@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Upload, X } from "lucide-react";
-import SearchInput from "@/components/SearchInput"; // Assuming SearchInput is available
+import { SearchInput } from "@/components/ui/search-input";
 
 interface AlocacaoModalProps {
   isOpen: boolean;

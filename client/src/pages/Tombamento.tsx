@@ -241,36 +241,42 @@ export default function Tombamento() {
                     </Select>
                   </div>
 
-                  {selectedProdutoId && produtoEntradas.length > 0 && (
+                  {selectedProdutoId && (
                     <div>
                       <Label className="text-sm font-medium text-foreground mb-2 block">
                         Entradas do Produto
                       </Label>
                       <div className="border rounded-lg max-h-64 overflow-y-auto">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="text-xs">Código</TableHead>
-                              <TableHead className="text-xs">Data</TableHead>
-                              <TableHead className="text-xs">Hora</TableHead>
-                              <TableHead className="text-xs">Tipo</TableHead>
-                              <TableHead className="text-xs">Quantidade</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {produtoEntradas.map((entrada: any, index: number) => (
-                              <TableRow key={index}>
-                                <TableCell className="text-xs">{entrada.codigo}</TableCell>
-                                <TableCell className="text-xs">
-                                  {entrada.data ? new Date(entrada.data).toLocaleDateString('pt-BR') : '-'}
-                                </TableCell>
-                                <TableCell className="text-xs">{entrada.hora || '-'}</TableCell>
-                                <TableCell className="text-xs">{entrada.tipo_pedido}</TableCell>
-                                <TableCell className="text-xs">{entrada.quantidadeentrada}</TableCell>
+                        {produtoEntradas.length > 0 ? (
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead className="text-xs">Código</TableHead>
+                                <TableHead className="text-xs">Data</TableHead>
+                                <TableHead className="text-xs">Hora</TableHead>
+                                <TableHead className="text-xs">Tipo</TableHead>
+                                <TableHead className="text-xs">Quantidade</TableHead>
                               </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
+                            </TableHeader>
+                            <TableBody>
+                              {produtoEntradas.map((entrada: any, index: number) => (
+                                <TableRow key={index}>
+                                  <TableCell className="text-xs">{entrada.codigo}</TableCell>
+                                  <TableCell className="text-xs">
+                                    {entrada.data ? new Date(entrada.data).toLocaleDateString('pt-BR') : '-'}
+                                  </TableCell>
+                                  <TableCell className="text-xs">{entrada.hora || '-'}</TableCell>
+                                  <TableCell className="text-xs">{entrada.tipo_pedido}</TableCell>
+                                  <TableCell className="text-xs">{entrada.quantidadeentrada}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        ) : (
+                          <div className="p-4 text-center text-sm text-muted-foreground">
+                            Não foram encontradas entradas para o produto selecionado
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -291,9 +297,7 @@ export default function Tombamento() {
                       data-testid="input-tombamento"
                     />
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  
                   <div>
                     <Label htmlFor="serial" className="text-sm font-medium text-foreground">
                       Número Serial
@@ -307,7 +311,9 @@ export default function Tombamento() {
                       data-testid="input-serial"
                     />
                   </div>
-                  
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="responsavel" className="text-sm font-medium text-foreground">
                       Responsável
@@ -321,9 +327,7 @@ export default function Tombamento() {
                       data-testid="input-responsavel"
                     />
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  
                   <div>
                     <Label htmlFor="status" className="text-sm font-medium text-foreground">
                       Status

@@ -124,6 +124,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/produtos/:id/entradas", async (req, res) => {
+    try {
+      const fkproduto = parseInt(req.params.id);
+      const entradas = await storage.getProdutoEntradas(fkproduto);
+      res.json(entradas);
+    } catch (error) {
+      console.error('Error fetching product entries:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
   // Tombamento routes
   app.get("/api/tombamentos", async (req, res) => {
     try {

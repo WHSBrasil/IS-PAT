@@ -1,6 +1,6 @@
 
 import { useState, useMemo } from "react";
-import { useTombamentos, useCreateTombamento, useUpdateTombamento, useProdutos } from "@/hooks/usePatrimonio";
+import { useTombamentos, useCreateTombamento, useUpdateTombamento, useProdutos, useProdutoEntradas } from "@/hooks/usePatrimonio";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { SearchInput } from "@/components/ui/search-input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Search, Eye, Pencil, Trash2, Image, ArrowLeft, Upload, X } from "lucide-react";
 
 export default function Tombamento() {
@@ -16,6 +17,7 @@ export default function Tombamento() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchProduto, setSearchProduto] = useState("");
+  const [selectedProdutoId, setSelectedProdutoId] = useState<number | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -30,6 +32,7 @@ export default function Tombamento() {
 
   const { data: tombamentos = [], isLoading: isLoadingTombamentos } = useTombamentos();
   const { data: produtos = [] } = useProdutos();
+  const { data: produtoEntradas = [] } = useProdutoEntradas(selectedProdutoId);
   const createTombamento = useCreateTombamento();
   const updateTombamento = useUpdateTombamento();
 
@@ -197,14 +200,17 @@ export default function Tombamento() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-4">
                   <div>
                     <Label htmlFor="fkproduto" className="text-sm font-medium text-foreground">
                       Produto *
                     </Label>
                     <Select
                       value={formData.fkproduto}
-                      onValueChange={(value) => setFormData({ ...formData, fkproduto: value })}
+                      onValueChange={(value) => {
+                        setFormData({ ...formData, fkproduto: value });
+                        setSelectedProdutoId(parseInt(value));
+                      }}
                       required
                     >
                       <SelectTrigger data-testid="select-produto">
@@ -234,7 +240,43 @@ export default function Tombamento() {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
+                  {selectedProdutoId && produtoEntradas.length > 0 && (
+                    <div>
+                      <Label className="text-sm font-medium text-foreground mb-2 block">
+                        Entradas do Produto
+                      </Label>
+                      <div className="border rounded-lg max-h-64 overflow-y-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="text-xs">Código</TableHead>
+                              <TableHead className="text-xs">Data</TableHead>
+                              <TableHead className="text-xs">Hora</TableHead>
+                              <TableHead className="text-xs">Tipo</TableHead>
+                              <TableHead className="text-xs">Quantidade</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {produtoEntradas.map((entrada: any, index: number) => (
+                              <TableRow key={index}>
+                                <TableCell className="text-xs">{entrada.codigo}</TableCell>
+                                <TableCell className="text-xs">
+                                  {entrada.data ? new Date(entrada.data).toLocaleDateString('pt-BR') : '-'}
+                                </TableCell>
+                                <TableCell className="text-xs">{entrada.hora || '-'}</TableCell>
+                                <TableCell className="text-xs">{entrada.tipo_pedido}</TableCell>
+                                <TableCell className="text-xs">{entrada.quantidadeentrada}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="tombamento" className="text-sm font-medium text-foreground">
                       Número de Tombamento *

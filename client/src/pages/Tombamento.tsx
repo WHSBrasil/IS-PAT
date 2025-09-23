@@ -31,7 +31,13 @@ export default function Tombamento() {
 
   const { data: tombamentos = [], isLoading: isLoadingTombamentos } = useTombamentos();
   const { data: produtos = [] } = useProdutos();
-  const { data: produtoEntradas = [] } = useProdutoEntradas(selectedProdutoId);
+  const { data: produtoEntradas = [], isLoading: isLoadingEntradas, error: errorEntradas } = useProdutoEntradas(selectedProdutoId);
+  
+  // Debug logs
+  console.log('Selected product ID:', selectedProdutoId);
+  console.log('Product entries data:', produtoEntradas);
+  console.log('Is loading entries:', isLoadingEntradas);
+  console.log('Entries error:', errorEntradas);
   const createTombamento = useCreateTombamento();
   const updateTombamento = useUpdateTombamento();
 

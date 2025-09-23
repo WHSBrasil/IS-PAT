@@ -14,6 +14,7 @@ export const api = {
 
   // Produtos
   getProdutos: () => apiRequest("GET", "/api/produtos"),
+  getProdutoEntradas: (fkproduto: number) => apiRequest("GET", `/api/produtos/${fkproduto}/entradas`),
 
   // Tombamentos
   getTombamentos: () => apiRequest("GET", "/api/tombamentos"),

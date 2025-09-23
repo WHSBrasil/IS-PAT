@@ -118,8 +118,8 @@ export const useProdutoEntradas = (fkproduto: number | null) => {
     queryKey: ['produto-entradas', fkproduto],
     queryFn: async () => {
       if (!fkproduto) return [];
-      const response = await api.get(`/produtos/${fkproduto}/entradas`);
-      return response.data;
+      const response = await api.getProdutoEntradas(fkproduto);
+      return response.json();
     },
     enabled: !!fkproduto,
   });

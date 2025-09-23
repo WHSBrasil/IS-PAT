@@ -1,12 +1,13 @@
+
 import { Pool } from 'pg';
 
 const connectionConfig = {
-  host: process.env.PGHOST || 'db.redeis.com.br',
-  port: parseInt(process.env.PGPORT || '5555'),
-  user: process.env.PGUSER || 'sotech',
-  password: process.env.PGPASSWORD || 'SthNox@2022',
-  database: process.env.PGDATABASE || 'dbapr',
-  ssl: true, // Required for external database
+  host: 'db.redeis.com.br',
+  port: 5555,
+  user: 'sotech',
+  password: 'SthNox@2022',
+  database: 'dbapr',
+  ssl: true,
   schema: 'sotech'
 };
 

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Upload, X } from "lucide-react";
+import SearchInput from "@/components/SearchInput"; // Assuming SearchInput is available
 
 interface AlocacaoModalProps {
   isOpen: boolean;
@@ -27,6 +28,10 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
+  const [searchTombamento, setSearchTombamento] = useState("");
+  const [searchUnidade, setSearchUnidade] = useState("");
+  const [searchSetor, setSearchSetor] = useState("");
+
   const { data: tombamentos = [] } = useTombamentos();
   const { data: unidadesSaude = [] } = useUnidadesSaude();
   const { data: setoresData } = useSetores();
@@ -38,6 +43,19 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
   const availableTombamentos = editingItem
     ? tombamentos.filter((t: any) => t.status === "disponivel" || t.pktombamento === editingItem.fktombamento)
     : tombamentos.filter((t: any) => t.status === "disponivel");
+
+  const filteredTombamentos = availableTombamentos.filter((t: any) =>
+    (t.tombamento?.toString().toLowerCase().includes(searchTombamento.toLowerCase()) ||
+     t.produto?.nome?.toLowerCase().includes(searchTombamento.toLowerCase()))
+  );
+
+  const filteredUnidades = (Array.isArray(unidadesSaude) ? unidadesSaude : []).filter((unidade: any) =>
+    unidade.unidadesaude?.toLowerCase().includes(searchUnidade.toLowerCase())
+  );
+
+  const filteredSetores = (Array.isArray(setores) ? setores : []).filter((setor: any) =>
+    setor.setor?.toLowerCase().includes(searchSetor.toLowerCase())
+  );
 
   useEffect(() => {
     if (editingItem) {
@@ -150,12 +168,27 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
                 <SelectTrigger data-testid="select-tombamento">
                   <SelectValue placeholder="Selecione um tombamento" />
                 </SelectTrigger>
-                <SelectContent>
-                  {availableTombamentos.map((tombamento: any) => (
-                    <SelectItem key={tombamento.pktombamento} value={tombamento.pktombamento.toString()}>
-                      {tombamento.tombamento} - {tombamento.produto?.nome || tombamento.produto?.descricao || "Produto"}
-                    </SelectItem>
-                  ))}
+                <SelectContent className="max-h-[200px]">
+                  <div className="sticky top-0 bg-background p-2 border-b">
+                    <SearchInput
+                      value={searchTombamento}
+                      onChange={setSearchTombamento}
+                      placeholder="Pesquisar tombamento..."
+                      data-testid="search-tombamento"
+                      className="h-8"
+                    />
+                  </div>
+                  {filteredTombamentos.length > 0 ? (
+                    filteredTombamentos.map((tombamento: any) => (
+                      <SelectItem key={tombamento.pktombamento} value={tombamento.pktombamento.toString()}>
+                        {tombamento.tombamento} - {tombamento.produto?.nome || "Produto não encontrado"}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="p-2 text-sm text-muted-foreground">
+                      {searchTombamento ? "Nenhum tombamento encontrado" : "Nenhum tombamento disponível"}
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -172,12 +205,27 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
                 <SelectTrigger data-testid="select-unidade">
                   <SelectValue placeholder="Selecione uma unidade" />
                 </SelectTrigger>
-                <SelectContent>
-                  {(Array.isArray(unidadesSaude) ? unidadesSaude : []).map((unidade: any) => (
-                    <SelectItem key={unidade.pkunidadesaude} value={unidade.pkunidadesaude.toString()}>
-                      {unidade.unidadesaude || unidade.nome || unidade.descricao}
-                    </SelectItem>
-                  ))}
+                <SelectContent className="max-h-[200px]">
+                  <div className="sticky top-0 bg-background p-2 border-b">
+                    <SearchInput
+                      value={searchUnidade}
+                      onChange={setSearchUnidade}
+                      placeholder="Pesquisar unidade..."
+                      data-testid="search-unidade"
+                      className="h-8"
+                    />
+                  </div>
+                  {filteredUnidades.length > 0 ? (
+                    filteredUnidades.map((unidade: any) => (
+                      <SelectItem key={unidade.pkunidadesaude} value={unidade.pkunidadesaude.toString()}>
+                        {unidade.unidadesaude}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="p-2 text-sm text-muted-foreground">
+                      {searchUnidade ? "Nenhuma unidade encontrada" : "Carregando unidades..."}
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -193,14 +241,29 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
                 onValueChange={(value) => setFormData({ ...formData, fksetor: value })}
               >
                 <SelectTrigger data-testid="select-setor">
-                  <SelectValue placeholder="Selecione um setor (opcional)" />
+                  <SelectValue placeholder="Selecione um setor" />
                 </SelectTrigger>
-                <SelectContent>
-                  {(Array.isArray(setores) ? setores : []).map((setor: any) => (
-                    <SelectItem key={setor.pksetor} value={setor.pksetor.toString()}>
-                      {setor.setor || setor.nome || setor.descricao}
-                    </SelectItem>
-                  ))}
+                <SelectContent className="max-h-[200px]">
+                  <div className="sticky top-0 bg-background p-2 border-b">
+                    <SearchInput
+                      value={searchSetor}
+                      onChange={setSearchSetor}
+                      placeholder="Pesquisar setor..."
+                      data-testid="search-setor"
+                      className="h-8"
+                    />
+                  </div>
+                  {filteredSetores.length > 0 ? (
+                    filteredSetores.map((setor: any) => (
+                      <SelectItem key={setor.pksetor} value={setor.pksetor.toString()}>
+                        {setor.setor}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="p-2 text-sm text-muted-foreground">
+                      {searchSetor ? "Nenhum setor encontrado" : "Carregando setores..."}
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
             </div>

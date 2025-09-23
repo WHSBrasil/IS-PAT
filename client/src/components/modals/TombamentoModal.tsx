@@ -139,36 +139,37 @@ export default function TombamentoModal({ isOpen, onClose, editingItem }: Tombam
               <Label htmlFor="fkproduto" className="text-sm font-medium text-foreground">
                 Produto *
               </Label>
-              <div className="space-y-2">
-                <SearchInput
-                  value={searchProduto}
-                  onChange={setSearchProduto}
-                  placeholder="Pesquisar produto..."
-                  data-testid="search-produto"
-                />
-                <Select
-                  value={formData.fkproduto}
-                  onValueChange={(value) => setFormData({ ...formData, fkproduto: value })}
-                  required
-                >
-                  <SelectTrigger data-testid="select-produto">
-                    <SelectValue placeholder="Selecione um produto" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[200px]">
-                    {filteredProdutos.length > 0 ? (
-                      filteredProdutos.map((produto: any) => (
-                        <SelectItem key={produto.pkproduto} value={produto.pkproduto.toString()}>
-                          {produto.produto}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <div className="p-2 text-sm text-muted-foreground">
-                        Nenhum produto encontrado
-                      </div>
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
+              <Select
+                value={formData.fkproduto}
+                onValueChange={(value) => setFormData({ ...formData, fkproduto: value })}
+                required
+              >
+                <SelectTrigger data-testid="select-produto">
+                  <SelectValue placeholder="Selecione um produto" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[200px]">
+                  <div className="sticky top-0 bg-background p-2 border-b">
+                    <SearchInput
+                      value={searchProduto}
+                      onChange={setSearchProduto}
+                      placeholder="Pesquisar produto..."
+                      data-testid="search-produto"
+                      className="h-8"
+                    />
+                  </div>
+                  {filteredProdutos.length > 0 ? (
+                    filteredProdutos.map((produto: any) => (
+                      <SelectItem key={produto.pkproduto} value={produto.pkproduto.toString()}>
+                        {produto.produto}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="p-2 text-sm text-muted-foreground">
+                      {searchProduto ? "Nenhum produto encontrado" : "Carregando produtos..."}
+                    </div>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
             
             <div>

@@ -28,7 +28,7 @@ export default function Tombamento() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
-  const { data: tombamentos = [], isLoading } = useTombamentos();
+  const { data: tombamentos = [], isLoading: isLoadingTombamentos } = useTombamentos();
   const { data: produtos = [] } = useProdutos();
   const createTombamento = useCreateTombamento();
   const updateTombamento = useUpdateTombamento();
@@ -376,7 +376,7 @@ export default function Tombamento() {
     );
   }
 
-  if (isLoading) {
+  if (isLoadingTombamentos) {
     return (
       <div className="p-6">
         <div className="space-y-6">

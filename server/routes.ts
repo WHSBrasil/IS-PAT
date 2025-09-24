@@ -4,6 +4,19 @@ import { storage } from "./storage";
 import multer from "multer";
 import path from "path";
 
+/**
+ * API Routes with menu parameter support
+ * 
+ * All frontend routes support the 'menu' query parameter:
+ * - menu=false: Hides the sidebar and header for embedded/modal display
+ * - menu=true or omitted: Shows full interface with sidebar and header
+ * 
+ * Examples:
+ * - /?menu=false (Dashboard without menu)
+ * - /tombamento?menu=false (Tombamento page without menu)
+ * - /classificacoes?menu=false (Classifications page without menu)
+ */
+
 // Configure multer for file uploads
 const upload = multer({
   dest: 'uploads/',

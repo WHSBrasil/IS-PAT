@@ -604,53 +604,43 @@ export default function Alocacao() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Tombamento</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Produto</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Unidade</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Setor</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Responsável</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Data Alocação</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Ações</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-card divide-y divide-border">
-                  {filteredAlocacoes.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="px-6 py-4 text-center text-muted-foreground">
-                        {searchTerm || unidadeFilter !== "all" ? "Nenhuma alocação encontrada" : "Nenhuma alocação cadastrada"}
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredAlocacoes.map((item: any) => (
-                      <tr key={item.pkalocacao} data-testid={`alocacao-row-${item.pkalocacao}`}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-foreground">
+            {filteredAlocacoes.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {searchTerm || unidadeFilter !== "all" ? "Nenhuma alocação encontrada" : "Nenhuma alocação cadastrada"}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredAlocacoes.map((item: any) => (
+                  <Card key={item.pkalocacao} data-testid={`alocacao-row-${item.pkalocacao}`} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        {/* First line: Tombamento and Unit */}
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm font-semibold text-foreground">
                             {item.tombamento?.tombamento || "-"}
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-xs text-muted-foreground">
+                            {new Date(item.dataalocacao).toLocaleDateString('pt-BR')}
+                          </div>
+                        </div>
+                        
+                        {/* Second line: Product and Unit info */}
+                        <div className="space-y-1">
                           <div className="text-sm font-medium text-foreground">
                             {item.tombamento?.produto?.nome || "Produto não encontrado"}
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                          {item.unidadesaude?.nome || "-"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                          {item.setor?.nome || "-"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                          {item.responsavel_unidade || "-"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                          {new Date(item.dataalocacao).toLocaleDateString('pt-BR')}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>{item.unidadesaude?.nome || "Unidade não informada"}</span>
+                            <span>{item.setor?.nome || "Setor não informado"}</span>
+                          </div>
+                        </div>
+                        
+                        {/* Responsible and actions */}
+                        <div className="flex items-center justify-between pt-2 border-t border-border">
+                          <div className="text-xs text-muted-foreground">
+                            {item.responsavel_unidade || "Sem responsável"}
+                          </div>
+                          <div className="flex space-x-1">
                             <Button
                               variant="ghost"
                               size="sm"
@@ -699,13 +689,13 @@ export default function Alocacao() {
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

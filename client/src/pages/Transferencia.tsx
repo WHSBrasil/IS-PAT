@@ -152,57 +152,43 @@ export default function Transferencia() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Data</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Tombamento</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Produto</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Origem</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Destino</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Responsável</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Ações</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-card divide-y divide-border">
-                  {filteredTransferencias.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="px-6 py-4 text-center text-muted-foreground">
-                        {searchTerm || periodFilter !== "30" ? "Nenhuma transferência encontrada" : "Nenhuma transferência cadastrada"}
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredTransferencias.map((item: any) => (
-                      <tr key={item.pktransferencia} data-testid={`transferencia-row-${item.pktransferencia}`}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                          {new Date(item.datatasnferencia).toLocaleDateString('pt-BR')}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-foreground">
+            {filteredTransferencias.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {searchTerm || periodFilter !== "30" ? "Nenhuma transferência encontrada" : "Nenhuma transferência cadastrada"}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredTransferencias.map((item: any) => (
+                  <Card key={item.pktransferencia} data-testid={`transferencia-row-${item.pktransferencia}`} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        {/* First line: Tombamento and date */}
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm font-semibold text-foreground">
                             {item.tombamento?.tombamento || "-"}
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-xs text-muted-foreground">
+                            {new Date(item.datatasnferencia).toLocaleDateString('pt-BR')}
+                          </div>
+                        </div>
+                        
+                        {/* Second line: Product and responsible */}
+                        <div className="space-y-1">
                           <div className="text-sm font-medium text-foreground">
                             {item.tombamento?.produto?.nome || "Produto não encontrado"}
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-foreground">
-                            {item.unidade_origem?.nome || "Não informado"}
+                          <div className="text-xs text-muted-foreground">
+                            Responsável: {item.responsavel || "Não informado"}
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-foreground">
-                            {item.unidade_destino?.nome || "Não informado"}
+                        </div>
+                        
+                        {/* Transfer info and actions */}
+                        <div className="space-y-2 pt-2 border-t border-border">
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>De: {item.unidade_origem?.nome || "Não informado"}</span>
+                            <span>Para: {item.unidade_destino?.nome || "Não informado"}</span>
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                          {item.responsavel || "-"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
+                          <div className="flex justify-end space-x-1">
                             <Button
                               variant="ghost"
                               size="sm"
@@ -220,13 +206,13 @@ export default function Transferencia() {
                               <Printer className="w-4 h-4" />
                             </Button>
                           </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

@@ -600,63 +600,39 @@ export default function Tombamento() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Tombamento</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Bem</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Nº Serial</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Responsável</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Fotos</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Ações</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-card divide-y divide-border">
-                  {filteredTombamentos.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="px-6 py-4 text-center text-muted-foreground">
-                        {searchTerm || statusFilter !== "all" ? "Nenhum tombamento encontrado" : "Nenhum tombamento cadastrado"}
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredTombamentos.map((item: any) => (
-                      <tr key={item.pktombamento} data-testid={`tombamento-row-${item.pktombamento}`}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-foreground">{item.tombamento}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+            {filteredTombamentos.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {searchTerm || statusFilter !== "all" ? "Nenhum tombamento encontrado" : "Nenhum tombamento cadastrado"}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredTombamentos.map((item: any) => (
+                  <Card key={item.pktombamento} data-testid={`tombamento-row-${item.pktombamento}`} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        {/* First line: Tombamento number and status */}
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm font-semibold text-foreground">{item.tombamento}</div>
+                          {getStatusBadge(item.status)}
+                        </div>
+                        
+                        {/* Second line: Product name and serial */}
+                        <div className="space-y-1">
                           <div className="text-sm font-medium text-foreground">
                             {item.produto?.nome || "Bem não encontrado"}
                           </div>
-                          {item.produto?.descricao && (
-                            <div className="text-sm text-muted-foreground">{item.produto.descricao}</div>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                          {item.serial || "-"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {getStatusBadge(item.status)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                          {item.responsavel || "-"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center space-x-1">
-                            <span className="text-sm text-muted-foreground">
-                              {item.photos ? JSON.parse(item.photos).length : 0} fotos
-                            </span>
-                            {item.photos && (
-                              <Button variant="ghost" size="sm" title="Ver fotos">
-                                <Image className="w-4 h-4" />
-                              </Button>
-                            )}
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>Serial: {item.serial || "Não informado"}</span>
+                            <span>{item.photos ? JSON.parse(item.photos).length : 0} fotos</span>
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
+                        </div>
+                        
+                        {/* Responsible and actions */}
+                        <div className="flex items-center justify-between pt-2 border-t border-border">
+                          <div className="text-xs text-muted-foreground">
+                            {item.responsavel || "Sem responsável"}
+                          </div>
+                          <div className="flex space-x-1">
                             <Button variant="ghost" size="sm" title="Ver detalhes" data-testid={`button-view-${item.pktombamento}`}>
                               <Eye className="w-4 h-4" />
                             </Button>
@@ -679,13 +655,13 @@ export default function Tombamento() {
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

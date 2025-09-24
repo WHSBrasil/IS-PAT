@@ -224,68 +224,56 @@ export default function Classificacoes() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Classificação</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Criado em</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Ações</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-card divide-y divide-border">
-                  {filteredClassificacoes.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="px-6 py-4 text-center text-muted-foreground">
-                        {searchTerm ? "Nenhuma classificação encontrada" : "Nenhuma classificação cadastrada"}
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredClassificacoes.map((item: any) => (
-                      <tr key={item.pkclassificacao} data-testid={`classification-row-${item.pkclassificacao}`}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                          {item.pkclassificacao}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-foreground">{item.classificacao}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+            {filteredClassificacoes.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {searchTerm ? "Nenhuma classificação encontrada" : "Nenhuma classificação cadastrada"}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredClassificacoes.map((item: any) => (
+                  <Card key={item.pkclassificacao} data-testid={`classification-row-${item.pkclassificacao}`} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        {/* First line: Classification name and status */}
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm font-semibold text-foreground">{item.classificacao}</div>
                           <Badge variant={item.ativo ? "default" : "secondary"}>
                             {item.ativo ? "Ativo" : "Inativo"}
                           </Badge>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                          {new Date(item.created_at).toLocaleDateString('pt-BR')}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEdit(item)}
-                              data-testid={`button-edit-${item.pkclassificacao}`}
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDelete(item.pkclassificacao)}
-                              className="text-destructive hover:text-destructive"
-                              data-testid={`button-delete-${item.pkclassificacao}`}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                        </div>
+                        
+                        {/* Second line: ID and creation date */}
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span>ID: {item.pkclassificacao}</span>
+                          <span>{new Date(item.created_at).toLocaleDateString('pt-BR')}</span>
+                        </div>
+                        
+                        {/* Actions */}
+                        <div className="flex justify-end space-x-2 pt-2 border-t border-border">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEdit(item)}
+                            data-testid={`button-edit-${item.pkclassificacao}`}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(item.pkclassificacao)}
+                            className="text-destructive hover:text-destructive"
+                            data-testid={`button-delete-${item.pkclassificacao}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
 
             <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
               <div className="text-sm text-muted-foreground">

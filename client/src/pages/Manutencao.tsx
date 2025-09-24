@@ -270,55 +270,41 @@ export default function Manutencao() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Tombamento</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Produto</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Data Retirada</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Motivo</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Previsão Retorno</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Ações</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-card divide-y divide-border">
-                  {filteredManutencoes.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="px-6 py-4 text-center text-muted-foreground">
-                        {searchTerm || motivoFilter !== "all" ? "Nenhuma manutenção encontrada" : "Nenhuma manutenção cadastrada"}
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredManutencoes.map((item: any) => (
-                      <tr key={item.pkmanutencao} data-testid={`manutencao-row-${item.pkmanutencao}`}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-foreground">
+            {filteredManutencoes.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                {searchTerm || motivoFilter !== "all" ? "Nenhuma manutenção encontrada" : "Nenhuma manutenção cadastrada"}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredManutencoes.map((item: any) => (
+                  <Card key={item.pkmanutencao} data-testid={`manutencao-row-${item.pkmanutencao}`} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        {/* First line: Tombamento and status */}
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm font-semibold text-foreground">
                             {item.tombamento?.tombamento || "-"}
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                          {getStatusBadge(item)}
+                        </div>
+                        
+                        {/* Second line: Product and motivo */}
+                        <div className="space-y-1">
                           <div className="text-sm font-medium text-foreground">
                             {item.tombamento?.produto?.nome || "Produto não encontrado"}
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                          {new Date(item.dataretirada).toLocaleDateString('pt-BR')}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-foreground">{item.motivo}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                          {item.dataretorno 
-                            ? new Date(item.dataretorno).toLocaleDateString('pt-BR')
-                            : "Em aberto"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {getStatusBadge(item)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-2">
+                          <div className="text-xs text-muted-foreground">
+                            Motivo: {item.motivo}
+                          </div>
+                        </div>
+                        
+                        {/* Dates and actions */}
+                        <div className="space-y-2 pt-2 border-t border-border">
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>Retirada: {new Date(item.dataretirada).toLocaleDateString('pt-BR')}</span>
+                            <span>Retorno: {item.dataretorno ? new Date(item.dataretorno).toLocaleDateString('pt-BR') : "Em aberto"}</span>
+                          </div>
+                          <div className="flex justify-end space-x-1">
                             {!item.dataretorno && (
                               <Button
                                 variant="ghost"
@@ -348,13 +334,13 @@ export default function Manutencao() {
                               <Eye className="w-4 h-4" />
                             </Button>
                           </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

@@ -33,7 +33,7 @@ export default function Tombamento() {
   const { data: tombamentos = [], isLoading: isLoadingTombamentos } = useTombamentos();
   const { data: produtos = [] } = useProdutos();
   const { data: produtoEntradas = [], isLoading: isLoadingEntradas, error: errorEntradas } = useProdutoEntradas(selectedProdutoId);
-  
+
   // Debug logs
   console.log('Selected product ID:', selectedProdutoId);
   console.log('Product entries data:', produtoEntradas);
@@ -161,7 +161,7 @@ export default function Tombamento() {
         handleBackToList();
       } else {
         await createTombamento.mutateAsync(submitFormData);
-        
+
         // Clear form but stay on screen for new entries
         setFormData({
           fkproduto: formData.fkproduto, // Keep selected product
@@ -230,7 +230,7 @@ export default function Tombamento() {
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="fkproduto" className="text-sm font-medium text-foreground">
-                      Produto *
+                      Bem *
                     </Label>
                     <Select
                         value={formData.fkproduto}
@@ -274,7 +274,7 @@ export default function Tombamento() {
                   {selectedProdutoId && (
                     <div>
                       <Label className="text-sm font-medium text-foreground mb-2 block">
-                        Entradas do Produto
+                        Entradas do Bem
                       </Label>
                       <div className="border rounded-lg max-h-64 overflow-y-auto">
                         {produtoEntradas.length > 0 ? (
@@ -300,7 +300,7 @@ export default function Tombamento() {
                                     setFormData(prev => ({ ...prev, fkpedidoitem: entrada.pkpedidoitem.toString() }));
                                   }, 0);
                                 }
-                                
+
                                 return (
                                   <TableRow 
                                     key={index}
@@ -346,11 +346,11 @@ export default function Tombamento() {
                           </Table>
                         ) : (
                           <div className="p-4 text-center text-sm text-muted-foreground">
-                            Não foram encontradas entradas disponíveis para o produto selecionado
+                            Não foram encontradas entradas disponíveis para o Bem selecionado
                           </div>
                         )}
                       </div>
-                      
+
                       {produtoEntradas.length > 1 && (
                         <div className="mt-2 text-xs text-muted-foreground">
                           * Selecione a entrada da qual será feito o tombamento
@@ -605,7 +605,7 @@ export default function Tombamento() {
                 <thead className="bg-muted">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Tombamento</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Produto</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Bem</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Nº Serial</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Responsável</th>
@@ -628,7 +628,7 @@ export default function Tombamento() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-foreground">
-                            {item.produto?.nome || "Produto não encontrado"}
+                            {item.produto?.nome || "Bem não encontrado"}
                           </div>
                           {item.produto?.descricao && (
                             <div className="text-sm text-muted-foreground">{item.produto.descricao}</div>

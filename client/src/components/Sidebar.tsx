@@ -75,7 +75,7 @@ export default function Sidebar() {
             </svg>
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-foreground">PatriSaúde</h1>
+            <h1 className="text-lg font-semibold text-foreground">IS Pat</h1>
             <p className="text-xs text-muted-foreground">Gestão de Patrimônio</p>
           </div>
         </div>
@@ -113,7 +113,7 @@ export default function Sidebar() {
             </svg>
           </div>
           <div>
-            <p className="text-sm font-medium text-foreground">Admin Sistema</p>
+            <p className="text-sm font-medium text-foreground">Sistema IS</p>
             <p className="text-xs text-muted-foreground">Gestão Patrimonial</p>
           </div>
         </div>

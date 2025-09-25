@@ -116,6 +116,9 @@ export interface IStorage {
 
   // Dashboard methods
   getDashboardStats(): Promise<DashboardStats>;
+
+  // Company methods
+  getEmpresa(): Promise<any | null>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -678,6 +681,16 @@ export class DatabaseStorage implements IStorage {
       allocated: parseInt(allocatedResult.rows[0].total),
       maintenance: parseInt(maintenanceResult.rows[0].total)
     };
+  }
+
+  async getEmpresa() {
+    const result = await query(`
+      SELECT mantenedora
+      FROM sotech.cdg_mantenedora
+      LIMIT 1
+    `);
+
+    return result.rows[0] || null;
   }
 }
 

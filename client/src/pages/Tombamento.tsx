@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { SearchInput } from "@/components/ui/search-input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, Eye, Pencil, Trash2, Image, ArrowLeft, Upload, X } from "lucide-react";
+import { Plus, Search, Eye, Pencil, Trash2, Image, ArrowLeft, Upload, X, QrCode } from "lucide-react";
+import EtiquetaImpressao from "@/components/EtiquetaImpressao";
 
 export default function Tombamento() {
   const [viewMode, setViewMode] = useState<"list" | "form">("list");
@@ -18,6 +19,9 @@ export default function Tombamento() {
   const [searchProduto, setSearchProduto] = useState("");
   const [selectedProdutoId, setSelectedProdutoId] = useState<number | null>(null);
   const [selectedPedidoitem, setSelectedPedidoitem] = useState<number | null>(null);
+  const [showEtiquetaModal, setShowEtiquetaModal] = useState(false);
+  const [selectedTombamentoForLabel, setSelectedTombamentoForLabel] = useState<any>(null);
+  const [empresaData, setEmpresaData] = useState<any>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -33,6 +37,14 @@ export default function Tombamento() {
   const { data: tombamentos = [], isLoading: isLoadingTombamentos } = useTombamentos();
   const { data: produtos = [] } = useProdutos();
   const { data: produtoEntradas = [], isLoading: isLoadingEntradas, error: errorEntradas } = useProdutoEntradas(selectedProdutoId);
+
+  // Buscar dados da empresa
+  useState(() => {
+    fetch('/api/empresa')
+      .then(response => response.json())
+      .then(data => setEmpresaData(data))
+      .catch(error => console.error('Error fetching empresa:', error));
+  }, []);
 
   // Debug logs
   console.log('Selected product ID:', selectedProdutoId);
@@ -109,6 +121,11 @@ export default function Tombamento() {
     setSelectedFiles([]);
     previewUrls.forEach(url => URL.revokeObjectURL(url));
     setPreviewUrls([]);
+  };
+
+  const handlePrintLabel = (tombamento: any) => {
+    setSelectedTombamentoForLabel(tombamento);
+    setShowEtiquetaModal(true);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -639,6 +656,15 @@ export default function Tombamento() {
                             <Button
                               variant="ghost"
                               size="sm"
+                              onClick={() => handlePrintLabel(item)}
+                              title="Imprimir Etiqueta"
+                              data-testid={`button-print-${item.pktombamento}`}
+                            >
+                              <QrCode className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={() => handleEdit(item)}
                               title="Editar"
                               data-testid={`button-edit-${item.pktombamento}`}
@@ -665,6 +691,19 @@ export default function Tombamento() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal de impressão de etiqueta */}
+      {showEtiquetaModal && selectedTombamentoForLabel && (
+        <EtiquetaImpressao
+          tombamento={selectedTombamentoForLabel}
+          empresa={empresaData}
+          isOpen={showEtiquetaModal}
+          onClose={() => {
+            setShowEtiquetaModal(false);
+            setSelectedTombamentoForLabel(null);
+          }}
+        />
+      )}
     </div>
   );
 }

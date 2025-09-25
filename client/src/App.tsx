@@ -7,6 +7,7 @@ import Layout from "@/components/Layout";
 import Dashboard from "@/pages/Dashboard";
 import Classificacoes from "@/pages/Classificacoes";
 import Tombamento from "@/pages/Tombamento";
+import TombamentoPublico from "@/pages/TombamentoPublico";
 import Alocacao from "@/pages/Alocacao";
 import Transferencia from "@/pages/Transferencia";
 import Manutencao from "@/pages/Manutencao";
@@ -19,10 +20,11 @@ function Router() {
         <Route path="/" component={Dashboard} />
         <Route path="/classificacoes" component={Classificacoes} />
         <Route path="/tombamento" component={Tombamento} />
+        <Route path="/tomb/publico/:id" component={TombamentoPublico} />
         <Route path="/alocacao" component={Alocacao} />
         <Route path="/transferencia" component={Transferencia} />
         <Route path="/manutencao" component={Manutencao} />
-        <Route component={NotFound} />
+        <Route path="*" component={NotFound} />
       </Switch>
     </Layout>
   );

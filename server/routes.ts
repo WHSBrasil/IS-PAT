@@ -426,6 +426,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Empresa route
+  app.get("/api/empresa", async (req, res) => {
+    try {
+      const empresa = await storage.getEmpresa();
+      res.json(empresa);
+    } catch (error) {
+      console.error('Error fetching empresa:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
   // Support data routes
   app.get("/api/unidades-saude", async (req, res) => {
     try {

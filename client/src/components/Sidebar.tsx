@@ -1,6 +1,8 @@
 import { Link, useLocation } from "wouter";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
+import { Button } from "./ui/button";
 
 const navigationItems = [
   {
@@ -62,7 +64,11 @@ const navigationItems = [
   },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  onClose?: () => void;
+}
+
+export default function Sidebar({ onClose }: SidebarProps) {
   const [location] = useLocation();
   const isMobile = useIsMobile();
 
@@ -76,16 +82,29 @@ export default function Sidebar() {
     >
       {/* Logo Header */}
       <div className="p-6 border-b border-border">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <svg className="w-5 h-5 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
-            </svg>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-lg font-semibold text-foreground">IS Pat</h1>
+              <p className="text-xs text-muted-foreground">Gestão de Patrimônio</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-lg font-semibold text-foreground">IS Pat</h1>
-            <p className="text-xs text-muted-foreground">Gestão de Patrimônio</p>
-          </div>
+          {onClose && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={onClose}
+              className="h-8 w-8"
+              title="Fechar menu"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       </div>
 

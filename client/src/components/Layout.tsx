@@ -1,4 +1,5 @@
-import { ReactNode } from "react";
+
+import { ReactNode, useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./Sidebar";
@@ -16,12 +17,32 @@ export default function Layout({ children }: LayoutProps) {
   const urlParams = new URLSearchParams(window.location.search);
   const menuParam = urlParams.get('menu');
   
-  // Hide menu if:
-  // 1. URL parameter menu=false is explicitly set, OR
-  // 2. It's a mobile device AND menu=true is NOT explicitly set
-  const hideMenu = menuParam === 'false' || (isMobile && menuParam !== 'true');
+  // State for menu visibility
+  const [menuVisible, setMenuVisible] = useState(() => {
+    if (menuParam === 'false') return false;
+    if (menuParam === 'true') return true;
+    return !isMobile; // Default: visible on desktop, hidden on mobile
+  });
 
-  if (hideMenu) {
+  // Update menu visibility when mobile state changes
+  useEffect(() => {
+    if (menuParam === 'false') {
+      setMenuVisible(false);
+    } else if (menuParam === 'true') {
+      setMenuVisible(true);
+    } else {
+      setMenuVisible(!isMobile);
+    }
+  }, [isMobile, menuParam]);
+
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible);
+  };
+
+  // Force hide menu if URL parameter is false
+  const forceHideMenu = menuParam === 'false';
+
+  if (forceHideMenu) {
     return (
       <div className="flex h-screen bg-background">
         <main className="flex-1 flex flex-col overflow-hidden">
@@ -35,9 +56,12 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar />
+      {menuVisible && <Sidebar onClose={isMobile ? toggleMenu : undefined} />}
       <main className="flex-1 flex flex-col overflow-hidden">
-        <Header />
+        <Header 
+          onMenuToggle={toggleMenu} 
+          showMenuButton={isMobile || !menuVisible} 
+        />
         <div className="flex-1 overflow-auto bg-background">
           {children}
         </div>

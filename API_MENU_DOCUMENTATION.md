@@ -53,11 +53,23 @@ fetch('https://[seu-repl].repl.co/alocacao?menu=false')
   });
 ```
 
+### 4. Forçar Menu em Dispositivo Móvel
+```
+https://[seu-repl].repl.co/tombamento?menu=true
+```
+
 ## Comportamento
 
 - **menu=false**: Remove sidebar e header, exibe apenas o conteúdo da página com padding
-- **menu=true** ou **sem parâmetro**: Exibe interface completa com sidebar e header
+- **menu=true**: Força a exibição da interface completa com sidebar e header (mesmo em mobile)
+- **sem parâmetro**: 
+  - Em desktop: Exibe interface completa com sidebar e header
+  - Em mobile: Oculta automaticamente o menu para melhor experiência
 - O parâmetro é case-sensitive (deve ser minúsculo)
+
+## Comportamento Móvel
+
+Por padrão, em dispositivos móveis (largura < 768px), o menu é automaticamente ocultado para proporcionar uma melhor experiência do usuário. Para forçar a exibição do menu em dispositivos móveis, use `menu=true`.
 
 ## Rotas Disponíveis
 

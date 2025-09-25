@@ -1,4 +1,5 @@
 import { Link, useLocation } from "wouter";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 const navigationItems = [
@@ -63,9 +64,16 @@ const navigationItems = [
 
 export default function Sidebar() {
   const [location] = useLocation();
+  const isMobile = useIsMobile();
 
   return (
-    <aside className="w-64 bg-card border-r border-border flex flex-col shadow-sm" data-testid="sidebar">
+    <aside 
+      className={cn(
+        "bg-card border-r border-border flex flex-col shadow-sm",
+        isMobile ? "w-full" : "w-64"
+      )} 
+      data-testid="sidebar"
+    >
       {/* Logo Header */}
       <div className="p-6 border-b border-border">
         <div className="flex items-center space-x-3">

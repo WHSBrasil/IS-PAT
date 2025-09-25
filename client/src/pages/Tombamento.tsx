@@ -640,7 +640,7 @@ export default function Tombamento() {
                           </div>
                           <div className="flex items-center justify-between text-xs text-muted-foreground">
                             <span>Serial: {item.serial || "Não informado"}</span>
-                            <span>{item.photos ? JSON.parse(item.photos).length : 0} fotos</span>
+                            <span>{item.photos ? (typeof item.photos === 'string' ? JSON.parse(item.photos).length : Array.isArray(item.photos) ? item.photos.length : 0) : 0} fotos</span>
                           </div>
                         </div>
                         

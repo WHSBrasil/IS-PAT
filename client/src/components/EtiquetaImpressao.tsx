@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,6 +16,32 @@ interface EtiquetaImpressaoProps {
 
 export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose }: EtiquetaImpressaoProps) {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
+
+  const baseUrl = window.location.origin;
+  const qrUrl = `${baseUrl}/tomb/publico/${tombamento.pktombamento}`;
+
+  useEffect(() => {
+    if (isOpen && tombamento) {
+      generateQRCodeForPreview();
+    }
+  }, [isOpen, tombamento]);
+
+  const generateQRCodeForPreview = async () => {
+    try {
+      const qrDataUrl = await QRCode.toDataURL(qrUrl, {
+        width: 200,
+        margin: 1,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF',
+        },
+      });
+      setQrCodeDataUrl(qrDataUrl);
+    } catch (error) {
+      console.error('Error generating QR code for preview:', error);
+    }
+  };
 
   const generateQRCode = async (data: string): Promise<string> => {
     try {
@@ -36,40 +63,32 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
     setIsGenerating(true);
 
     try {
-      // URL do QR Code
-      const baseUrl = window.location.origin;
-      const qrUrl = `${baseUrl}/tomb/publico/${tombamento.pktombamento}`;
-      
-      // Gerar QR Code como base64
-      const qrCodeDataUrl = await generateQRCode(qrUrl);
-      
       // Dados para a etiqueta
       const tombamentoNum = tombamento.tombamento || 'N/A';
       const descricao = tombamento.produto?.nome || 'Produto não informado';
       const empresaNome = empresa?.mantenedora || 'Nome da empresa não informado';
       
-      // Limitar tamanho do texto para caber na etiqueta
-      const descricaoTruncada = descricao.length > 40 ? descricao.substring(0, 37) + '...' : descricao;
-      const empresaTruncada = empresaNome.length > 35 ? empresaNome.substring(0, 32) + '...' : empresaNome;
+      // Limitar tamanho do texto para caber na etiqueta 50mm x 25mm
+      const descricaoTruncada = descricao.length > 45 ? descricao.substring(0, 42) + '...' : descricao;
+      const empresaTruncada = empresaNome.length > 30 ? empresaNome.substring(0, 27) + '...' : empresaNome;
 
-      // Código ZPL para impressora Zebra ZD220
-      // Etiqueta 58mm x 32mm (464 x 256 dots a 8 dots/mm)
+      // Código ZPL para impressora Zebra
+      // Etiqueta 50mm x 25mm (400 x 200 dots a 8 dots/mm)
       const zplCode = `
 ^XA
 ^MMT
-^PW464
-^LL256
+^PW400
+^LL200
 
-^FO10,10^BQN,2,4^FDMM,A${qrUrl}^FS
+^FO5,5^APN,14,10^FB390,1,0,L,0^FD${descricaoTruncada}^FS
 
-^FO170,10^APN,18,10^FD${tombamentoNum}^FS
+^FO5,25^BQN,2,3^FDMM,A${qrUrl}^FS
 
-^FO170,35^APN,12,8^FB280,3,0,L,0^FD${descricaoTruncada}^FS
+^FO105,25^APN,12,8^FD${tombamentoNum}^FS
 
-^FO10,180^APN,10,6^FDEquipamento de propriedade de:^FS
-^FO10,200^APN,12,8^FB440,2,0,L,0^FD${empresaTruncada}^FS
+^FO105,50^APN,10,6^FDDe propriedade de:^FS
 
-^FO10,240^APN,8,5^FD${new Date().toLocaleDateString('pt-BR')}^FS
+^FO105,70^APN,10,8^FB285,3,0,L,0^FD${empresaTruncada}^FS
 
 ^XZ
       `.trim();
@@ -129,28 +148,38 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
   };
 
   const previewEtiqueta = () => {
-    const baseUrl = window.location.origin;
-    const qrUrl = `${baseUrl}/tomb/publico/${tombamento.pktombamento}`;
+    const descricao = tombamento.produto?.nome || 'Produto não informado';
+    const descricaoTruncada = descricao.length > 45 ? descricao.substring(0, 42) + '...' : descricao;
+    const empresaNome = empresa?.mantenedora || 'Nome da empresa não informado';
+    const empresaTruncada = empresaNome.length > 30 ? empresaNome.substring(0, 27) + '...' : empresaNome;
     
     return (
-      <div className="border border-gray-300 bg-white p-4 rounded" style={{ width: '232px', height: '128px', fontSize: '10px' }}>
+      <div className="border border-gray-300 bg-white p-2 rounded" style={{ width: '200px', height: '100px', fontSize: '8px' }}>
+        {/* Primeira linha - Descrição do bem */}
+        <div className="text-xs font-medium mb-1 leading-tight">
+          {descricaoTruncada}
+        </div>
+        
+        {/* Segunda parte - QR Code e informações */}
         <div className="flex h-full">
-          <div className="flex-shrink-0 mr-3">
-            <QrCode size={80} className="text-gray-400" />
-            <div className="text-xs text-center mt-1">QR Code</div>
+          {/* QR Code - 25% da largura */}
+          <div className="flex-shrink-0 mr-2" style={{ width: '48px' }}>
+            {qrCodeDataUrl && (
+              <img 
+                src={qrCodeDataUrl} 
+                alt="QR Code" 
+                className="w-full h-auto"
+                style={{ maxHeight: '70px' }}
+              />
+            )}
           </div>
-          <div className="flex-1 space-y-1">
-            <div className="font-bold text-sm">{tombamento.tombamento}</div>
-            <div className="text-xs leading-tight">
-              {(tombamento.produto?.nome || 'Produto não informado').substring(0, 35)}
-              {(tombamento.produto?.nome || '').length > 35 && '...'}
-            </div>
-            <div className="mt-2 text-xs">
-              <div>Equipamento de propriedade de:</div>
-              <div className="font-semibold">
-                {(empresa?.mantenedora || 'Nome da empresa').substring(0, 30)}
-                {(empresa?.mantenedora || '').length > 30 && '...'}
-              </div>
+          
+          {/* Informações ao lado do QR Code */}
+          <div className="flex-1 space-y-1 text-xs">
+            <div className="font-bold">{tombamento.tombamento}</div>
+            <div className="text-xs">De propriedade de:</div>
+            <div className="font-medium leading-tight">
+              {empresaTruncada}
             </div>
           </div>
         </div>
@@ -170,7 +199,7 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
         
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-medium mb-2">Preview da Etiqueta (58mm x 32mm)</h4>
+            <h4 className="text-sm font-medium mb-2">Preview da Etiqueta (50mm x 25mm)</h4>
             <div className="flex justify-center">
               {previewEtiqueta()}
             </div>
@@ -179,7 +208,7 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
           <div className="text-xs text-gray-600 space-y-1">
             <div><strong>Tombamento:</strong> {tombamento.tombamento}</div>
             <div><strong>Produto:</strong> {tombamento.produto?.nome || 'Não informado'}</div>
-            <div><strong>QR Code URL:</strong> {`${window.location.origin}/tomb/publico/${tombamento.pktombamento}`}</div>
+            <div><strong>QR Code URL:</strong> {qrUrl}</div>
             <div><strong>Empresa:</strong> {empresa?.mantenedora || 'Não informado'}</div>
           </div>
 
@@ -201,3 +230,4 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
     </Dialog>
   );
 }
+

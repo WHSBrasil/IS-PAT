@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -30,8 +28,9 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
   const generateQRCodeForPreview = async () => {
     try {
       const qrDataUrl = await QRCode.toDataURL(qrUrl, {
-        width: 200,
+        width: 120,
         margin: 1,
+        errorCorrectionLevel: 'H',
         color: {
           dark: '#000000',
           light: '#FFFFFF',
@@ -46,8 +45,9 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
   const generateQRCode = async (data: string): Promise<string> => {
     try {
       return await QRCode.toDataURL(data, {
-        width: 200,
+        width: 120,
         margin: 1,
+        errorCorrectionLevel: 'H',
         color: {
           dark: '#000000',
           light: '#FFFFFF',
@@ -67,7 +67,7 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
       const tombamentoNum = tombamento.tombamento || 'N/A';
       const descricao = tombamento.produto?.nome || 'Produto não informado';
       const empresaNome = empresa?.mantenedora || 'Nome da empresa não informado';
-      
+
       // Limitar tamanho do texto para caber na etiqueta 50mm x 25mm
       const descricaoTruncada = descricao.length > 45 ? descricao.substring(0, 42) + '...' : descricao;
       const empresaTruncada = empresaNome.length > 30 ? empresaNome.substring(0, 27) + '...' : empresaNome;
@@ -129,21 +129,23 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
       }
 
       // Alternativa: tentar enviar via fetch para endpoint local (se houver serviço rodando)
-      try {
-        await fetch('http://localhost:9100', {
-          method: 'POST',
-          body: zplCode,
-          headers: {
-            'Content-Type': 'application/x-zpl'
-          }
-        });
-        alert('Etiqueta enviada para impressora!');
-      } catch (fetchError) {
-        console.log('Tentativa de impressão via rede falhou (normal se não houver serviço configurado)');
-      }
+      // Esta parte foi removida pois causa erro em ambiente web
+      // try {
+      //   await fetch('http://localhost:9100', {
+      //     method: 'POST',
+      //     body: zplCode,
+      //     headers: {
+      //       'Content-Type': 'application/x-zpl'
+      //     }
+      //   });
+      //   alert('Etiqueta enviada para impressora!');
+      // } catch (fetchError) {
+      //   console.log('Tentativa de impressão via rede falhou (normal se não houver serviço configurado)');
+      // }
 
     } catch (error) {
       console.error('Erro ao imprimir:', error);
+      alert('Erro ao imprimir. Verifique se o driver da impressora está instalado e se ela está conectada.');
     }
   };
 
@@ -152,14 +154,14 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
     const descricaoTruncada = descricao.length > 45 ? descricao.substring(0, 42) + '...' : descricao;
     const empresaNome = empresa?.mantenedora || 'Nome da empresa não informado';
     const empresaTruncada = empresaNome.length > 30 ? empresaNome.substring(0, 27) + '...' : empresaNome;
-    
+
     return (
       <div className="border border-gray-300 bg-white p-2 rounded" style={{ width: '200px', height: '100px', fontSize: '8px' }}>
         {/* Primeira linha - Descrição do bem */}
         <div className="text-xs font-medium mb-1 leading-tight">
           {descricaoTruncada}
         </div>
-        
+
         {/* Segunda parte - QR Code e informações */}
         <div className="flex h-full">
           {/* QR Code - 25% da largura */}
@@ -173,7 +175,7 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
               />
             )}
           </div>
-          
+
           {/* Informações ao lado do QR Code */}
           <div className="flex-1 space-y-1 text-xs">
             <div className="font-bold">{tombamento.tombamento}</div>
@@ -196,7 +198,7 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
             <span>Imprimir Etiqueta</span>
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <div>
             <h4 className="text-sm font-medium mb-2">Preview da Etiqueta (50mm x 25mm)</h4>
@@ -230,4 +232,3 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
     </Dialog>
   );
 }
-

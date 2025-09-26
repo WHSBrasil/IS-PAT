@@ -30,9 +30,8 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
   const generateQRCodeForPreview = async () => {
     try {
       const qrDataUrl = await QRCode.toDataURL(qrUrl, {
-        width: 128,
-        margin: 0,
-        errorCorrectionLevel: 'M',
+        width: 200,
+        margin: 1,
         color: {
           dark: '#000000',
           light: '#FFFFFF',
@@ -150,41 +149,36 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
 
   const previewEtiqueta = () => {
     const descricao = tombamento.produto?.nome || 'Produto não informado';
-    const descricaoTruncada = descricao.length > 35 ? descricao.substring(0, 32) + '...' : descricao;
+    const descricaoTruncada = descricao.length > 45 ? descricao.substring(0, 42) + '...' : descricao;
     const empresaNome = empresa?.mantenedora || 'Nome da empresa não informado';
-    const empresaTruncada = empresaNome.length > 25 ? empresaNome.substring(0, 22) + '...' : empresaNome;
+    const empresaTruncada = empresaNome.length > 30 ? empresaNome.substring(0, 27) + '...' : empresaNome;
     
     return (
       <div className="border border-gray-300 bg-white p-2 rounded" style={{ width: '200px', height: '100px', fontSize: '8px' }}>
-        {/* Primeira linha - Descrição do bem (destaque) */}
-        <div className="font-bold mb-1 leading-tight" style={{ fontSize: '10px' }}>
+        {/* Primeira linha - Descrição do bem */}
+        <div className="text-xs font-medium mb-1 leading-tight">
           {descricaoTruncada}
         </div>
         
         {/* Segunda parte - QR Code e informações */}
-        <div className="flex" style={{ height: '75px' }}>
-          {/* QR Code - mais slim */}
-          <div className="flex-shrink-0 mr-1" style={{ width: '40px' }}>
+        <div className="flex h-full">
+          {/* QR Code - 25% da largura */}
+          <div className="flex-shrink-0 mr-2" style={{ width: '48px' }}>
             {qrCodeDataUrl && (
               <img 
                 src={qrCodeDataUrl} 
                 alt="QR Code" 
-                className="w-full h-full object-contain"
-                style={{ maxHeight: '70px', maxWidth: '40px' }}
+                className="w-full h-auto"
+                style={{ maxHeight: '70px' }}
               />
             )}
           </div>
           
           {/* Informações ao lado do QR Code */}
-          <div className="flex-1 space-y-0.5" style={{ fontSize: '8px' }}>
-            {/* Segunda linha - Código do tombamento */}
-            <div className="font-bold leading-tight">{tombamento.tombamento}</div>
-            
-            {/* Terceira linha - "De propriedade de:" */}
-            <div className="leading-tight">De propriedade de:</div>
-            
-            {/* Quarta linha - Nome da empresa (fonte menor) */}
-            <div className="font-medium leading-tight" style={{ fontSize: '7px' }}>
+          <div className="flex-1 space-y-1 text-xs">
+            <div className="font-bold">{tombamento.tombamento}</div>
+            <div className="text-xs">De propriedade de:</div>
+            <div className="font-medium leading-tight">
               {empresaTruncada}
             </div>
           </div>

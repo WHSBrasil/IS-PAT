@@ -194,8 +194,7 @@ export default function TombamentoPublico() {
                     console.error('Error parsing photos:', error);
                     return null;
                   }
-                })()}</div>
-            </div>
+                })()}
               </div>
             </div>
           </CardContent>

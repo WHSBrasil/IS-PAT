@@ -80,15 +80,15 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
 ^PW400
 ^LL200
 
-^FO5,5^APN,14,10^FB390,1,0,L,0^FD${descricaoTruncada}^FS
+^FO5,5^A0N,20,15^FB390,1,0,L,0^FD${descricaoTruncada}^FS
 
-^FO5,25^BQN,2,3^FDMM,A${qrUrl}^FS
+^FO5,35^BQN,2,4^FDMM,A${qrUrl}^FS
 
-^FO105,25^APN,12,8^FD${tombamentoNum}^FS
+^FO110,35^A0N,18,12^FD${tombamentoNum}^FS
 
-^FO105,50^APN,10,6^FDDe propriedade de:^FS
+^FO110,60^A0N,14,10^FDDe propriedade de:^FS
 
-^FO105,70^APN,10,8^FB285,3,0,L,0^FD${empresaTruncada}^FS
+^FO110,80^A0N,14,10^FB285,3,0,L,0^FD${empresaTruncada}^FS
 
 ^XZ
       `.trim();

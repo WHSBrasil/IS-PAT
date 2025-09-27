@@ -172,21 +172,30 @@ export default function TombamentoPublico() {
                 )}
 
                 {/* Fotos do item */}
-                {tombamento.photos && JSON.parse(tombamento.photos).length > 0 && (
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600">Fotos do Item</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      {JSON.parse(tombamento.photos).slice(0, 4).map((photo: any, index: number) => (
-                        <img
-                          key={index}
-                          src={`/uploads/${photo.filename}`}
-                          alt={`Foto ${index + 1}`}
-                          className="w-full h-20 object-cover rounded border"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
+                {(() => {
+                  try {
+                    const photos = tombamento.photos ? JSON.parse(tombamento.photos) : [];
+                    return photos.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600">Fotos do Item</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {photos.slice(0, 4).map((photo: any, index: number) => (
+                            <img
+                              key={index}
+                              src={`/uploads/${photo.filename}`}
+                              alt={`Foto ${index + 1}`}
+                              className="w-full h-20 object-cover rounded border"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  } catch (error) {
+                    console.error('Error parsing photos:', error);
+                    return null;
+                  }
+                })()}</div>
+            </div>
               </div>
             </div>
           </CardContent>

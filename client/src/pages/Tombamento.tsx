@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useTombamentos, useCreateTombamento, useUpdateTombamento, useProdutos, useProdutoEntradas } from "@/hooks/usePatrimonio";
+import { useTombamentos, useCreateTombamento, useUpdateTombamento, useProdutos, useProdutoEntradas, useProdutoLocalizacao } from "@/hooks/usePatrimonio";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,7 @@ export default function Tombamento() {
   const { data: tombamentos = [], isLoading: isLoadingTombamentos } = useTombamentos();
   const { data: produtos = [] } = useProdutos();
   const { data: produtoEntradas = [], isLoading: isLoadingEntradas, error: errorEntradas } = useProdutoEntradas(selectedProdutoId);
+  const { data: produtoLocalizacao } = useProdutoLocalizacao(selectedProdutoId);
 
   // Buscar dados da empresa
   useState(() => {
@@ -197,6 +198,26 @@ export default function Tombamento() {
     } catch (error) {
       console.error("Error saving tombamento:", error);
     }
+  };
+
+  // Function to format tombamento number
+  const formatTombamento = (value: string) => {
+    const trimmedValue = value.trim();
+    
+    // Check if it's a valid integer
+    const numericValue = parseInt(trimmedValue);
+    if (!isNaN(numericValue) && numericValue.toString() === trimmedValue && produtoLocalizacao?.localizacao) {
+      // Format with location prefix and 6-digit padding
+      const paddedNumber = numericValue.toString().padStart(6, '0');
+      return `${produtoLocalizacao.localizacao}${paddedNumber}`;
+    }
+    
+    return trimmedValue;
+  };
+
+  const handleTombamentoChange = (value: string) => {
+    const formattedValue = formatTombamento(value);
+    setFormData({ ...formData, tombamento: formattedValue });
   };
 
   const getStatusBadge = (status: string) => {
@@ -388,8 +409,8 @@ export default function Tombamento() {
                       id="tombamento"
                       type="text"
                       value={formData.tombamento}
-                      onChange={(e) => setFormData({ ...formData, tombamento: e.target.value })}
-                      placeholder="Ex: TB-001234"
+                      onChange={(e) => handleTombamentoChange(e.target.value)}
+                      placeholder={produtoLocalizacao?.localizacao ? `Ex: 27 (será formatado como ${produtoLocalizacao.localizacao}000027)` : "Ex: TB-001234"}
                       required
                       data-testid="input-tombamento"
                     />

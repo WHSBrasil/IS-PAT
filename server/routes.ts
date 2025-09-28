@@ -14,7 +14,7 @@ import path from "path";
  * Examples:
  * - /?menu=false (Dashboard without menu)
  * - /tombamento?menu=false (Tombamento page without menu)
- * - /classificacoes?menu=false (Classifications page without menu)
+ * - /classificacoes?menu=false (Classificações page without menu)
  */
 
 // Configure multer for file uploads
@@ -27,7 +27,7 @@ const upload = multer({
     const allowedTypes = /jpeg|jpg|png|webp/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
-    
+
     if (mimetype && extname) {
       return cb(null, true);
     } else {
@@ -37,7 +37,7 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  
+
   // Dashboard routes
   app.get("/api/dashboard/stats", async (req, res) => {
     try {
@@ -64,11 +64,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const classificacao = await storage.getClassificacao(id);
-      
+
       if (!classificacao) {
         return res.status(404).json({ error: 'Classificação não encontrada' });
       }
-      
+
       res.json(classificacao);
     } catch (error) {
       console.error('Error fetching classificacao:', error);
@@ -79,7 +79,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/classificacoes", async (req, res) => {
     try {
       const { classificacao, ativo = true } = req.body;
-      
+
       if (!classificacao) {
         return res.status(400).json({ error: 'Nome da classificação é obrigatório' });
       }
@@ -89,7 +89,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ativo,
         fkuser: 0 // Default user
       });
-      
+
       res.status(201).json(newClassificacao);
     } catch (error) {
       console.error('Error creating classificacao:', error);
@@ -101,7 +101,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const updates = req.body;
-      
+
       const classificacao = await storage.updateClassificacao(id, updates);
       res.json(classificacao);
     } catch (error) {
@@ -114,7 +114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const success = await storage.deleteClassificacao(id);
-      
+
       if (success) {
         res.json({ message: 'Classificação excluída com sucesso' });
       } else {
@@ -137,20 +137,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get product entries for tombamento form
   app.get("/api/produtos/:id/entradas", async (req, res) => {
     try {
       const fkproduto = parseInt(req.params.id);
-      console.log(`API call - Getting entries for product ID: ${fkproduto}`);
-      
-      const entradas = await storage.getProdutoEntradas(fkproduto);
-      console.log(`API response - Found ${entradas.length} entries for product ${fkproduto}`);
-      
-      res.json(entradas);
+
+      if (isNaN(fkproduto)) {
+        return res.status(400).json({ error: "ID do produto inválido" });
+      }
+
+      console.log('API call - Getting entries for product ID:', fkproduto);
+
+      const result = await db.query(`
+        SELECT 
+          pe.pkpedido,
+          pe.datapedido,
+          pe.tipo as tipo_pedido,
+          CASE pe.tipo 
+            WHEN 6 THEN 'E'
+            ELSE 'O'
+          END as tipo_texto,
+          pi.pkpedidoitem,
+          pi.quantidadeentrada::text,
+          COALESCE(t.quantidade_tombada, 0) as quantidade_tombada
+        FROM sotech.est_pedidoitem pi
+        INNER JOIN sotech.est_pedido pe ON pi.fkpedido = pe.pkpedido
+        LEFT JOIN (
+          SELECT 
+            fkpedidoitem,
+            COUNT(*) as quantidade_tombada
+          FROM sotech.est_tombamento 
+          WHERE fkpedidoitem IS NOT NULL
+          GROUP BY fkpedidoitem
+        ) t ON pi.pkpedidoitem = t.fkpedidoitem
+        WHERE pi.fkproduto = $1
+        AND pe.tipo = 6
+        AND pi.quantidadeentrada > 0
+        ORDER BY pe.datapedido DESC
+      `, [fkproduto]);
+
+      console.log('Searching for product entries with fkproduto:', fkproduto);
+      console.log('Found entries:', result.rows);
+
+      // Calculate available quantity for each entry
+      const entriesWithAvailability = result.rows.map(row => {
+        const quantidadeEntrada = parseFloat(row.quantidadeentrada);
+        const quantidadeTombada = parseInt(row.quantidade_tombada) || 0;
+        const quantidadeDisponivel = quantidadeEntrada - quantidadeTombada;
+
+        return {
+          ...row,
+          quantidadeentrada: quantidadeEntrada,
+          quantidade_tombada: quantidadeTombada,
+          quantidade_disponivel: quantidadeDisponivel
+        };
+      }).filter(entry => entry.quantidade_disponivel > 0);
+
+      console.log('API response - Found', entriesWithAvailability.length, 'entries for product', fkproduto);
+
+      res.json(entriesWithAvailability);
     } catch (error) {
-      console.error('Error fetching product entries:', error);
-      res.status(500).json({ error: 'Erro interno do servidor' });
+      console.error("Error fetching product entries:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
     }
   });
+
+  // Get product location for tombamento formatting
+  app.get("/api/produtos/:id/localizacao", async (req, res) => {
+    try {
+      const fkproduto = parseInt(req.params.id);
+
+      if (isNaN(fkproduto)) {
+        return res.status(400).json({ error: "ID do produto inválido" });
+      }
+
+      const result = await db.query(`
+        SELECT localizacao
+        FROM sotech.est_produto
+        WHERE pkproduto = $1
+      `, [fkproduto]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Produto não encontrado" });
+      }
+
+      res.json({ localizacao: result.rows[0].localizacao || "" });
+    } catch (error) {
+      console.error("Error fetching product location:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
 
   // Tombamento routes
   app.get("/api/tombamentos", async (req, res) => {
@@ -167,11 +244,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const tombamento = await storage.getTombamento(id);
-      
+
       if (!tombamento) {
         return res.status(404).json({ error: 'Tombamento não encontrado' });
       }
-      
+
       res.json(tombamento);
     } catch (error) {
       console.error('Error fetching tombamento:', error);
@@ -182,7 +259,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/tombamentos", upload.array('photos'), async (req, res) => {
     try {
       const { fkproduto, fkpedidoitem, tombamento, serial, responsavel, status = 'disponivel' } = req.body;
-      
+
       if (!fkproduto || !tombamento) {
         return res.status(400).json({ error: 'Produto e número de tombamento são obrigatórios' });
       }
@@ -208,7 +285,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status,
         fkuser: 0
       });
-      
+
       res.status(201).json(newTombamento);
     } catch (error) {
       console.error('Error creating tombamento:', error);
@@ -220,7 +297,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const updates = { ...req.body };
-      
+
       // Handle uploaded photos
       if (req.files && Array.isArray(req.files) && req.files.length > 0) {
         updates.photos = (req.files as Express.Multer.File[]).map(file => ({
@@ -234,7 +311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (updates.fkproduto) {
         updates.fkproduto = parseInt(updates.fkproduto);
       }
-      
+
       const tombamento = await storage.updateTombamento(id, updates);
       res.json(tombamento);
     } catch (error) {
@@ -247,7 +324,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const success = await storage.deleteTombamento(id);
-      
+
       if (success) {
         res.json({ message: 'Tombamento excluído com sucesso' });
       } else {
@@ -273,7 +350,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/alocacoes", upload.array('photos'), async (req, res) => {
     try {
       const { fktombamento, fkunidadesaude, fksetor, responsavel_unidade, dataalocacao, termo, responsavel } = req.body;
-      
+
       if (!fktombamento || !fkunidadesaude || !responsavel_unidade || !dataalocacao) {
         return res.status(400).json({ error: 'Tombamento, unidade, responsável e data são obrigatórios' });
       }
@@ -300,7 +377,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         responsavel,
         fkuser: 0
       });
-      
+
       res.status(201).json(newAlocacao);
     } catch (error) {
       console.error('Error creating alocacao:', error);
@@ -312,7 +389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const updates = { ...req.body };
-      
+
       // Handle uploaded photos
       if (req.files && Array.isArray(req.files) && req.files.length > 0) {
         updates.photos = (req.files as Express.Multer.File[]).map(file => ({
@@ -341,7 +418,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const success = await storage.deleteAlocacao(id);
-      
+
       if (success) {
         res.json({ message: 'Alocação excluída com sucesso' });
       } else {
@@ -367,7 +444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/transferencias", async (req, res) => {
     try {
       const { fktombamento, fkunidadesaude_origem, fkunidadesaude_destino, fksetor_origem, fksetor_destino, responsavel_destino, datatasnferencia, responsavel } = req.body;
-      
+
       if (!fktombamento || !fkunidadesaude_destino || !datatasnferencia) {
         return res.status(400).json({ error: 'Tombamento, unidade destino e data são obrigatórios' });
       }
@@ -383,7 +460,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         responsavel,
         fkuser: 0
       });
-      
+
       res.status(201).json(newTransferencia);
     } catch (error) {
       console.error('Error creating transferencia:', error);
@@ -405,7 +482,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/manutencoes", async (req, res) => {
     try {
       const { fktombamento, dataretirada, motivo, responsavel, dataretorno } = req.body;
-      
+
       if (!fktombamento || !dataretirada || !motivo) {
         return res.status(400).json({ error: 'Tombamento, data de retirada e motivo são obrigatórios' });
       }
@@ -418,7 +495,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dataretorno: dataretorno ? new Date(dataretorno) : undefined,
         fkuser: 0
       });
-      
+
       res.status(201).json(newManutencao);
     } catch (error) {
       console.error('Error creating manutencao:', error);

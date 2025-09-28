@@ -125,6 +125,18 @@ export const useProdutoEntradas = (fkproduto: number | null) => {
   });
 };
 
+export const useProdutoLocalizacao = (fkproduto: number | null) => {
+  return useQuery({
+    queryKey: ['produto-localizacao', fkproduto],
+    queryFn: async () => {
+      if (!fkproduto) return null;
+      const response = await fetch(`/api/produtos/${fkproduto}/localizacao`);
+      return response.json();
+    },
+    enabled: !!fkproduto,
+  });
+};
+
 // Tombamentos hooks
 export function useTombamentos() {
   return useQuery({

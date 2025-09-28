@@ -271,7 +271,23 @@ export default function Alocacao() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Informações da Alocação</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Informações da Alocação</CardTitle>
+                <div className="flex flex-col items-end">
+                  <Label htmlFor="dataalocacao" className="text-sm font-medium text-foreground mb-1">
+                    Data de Alocação *
+                  </Label>
+                  <Input
+                    id="dataalocacao"
+                    type="date"
+                    value={formData.dataalocacao}
+                    onChange={(e) => setFormData({ ...formData, dataalocacao: e.target.value })}
+                    required
+                    data-testid="input-data-alocacao"
+                    className="w-40"
+                  />
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -422,22 +438,6 @@ export default function Alocacao() {
                         )}
                       </SelectContent>
                     </Select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="dataalocacao" className="text-sm font-medium text-foreground">
-                      Data de Alocação *
-                    </Label>
-                    <Input
-                      id="dataalocacao"
-                      type="date"
-                      value={formData.dataalocacao}
-                      onChange={(e) => setFormData({ ...formData, dataalocacao: e.target.value })}
-                      required
-                      data-testid="input-data-alocacao"
-                    />
                   </div>
                 </div>
 

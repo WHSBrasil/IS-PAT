@@ -20,6 +20,7 @@ export default function ManutencaoModal({ isOpen, onClose, editingItem }: Manute
     motivo: "",
     responsavel: "",
     dataretorno: "",
+    observacao: "",
   });
 
   const { data: tombamentos = [] } = useTombamentos();
@@ -38,6 +39,7 @@ export default function ManutencaoModal({ isOpen, onClose, editingItem }: Manute
         motivo: editingItem.motivo || "",
         responsavel: editingItem.responsavel || "",
         dataretorno: editingItem.dataretorno ? new Date(editingItem.dataretorno).toISOString().split('T')[0] : "",
+        observacao: editingItem.observacao || "",
       });
     } else {
       const today = new Date().toISOString().split('T')[0];
@@ -47,6 +49,7 @@ export default function ManutencaoModal({ isOpen, onClose, editingItem }: Manute
         motivo: "",
         responsavel: "",
         dataretorno: "",
+        observacao: "",
       });
     }
   }, [editingItem]);
@@ -65,6 +68,7 @@ export default function ManutencaoModal({ isOpen, onClose, editingItem }: Manute
         motivo: formData.motivo,
         responsavel: formData.responsavel || undefined,
         dataretorno: formData.dataretorno ? new Date(formData.dataretorno) : undefined,
+        observacao: formData.observacao || undefined,
       };
 
       await createManutencao.mutateAsync(submitData);
@@ -165,6 +169,20 @@ export default function ManutencaoModal({ isOpen, onClose, editingItem }: Manute
               onChange={(e) => setFormData({ ...formData, responsavel: e.target.value })}
               placeholder="Nome do responsável ou empresa"
               data-testid="input-responsavel"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="observacao" className="text-sm font-medium text-foreground">
+              Observações
+            </Label>
+            <Textarea
+              id="observacao"
+              value={formData.observacao}
+              onChange={(e) => setFormData({ ...formData, observacao: e.target.value })}
+              placeholder="Observações sobre a manutenção..."
+              rows={2}
+              data-testid="textarea-observacao-manutencao"
             />
           </div>
 

@@ -259,10 +259,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/tombamentos", upload.array('photos'), async (req, res) => {
     try {
-      const { fkproduto, fkpedidoitem, tombamento, serial, responsavel, status = 'disponivel' } = req.body;
+      const { fkproduto, fkpedidoitem, tombamento, serial, imei, mac, observacao, responsavel, status = 'disponivel' } = req.body;
 
       if (!fkproduto || !tombamento) {
         return res.status(400).json({ error: 'Produto e número de tombamento são obrigatórios' });
+      }
+
+      // Validate IMEI if provided
+      if (imei && !/^\d{15}$/.test(imei)) {
+        return res.status(400).json({ error: 'IMEI deve conter exatamente 15 dígitos' });
+      }
+
+      // Validate MAC address if provided
+      if (mac && !/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/.test(mac)) {
+        return res.status(400).json({ error: 'MAC deve estar no formato XX:XX:XX:XX:XX:XX ou XX-XX-XX-XX-XX-XX' });
       }
 
       // Handle uploaded photos
@@ -314,6 +324,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             fkpedidoitem: fkpedidoitem ? parseInt(fkpedidoitem) : undefined,
             tombamento: formattedTombamento,
             serial: serial || '',
+            imei: imei || undefined,
+            mac: mac || undefined,
+            observacao: observacao || undefined,
             photos,
             responsavel,
             status,
@@ -335,6 +348,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           fkpedidoitem: fkpedidoitem ? parseInt(fkpedidoitem) : undefined,
           tombamento,
           serial,
+          imei: imei || undefined,
+          mac: mac || undefined,
+          observacao: observacao || undefined,
           photos,
           responsavel,
           status,
@@ -405,7 +421,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/alocacoes", upload.array('photos'), async (req, res) => {
     try {
-      const { fktombamento, fkunidadesaude, fksetor, responsavel_unidade, dataalocacao, termo, responsavel } = req.body;
+      const { fktombamento, fkunidadesaude, fksetor, responsavel_unidade, dataalocacao, termo, responsavel, observacao } = req.body;
 
       if (!fktombamento || !fkunidadesaude || !responsavel_unidade || !dataalocacao) {
         return res.status(400).json({ error: 'Tombamento, unidade, responsável e data são obrigatórios' });
@@ -431,6 +447,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         photos,
         termo,
         responsavel,
+        observacao: observacao || undefined,
         fkuser: 0
       });
 
@@ -499,7 +516,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/transferencias", async (req, res) => {
     try {
-      const { fktombamento, fkunidadesaude_origem, fkunidadesaude_destino, fksetor_origem, fksetor_destino, responsavel_destino, datatasnferencia, responsavel } = req.body;
+      const { fktombamento, fkunidadesaude_origem, fkunidadesaude_destino, fksetor_origem, fksetor_destino, responsavel_destino, datatasnferencia, responsavel, observacao } = req.body;
 
       if (!fktombamento || !fkunidadesaude_destino || !datatasnferencia) {
         return res.status(400).json({ error: 'Tombamento, unidade destino e data são obrigatórios' });
@@ -514,6 +531,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         responsavel_destino,
         datatasnferencia: new Date(datatasnferencia),
         responsavel,
+        observacao: observacao || undefined,
         fkuser: 0
       });
 
@@ -537,7 +555,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/manutencoes", async (req, res) => {
     try {
-      const { fktombamento, dataretirada, motivo, responsavel, dataretorno } = req.body;
+      const { fktombamento, dataretirada, motivo, responsavel, dataretorno, observacao } = req.body;
 
       if (!fktombamento || !dataretirada || !motivo) {
         return res.status(400).json({ error: 'Tombamento, data de retirada e motivo são obrigatórios' });
@@ -549,6 +567,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         motivo,
         responsavel,
         dataretorno: dataretorno ? new Date(dataretorno) : undefined,
+        observacao: observacao || undefined,
         fkuser: 0
       });
 

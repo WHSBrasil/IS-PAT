@@ -37,6 +37,9 @@ interface InsertTombamento {
   fkpedidoitem?: number;
   tombamento: string;
   serial?: string;
+  imei?: string;
+  mac?: string;
+  observacao?: string;
   photos?: any[];
   responsavel?: string;
   status?: string;
@@ -48,6 +51,9 @@ interface Tombamento {
   fkproduto: number;
   tombamento: string;
   serial?: string;
+  imei?: string;
+  mac?: string;
+  observacao?: string;
   photos?: string;
   responsavel?: string;
   status: string;
@@ -246,14 +252,17 @@ export class DatabaseStorage implements IStorage {
   async createTombamento(tombamento: InsertTombamento): Promise<Tombamento> {
     const result = await query(`
       INSERT INTO sotech.pat_tombamento
-      (fkproduto, fkpedidoitem, tombamento, serial, photos, responsavel, status, fkuser)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      (fkproduto, fkpedidoitem, tombamento, serial, imei, mac, observacao, photos, responsavel, status, fkuser)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING *
     `, [
       tombamento.fkproduto,
       tombamento.fkpedidoitem || null,
       tombamento.tombamento,
       tombamento.serial,
+      tombamento.imei,
+      tombamento.mac,
+      tombamento.observacao,
       tombamento.photos ? JSON.stringify(tombamento.photos) : null,
       tombamento.responsavel,
       tombamento.status || 'disponivel',
@@ -341,8 +350,8 @@ export class DatabaseStorage implements IStorage {
   async createAlocacao(alocacao: InsertAlocacao): Promise<Alocacao> {
     const result = await query(`
       INSERT INTO sotech.pat_alocacao
-      (fktombamento, fkunidadesaude, fksetor, responsavel_unidade, dataalocacao, photos, termo, responsavel, fkuser, fkprofissional)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      (fktombamento, fkunidadesaude, fksetor, responsavel_unidade, dataalocacao, photos, termo, responsavel, observacao, fkuser, fkprofissional)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING *
     `, [
       alocacao.fktombamento,
@@ -353,6 +362,7 @@ export class DatabaseStorage implements IStorage {
       alocacao.photos ? JSON.stringify(alocacao.photos) : null,
       alocacao.termo,
       alocacao.responsavel,
+      alocacao.observacao,
       alocacao.fkuser || 0,
       alocacao.fkprofissional
     ]);
@@ -443,8 +453,8 @@ export class DatabaseStorage implements IStorage {
     // Insert the transfer record
     const result = await query(`
       INSERT INTO sotech.pat_transferencia
-      (fktombamento, fkunidadesaude_origem, fkunidadesaude_destino, fksetor_origem, fksetor_destino, responsavel_destino, datatasnferencia, responsavel, fkuser)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      (fktombamento, fkunidadesaude_origem, fkunidadesaude_destino, fksetor_origem, fksetor_destino, responsavel_destino, datatasnferencia, responsavel, observacao, fkuser)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING *
     `, [
       transferencia.fktombamento,
@@ -455,6 +465,7 @@ export class DatabaseStorage implements IStorage {
       transferencia.responsavel_destino,
       transferencia.datatasnferencia,
       transferencia.responsavel,
+      transferencia.observacao,
       transferencia.fkuser || 0
     ]);
 
@@ -572,8 +583,8 @@ export class DatabaseStorage implements IStorage {
   async createManutencao(manutencao: InsertManutencao): Promise<Manutencao> {
     const result = await query(`
       INSERT INTO sotech.pat_manutencao
-      (fktombamento, dataretirada, motivo, responsavel, dataretorno, fkuser)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      (fktombamento, dataretirada, motivo, responsavel, dataretorno, observacao, fkuser)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
     `, [
       manutencao.fktombamento,
@@ -581,6 +592,7 @@ export class DatabaseStorage implements IStorage {
       manutencao.motivo,
       manutencao.responsavel,
       manutencao.dataretorno,
+      manutencao.observacao,
       manutencao.fkuser || 0
     ]);
 

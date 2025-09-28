@@ -22,6 +22,7 @@ export default function TransferenciaModal({ isOpen, onClose, editingItem }: Tra
     responsavel_destino: "",
     datatasnferencia: "",
     responsavel: "",
+    observacao: "", // Added observacao field
   });
 
   const { data: alocacoes = [] } = useAlocacoes();
@@ -40,6 +41,7 @@ export default function TransferenciaModal({ isOpen, onClose, editingItem }: Tra
         responsavel_destino: editingItem.responsavel_destino || "",
         datatasnferencia: editingItem.datatasnferencia ? new Date(editingItem.datatasnferencia).toISOString().split('T')[0] : "",
         responsavel: editingItem.responsavel || "",
+        observacao: editingItem.observacao || "", // Initialize observacao if editing
       });
     } else {
       const today = new Date().toISOString().split('T')[0];
@@ -52,6 +54,7 @@ export default function TransferenciaModal({ isOpen, onClose, editingItem }: Tra
         responsavel_destino: "",
         datatasnferencia: today,
         responsavel: "",
+        observacao: "", // Initialize observacao for new transfer
       });
     }
   }, [editingItem]);
@@ -59,7 +62,7 @@ export default function TransferenciaModal({ isOpen, onClose, editingItem }: Tra
   // When tombamento is selected, auto-fill origem data
   const handleTombamentoChange = (value: string) => {
     setFormData(prev => ({ ...prev, fktombamento: value }));
-    
+
     const selectedAlocacao = alocacoes.find((a: any) => a.fktombamento.toString() === value);
     if (selectedAlocacao) {
       setFormData(prev => ({
@@ -72,7 +75,7 @@ export default function TransferenciaModal({ isOpen, onClose, editingItem }: Tra
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.fktombamento || !formData.fkunidadesaude_destino || !formData.datatasnferencia) {
       return;
     }
@@ -115,7 +118,7 @@ export default function TransferenciaModal({ isOpen, onClose, editingItem }: Tra
             {editingItem ? "Editar Transferência" : "Nova Transferência"}
           </DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="fktombamento" className="text-sm font-medium text-foreground">
@@ -132,7 +135,7 @@ export default function TransferenciaModal({ isOpen, onClose, editingItem }: Tra
               <SelectContent>
                 {alocacoes.map((alocacao: any) => (
                   <SelectItem key={alocacao.pkalocacao} value={alocacao.fktombamento.toString()}>
-                    {alocacao.tombamento?.tombamento} - {alocacao.tombamento?.produto?.nome} 
+                    {alocacao.tombamento?.tombamento} - {alocacao.tombamento?.produto?.nome}
                     ({alocacao.unidadesaude?.nome})
                   </SelectItem>
                 ))}
@@ -245,6 +248,21 @@ export default function TransferenciaModal({ isOpen, onClose, editingItem }: Tra
               onChange={(e) => setFormData({ ...formData, responsavel: e.target.value })}
               placeholder="Nome do responsável"
               data-testid="input-responsavel"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="observacao" className="text-sm font-medium text-foreground">
+              Observações
+            </Label>
+            <textarea
+              id="observacao"
+              value={formData.observacao}
+              onChange={(e) => setFormData({ ...formData, observacao: e.target.value })}
+              placeholder="Observações sobre a transferência..."
+              rows={2}
+              className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              data-testid="textarea-observacao"
             />
           </div>
 

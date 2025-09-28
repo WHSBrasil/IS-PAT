@@ -28,8 +28,12 @@ export default function Tombamento() {
   // Form state
   const [formData, setFormData] = useState({
     fkproduto: "",
+    fkpedidoitem: "",
     tombamento: "",
     serial: "",
+    imei: "",
+    mac: "",
+    observacao: "",
     responsavel: "",
     status: "disponivel",
   });
@@ -81,6 +85,9 @@ export default function Tombamento() {
       fkpedidoitem: "",
       tombamento: "",
       serial: "",
+      imei: "",
+      mac: "",
+      observacao: "",
       responsavel: "",
       status: "disponivel",
     });
@@ -98,6 +105,9 @@ export default function Tombamento() {
       fkpedidoitem: item.fkpedidoitem?.toString() || "",
       tombamento: item.tombamento || "",
       serial: item.serial || "",
+      imei: item.imei || "",
+      mac: item.mac || "",
+      observacao: item.observacao || "",
       responsavel: item.responsavel || "",
       status: item.status || "disponivel",
     });
@@ -116,6 +126,9 @@ export default function Tombamento() {
       fkpedidoitem: "",
       tombamento: "",
       serial: "",
+      imei: "",
+      mac: "",
+      observacao: "",
       responsavel: "",
       status: "disponivel",
     });
@@ -188,6 +201,9 @@ export default function Tombamento() {
           fkpedidoitem: formData.fkpedidoitem, // Keep selected entry
           tombamento: "",
           serial: "",
+          imei: "",
+          mac: "",
+          observacao: "",
           responsavel: "",
           status: "disponivel",
         });
@@ -203,28 +219,28 @@ export default function Tombamento() {
   // Function to format tombamento number
   const formatTombamento = (value: string) => {
     const trimmedValue = value.trim();
-    
+
     // Check if it's a batch tombamento (starts with $)
     if (trimmedValue.startsWith('$')) {
       // Keep the $ format as-is for display, validation will happen on submit
       return trimmedValue;
     }
-    
+
     // Check if it's a valid integer
     const numericValue = parseInt(trimmedValue);
     if (!isNaN(numericValue) && numericValue.toString() === trimmedValue) {
       // Format with 6-digit padding
       const paddedNumber = numericValue.toString().padStart(6, '0');
-      
+
       // If location is available, prepend it
       if (produtoLocalizacao?.localizacao) {
         return `${produtoLocalizacao.localizacao}${paddedNumber}`;
       }
-      
+
       // Otherwise, just return the padded number
       return paddedNumber;
     }
-    
+
     return trimmedValue;
   };
 
@@ -236,24 +252,24 @@ export default function Tombamento() {
   // Function to get batch preview
   const getBatchPreview = (tombamento: string) => {
     if (!tombamento.startsWith('$')) return null;
-    
+
     const batchPattern = /^\$(\d+)-(\d+)$/;
     const match = tombamento.match(batchPattern);
-    
+
     if (!match) return null;
-    
+
     const startNum = parseInt(match[1]);
     const endNum = parseInt(match[2]);
-    
+
     if (startNum >= endNum) return null;
     if (endNum - startNum > 100) return null;
-    
+
     const count = endNum - startNum + 1;
     const firstFormatted = (startNum.toString().padStart(6, '0'));
     const lastFormatted = (endNum.toString().padStart(6, '0'));
-    
+
     const prefix = produtoLocalizacao?.localizacao || '';
-    
+
     return {
       count,
       first: `${prefix}${firstFormatted}`,
@@ -494,6 +510,36 @@ export default function Tombamento() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
+                    <Label htmlFor="imei" className="text-sm font-medium text-foreground">
+                      IMEI
+                    </Label>
+                    <Input
+                      id="imei"
+                      type="text"
+                      value={formData.imei}
+                      onChange={(e) => setFormData({ ...formData, imei: e.target.value })}
+                      placeholder="Ex: 123456789012345"
+                      data-testid="input-imei"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="mac" className="text-sm font-medium text-foreground">
+                      MAC Address
+                    </Label>
+                    <Input
+                      id="mac"
+                      type="text"
+                      value={formData.mac}
+                      onChange={(e) => setFormData({ ...formData, mac: e.target.value })}
+                      placeholder="Ex: 00:1A:2B:3C:4D:5E"
+                      data-testid="input-mac"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
                     <Label htmlFor="responsavel" className="text-sm font-medium text-foreground">
                       Responsável
                     </Label>
@@ -525,6 +571,20 @@ export default function Tombamento() {
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="observacao" className="text-sm font-medium text-foreground">
+                    Observações
+                  </Label>
+                  <Input
+                    id="observacao"
+                    type="text"
+                    value={formData.observacao}
+                    onChange={(e) => setFormData({ ...formData, observacao: e.target.value })}
+                    placeholder="Informações adicionais sobre o item"
+                    data-testid="input-observacao"
+                  />
                 </div>
 
                 <div>
@@ -727,7 +787,7 @@ export default function Tombamento() {
                           <div className="text-sm font-semibold text-foreground">{item.tombamento}</div>
                           {getStatusBadge(item.status)}
                         </div>
-                        
+
                         {/* Second line: Product name and serial */}
                         <div className="space-y-1">
                           <div className="text-sm font-medium text-foreground">
@@ -738,7 +798,7 @@ export default function Tombamento() {
                             <span>{item.photos ? (typeof item.photos === 'string' ? JSON.parse(item.photos).length : Array.isArray(item.photos) ? item.photos.length : 0) : 0} fotos</span>
                           </div>
                         </div>
-                        
+
                         {/* Responsible and actions */}
                         <div className="flex items-center justify-between pt-2 border-t border-border">
                           <div className="text-xs text-muted-foreground">

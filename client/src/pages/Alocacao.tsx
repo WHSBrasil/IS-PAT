@@ -31,6 +31,7 @@ export default function Alocacao() {
     dataalocacao: "",
     termo: "",
     responsavel: "",
+    observacao: "",
   });
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
@@ -104,6 +105,7 @@ export default function Alocacao() {
       dataalocacao: today,
       termo: "",
       responsavel: "",
+      observacao: "",
     });
     setSelectedFiles([]);
     setPreviewUrls([]);
@@ -121,6 +123,7 @@ export default function Alocacao() {
       dataalocacao: item.dataalocacao ? new Date(item.dataalocacao).toISOString().split('T')[0] : "",
       termo: item.termo || "",
       responsavel: item.responsavel || "",
+      observacao: item.observacao || "",
     });
     setSelectedFiles([]);
     setPreviewUrls([]);
@@ -139,6 +142,7 @@ export default function Alocacao() {
       dataalocacao: "",
       termo: "",
       responsavel: "",
+      observacao: "",
     });
     setSelectedFiles([]);
     previewUrls.forEach(url => URL.revokeObjectURL(url));
@@ -483,6 +487,20 @@ export default function Alocacao() {
                     placeholder="Detalhes do termo de responsabilidade..."
                     rows={3}
                     data-testid="textarea-termo"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="observacao" className="text-sm font-medium text-foreground">
+                    Observações
+                  </Label>
+                  <Textarea
+                    id="observacao"
+                    value={formData.observacao}
+                    onChange={(e) => setFormData({ ...formData, observacao: e.target.value })}
+                    placeholder="Observações sobre a alocação..."
+                    rows={2}
+                    data-testid="textarea-observacao"
                   />
                 </div>
 

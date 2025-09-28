@@ -206,10 +206,17 @@ export default function Tombamento() {
     
     // Check if it's a valid integer
     const numericValue = parseInt(trimmedValue);
-    if (!isNaN(numericValue) && numericValue.toString() === trimmedValue && produtoLocalizacao?.localizacao) {
-      // Format with location prefix and 6-digit padding
+    if (!isNaN(numericValue) && numericValue.toString() === trimmedValue) {
+      // Format with 6-digit padding
       const paddedNumber = numericValue.toString().padStart(6, '0');
-      return `${produtoLocalizacao.localizacao}${paddedNumber}`;
+      
+      // If location is available, prepend it
+      if (produtoLocalizacao?.localizacao) {
+        return `${produtoLocalizacao.localizacao}${paddedNumber}`;
+      }
+      
+      // Otherwise, just return the padded number
+      return paddedNumber;
     }
     
     return trimmedValue;

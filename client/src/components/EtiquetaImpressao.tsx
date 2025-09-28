@@ -30,13 +30,16 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
   const generateQRCodeForPreview = async () => {
     try {
       const qrDataUrl = await QRCode.toDataURL(qrUrl, {
-        width: 80, // Reduzido para corresponder ao multiplicador 2
-        margin: 1,
-        errorCorrectionLevel: 'H',
+        width: 128, // Tamanho maior para melhor qualidade
+        margin: 2,
+        errorCorrectionLevel: 'M', // Nível médio para melhor legibilidade
         color: {
           dark: '#000000',
           light: '#FFFFFF',
         },
+        rendererOpts: {
+          quality: 1
+        }
       });
       setQrCodeDataUrl(qrDataUrl);
     } catch (error) {
@@ -198,52 +201,45 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
     const descricaoLinhas = breakTextIntoLines(descricao, 25, 2);
     const empresaLinhas = breakTextIntoLines(empresaNome, 20, 2);
 
-    // Dimensões reais da etiqueta em pixels (50mm x 25mm = ~189px x 95px a 96 DPI)
-    const realWidth = 189;
-    const realHeight = 95;
-    
-    // Aplicar zoom
-    const scaledWidth = realWidth * zoomLevel;
-    const scaledHeight = realHeight * zoomLevel;
+    // Dimensões base da etiqueta (50mm x 25mm)
+    const baseWidth = 200;
+    const baseHeight = 100;
 
     return (
       <div 
-        className="border-2 border-gray-400 bg-white relative overflow-hidden"
+        className="border-2 border-gray-800 bg-white relative mx-auto"
         style={{ 
-          width: `${scaledWidth}px`, 
-          height: `${scaledHeight}px`,
-          transform: `scale(1)`,
-          transformOrigin: 'top left'
+          width: `${baseWidth * zoomLevel}px`, 
+          height: `${baseHeight * zoomLevel}px`,
+          fontSize: `${zoomLevel}px`
         }}
       >
-        {/* Container interno com escala real */}
-        <div 
-          className="absolute inset-0"
-          style={{ 
-            transform: `scale(${zoomLevel})`,
-            transformOrigin: 'top left',
-            width: `${realWidth}px`,
-            height: `${realHeight}px`,
-            padding: '3px'
-          }}
-        >
+        {/* Conteúdo da etiqueta */}
+        <div className="absolute inset-0 p-1">
           {/* Linhas 1 e 2 - Descrição do bem */}
-          <div className="text-black font-bold leading-none mb-1" style={{ fontSize: '6px', lineHeight: '7px' }}>
-            <div>{descricaoLinhas[0].toUpperCase()}</div>
-            <div>{descricaoLinhas[1].toUpperCase()}</div>
+          <div 
+            className="text-black font-bold leading-tight mb-1" 
+            style={{ 
+              fontSize: `${6 * zoomLevel}px`, 
+              lineHeight: `${7 * zoomLevel}px` 
+            }}
+          >
+            <div className="truncate">{descricaoLinhas[0].toUpperCase()}</div>
+            <div className="truncate">{descricaoLinhas[1].toUpperCase()}</div>
           </div>
 
-          {/* Layout principal com QR Code e informações */}
-          <div className="flex items-start" style={{ height: '65px' }}>
+          {/* Layout principal - QR Code e informações lado a lado */}
+          <div className="flex items-start gap-1">
             {/* QR Code - lado esquerdo */}
-            <div className="flex-shrink-0 mr-2" style={{ width: '30px', height: '30px' }}>
+            <div className="flex-shrink-0">
               {qrCodeDataUrl && (
                 <img 
                   src={qrCodeDataUrl} 
                   alt="QR Code" 
+                  className="border border-gray-300"
                   style={{ 
-                    width: '30px', 
-                    height: '30px',
+                    width: `${32 * zoomLevel}px`, 
+                    height: `${32 * zoomLevel}px`,
                     imageRendering: 'pixelated'
                   }}
                 />
@@ -251,16 +247,28 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
             </div>
 
             {/* Informações ao lado do QR Code */}
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               {/* Linha 3 - Código do tombamento */}
-              <div className="font-bold text-black leading-none mb-1" style={{ fontSize: '10px', lineHeight: '10px' }}>
+              <div 
+                className="font-black text-black leading-none mb-1 truncate" 
+                style={{ 
+                  fontSize: `${12 * zoomLevel}px`, 
+                  lineHeight: `${12 * zoomLevel}px` 
+                }}
+              >
                 {tombamento.tombamento}
               </div>
               
               {/* Linhas 4 e 5 - Mantenedora */}
-              <div className="text-black leading-none" style={{ fontSize: '4px', lineHeight: '5px' }}>
-                <div className="font-medium">{empresaLinhas[0].toUpperCase()}</div>
-                <div className="font-medium">{empresaLinhas[1].toUpperCase()}</div>
+              <div 
+                className="text-black leading-tight" 
+                style={{ 
+                  fontSize: `${5 * zoomLevel}px`, 
+                  lineHeight: `${6 * zoomLevel}px` 
+                }}
+              >
+                <div className="font-semibold truncate">{empresaLinhas[0].toUpperCase()}</div>
+                <div className="font-semibold truncate">{empresaLinhas[1].toUpperCase()}</div>
               </div>
             </div>
           </div>
@@ -316,14 +324,12 @@ export default function EtiquetaImpressao({ tombamento, empresa, isOpen, onClose
               </div>
             </div>
             
-            <div className="bg-gray-100 p-4 rounded overflow-auto max-h-96">
-              <div className="flex justify-center">
-                {previewEtiquetaReal()}
-              </div>
+            <div className="bg-gray-100 p-6 rounded overflow-auto max-h-96 flex items-center justify-center">
+              {previewEtiquetaReal()}
             </div>
             
             <p className="text-xs text-gray-500 mt-2 text-center">
-              Preview em tamanho real - Use os controles de zoom para testar o QR Code
+              Preview da etiqueta (50mm x 25mm) - Zoom {zoomLevel}x - Use o zoom para testar a legibilidade do QR Code
             </p>
           </div>
 

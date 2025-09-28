@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { db } from "./db";
+import { query } from "./db";
 import multer from "multer";
 import path from "path";
 
@@ -149,7 +149,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('API call - Getting entries for product ID:', fkproduto);
 
-      const result = await db.query(`
+      const result = await query(`
         SELECT 
           pe.pkpedido,
           pe.datapedido,
@@ -212,7 +212,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "ID do produto inválido" });
       }
 
-      const result = await db.query(`
+      const result = await query(`
         SELECT localizacao
         FROM sotech.est_produto
         WHERE pkproduto = $1
@@ -297,7 +297,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Get product location for formatting
-        const produtoResult = await db.query(`
+        const produtoResult = await query(`
           SELECT localizacao FROM sotech.est_produto WHERE pkproduto = $1
         `, [parseInt(fkproduto)]);
 

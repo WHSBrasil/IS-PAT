@@ -10,6 +10,7 @@ import { SearchInput } from "@/components/ui/search-input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Search, Eye, Pencil, Trash2, Image, ArrowLeft, Upload, X, QrCode } from "lucide-react";
 import EtiquetaImpressao from "@/components/EtiquetaImpressao";
+import EtiquetaLoteModal from "@/components/EtiquetaLoteModal";
 
 export default function Tombamento() {
   const [viewMode, setViewMode] = useState<"list" | "form">("list");
@@ -21,6 +22,7 @@ export default function Tombamento() {
   const [selectedPedidoitem, setSelectedPedidoitem] = useState<number | null>(null);
   const [showEtiquetaModal, setShowEtiquetaModal] = useState(false);
   const [selectedTombamentoForLabel, setSelectedTombamentoForLabel] = useState<any>(null);
+  const [showEtiquetaLoteModal, setShowEtiquetaLoteModal] = useState(false);
   const [empresaData, setEmpresaData] = useState<any>(null);
 
   // Form state
@@ -538,14 +540,25 @@ export default function Tombamento() {
             <h2 className="text-2xl font-bold text-foreground">Tombamento de Bens</h2>
             <p className="text-muted-foreground">Registre novos itens com número de tombamento e fotos</p>
           </div>
-          <Button
-            onClick={handleNewTombamento}
-            className="flex items-center space-x-2"
-            data-testid="button-new-tombamento"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Novo Tombamento</span>
-          </Button>
+          <div className="flex space-x-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowEtiquetaLoteModal(true)}
+              className="flex items-center space-x-2"
+              data-testid="button-batch-labels"
+            >
+              <QrCode className="w-4 h-4" />
+              <span>Etiquetas em Lote</span>
+            </Button>
+            <Button
+              onClick={handleNewTombamento}
+              className="flex items-center space-x-2"
+              data-testid="button-new-tombamento"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Novo Tombamento</span>
+            </Button>
+          </div>
         </div>
 
         {/* Status Filter Tabs */}
@@ -704,6 +717,13 @@ export default function Tombamento() {
           }}
         />
       )}
+
+      {/* Modal de impressão de etiquetas em lote */}
+      <EtiquetaLoteModal
+        isOpen={showEtiquetaLoteModal}
+        onClose={() => setShowEtiquetaLoteModal(false)}
+        empresa={empresaData}
+      />
     </div>
   );
 }

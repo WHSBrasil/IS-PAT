@@ -160,15 +160,24 @@ export function useCreateTombamento() {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/tombamentos"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       // Invalidate all produto-entradas queries to update available quantities
       queryClient.invalidateQueries({ queryKey: ['produto-entradas'] });
-      toast({
-        title: "Sucesso",
-        description: "Tombamento criado com sucesso",
-      });
+      
+      // Check if it's a batch response
+      if (data.count && data.count > 1) {
+        toast({
+          title: "Sucesso",
+          description: `${data.count} tombamentos criados com sucesso em lote`,
+        });
+      } else {
+        toast({
+          title: "Sucesso",
+          description: "Tombamento criado com sucesso",
+        });
+      }
     },
     onError: () => {
       toast({

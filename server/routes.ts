@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { db } from "./db";
 import multer from "multer";
 import path from "path";
 
@@ -275,18 +276,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }));
       }
 
-      const newTombamento = await storage.createTombamento({
-        fkproduto: parseInt(fkproduto),
-        fkpedidoitem: fkpedidoitem ? parseInt(fkpedidoitem) : undefined,
-        tombamento,
-        serial,
-        photos,
-        responsavel,
-        status,
-        fkuser: 0
-      });
+      // Check if it's a batch tombamento (starts with $)
+      if (tombamento.startsWith('$')) {
+        const batchPattern = /^\$(\d+)-(\d+)$/;
+        const match = tombamento.match(batchPattern);
+        
+        if (!match) {
+          return res.status(400).json({ error: 'Formato de lote inválido. Use $inicio-fim (ex: $11-15)' });
+        }
 
-      res.status(201).json(newTombamento);
+        const startNum = parseInt(match[1]);
+        const endNum = parseInt(match[2]);
+
+        if (startNum >= endNum) {
+          return res.status(400).json({ error: 'O número inicial deve ser menor que o final' });
+        }
+
+        if (endNum - startNum > 100) {
+          return res.status(400).json({ error: 'Limite máximo de 100 tombamentos por lote' });
+        }
+
+        // Get product location for formatting
+        const produtoResult = await db.query(`
+          SELECT localizacao FROM sotech.est_produto WHERE pkproduto = $1
+        `, [parseInt(fkproduto)]);
+
+        const localizacao = produtoResult.rows[0]?.localizacao || '';
+
+        // Create batch tombamentos
+        const createdTombamentos = [];
+        for (let i = startNum; i <= endNum; i++) {
+          const paddedNumber = i.toString().padStart(6, '0');
+          const formattedTombamento = localizacao ? `${localizacao}${paddedNumber}` : paddedNumber;
+
+          const newTombamento = await storage.createTombamento({
+            fkproduto: parseInt(fkproduto),
+            fkpedidoitem: fkpedidoitem ? parseInt(fkpedidoitem) : undefined,
+            tombamento: formattedTombamento,
+            serial: serial || '',
+            photos,
+            responsavel,
+            status,
+            fkuser: 0
+          });
+
+          createdTombamentos.push(newTombamento);
+        }
+
+        res.status(201).json({
+          message: `${createdTombamentos.length} tombamentos criados com sucesso`,
+          tombamentos: createdTombamentos,
+          count: createdTombamentos.length
+        });
+      } else {
+        // Single tombamento creation
+        const newTombamento = await storage.createTombamento({
+          fkproduto: parseInt(fkproduto),
+          fkpedidoitem: fkpedidoitem ? parseInt(fkpedidoitem) : undefined,
+          tombamento,
+          serial,
+          photos,
+          responsavel,
+          status,
+          fkuser: 0
+        });
+
+        res.status(201).json(newTombamento);
+      }
     } catch (error) {
       console.error('Error creating tombamento:', error);
       res.status(500).json({ error: 'Erro interno do servidor' });

@@ -204,6 +204,12 @@ export default function Tombamento() {
   const formatTombamento = (value: string) => {
     const trimmedValue = value.trim();
     
+    // Check if it's a batch tombamento (starts with $)
+    if (trimmedValue.startsWith('$')) {
+      // Keep the $ format as-is for display, validation will happen on submit
+      return trimmedValue;
+    }
+    
     // Check if it's a valid integer
     const numericValue = parseInt(trimmedValue);
     if (!isNaN(numericValue) && numericValue.toString() === trimmedValue) {
@@ -226,6 +232,36 @@ export default function Tombamento() {
     const formattedValue = formatTombamento(value);
     setFormData({ ...formData, tombamento: formattedValue });
   };
+
+  // Function to get batch preview
+  const getBatchPreview = (tombamento: string) => {
+    if (!tombamento.startsWith('$')) return null;
+    
+    const batchPattern = /^\$(\d+)-(\d+)$/;
+    const match = tombamento.match(batchPattern);
+    
+    if (!match) return null;
+    
+    const startNum = parseInt(match[1]);
+    const endNum = parseInt(match[2]);
+    
+    if (startNum >= endNum) return null;
+    if (endNum - startNum > 100) return null;
+    
+    const count = endNum - startNum + 1;
+    const firstFormatted = (startNum.toString().padStart(6, '0'));
+    const lastFormatted = (endNum.toString().padStart(6, '0'));
+    
+    const prefix = produtoLocalizacao?.localizacao || '';
+    
+    return {
+      count,
+      first: `${prefix}${firstFormatted}`,
+      last: `${prefix}${lastFormatted}`
+    };
+  };
+
+  const batchPreview = getBatchPreview(formData.tombamento);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -417,10 +453,28 @@ export default function Tombamento() {
                       type="text"
                       value={formData.tombamento}
                       onChange={(e) => handleTombamentoChange(e.target.value)}
-                      placeholder={produtoLocalizacao?.localizacao ? `Ex: 27 (será formatado como ${produtoLocalizacao.localizacao}000027)` : "Ex: TB-001234"}
+                      placeholder={produtoLocalizacao?.localizacao ? `Ex: 27 ou $11-15 para lote` : "Ex: TB-001234 ou $11-15 para lote"}
                       required
                       data-testid="input-tombamento"
                     />
+                    {batchPreview && (
+                      <div className="mt-2 p-3 bg-accent/10 rounded-lg border border-accent/20">
+                        <div className="text-sm font-medium text-accent">Lote de Tombamento</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {batchPreview.count} tombamentos serão criados:
+                        </div>
+                        <div className="text-xs font-mono text-foreground mt-1">
+                          De: {batchPreview.first} até {batchPreview.last}
+                        </div>
+                      </div>
+                    )}
+                    {formData.tombamento.startsWith('$') && !batchPreview && formData.tombamento.length > 1 && (
+                      <div className="mt-2 p-3 bg-destructive/10 rounded-lg border border-destructive/20">
+                        <div className="text-sm text-destructive">
+                          Formato inválido. Use $inicio-fim (ex: $11-15)
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div>

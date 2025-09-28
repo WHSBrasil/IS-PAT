@@ -591,6 +591,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/profissionais", async (req, res) => {
+    try {
+      const profissionais = await storage.getProfissionais();
+      res.json(profissionais);
+    } catch (error) {
+      console.error('Error fetching profissionais:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
   app.get("/api/tombamentos/:id/historico", async (req, res) => {
     try {
       const fktombamento = parseInt(req.params.id);

@@ -1,8 +1,8 @@
 import { query } from './db';
-import { 
-  User, 
-  InsertUser, 
-  Classificacao, 
+import {
+  User,
+  InsertUser,
+  Classificacao,
   InsertClassificacao,
   Tombamento,
   InsertTombamento,
@@ -110,6 +110,7 @@ export interface IStorage {
   // Support data methods
   getUnidadesSaude(): Promise<UnidadeSaude[]>;
   getSetores(): Promise<Setor[]>;
+  getProfissionais(): Promise<any[]>;
 
   // Product entries methods
   getProdutoEntradas(fkproduto: number): Promise<any[]>;
@@ -179,7 +180,7 @@ export class DatabaseStorage implements IStorage {
   // Produto methods
   async getProdutos(): Promise<Produto[]> {
     const result = await query(`
-      SELECT p.pkproduto, p.produto, p.ativo 
+      SELECT p.pkproduto, p.produto, p.ativo
       FROM sotech.est_produto p
       LEFT JOIN sotech.est_subgrupo sg ON p.fksubgrupo = sg.pksubgrupo
       LEFT JOIN sotech.est_grupo g ON sg.fkgrupo = g.pkgrupo
@@ -207,7 +208,7 @@ export class DatabaseStorage implements IStorage {
       SELECT t.*, p.produto as produto_nome, p.produto as produto_descricao
       FROM sotech.pat_tombamento t
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
-      WHERE t.ativo = true 
+      WHERE t.ativo = true
       ORDER BY t.created_at DESC
     `);
 
@@ -244,9 +245,9 @@ export class DatabaseStorage implements IStorage {
 
   async createTombamento(tombamento: InsertTombamento): Promise<Tombamento> {
     const result = await query(`
-      INSERT INTO sotech.pat_tombamento 
-      (fkproduto, fkpedidoitem, tombamento, serial, photos, responsavel, status, fkuser) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+      INSERT INTO sotech.pat_tombamento
+      (fkproduto, fkpedidoitem, tombamento, serial, photos, responsavel, status, fkuser)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
     `, [
       tombamento.fkproduto,
@@ -278,9 +279,9 @@ export class DatabaseStorage implements IStorage {
     }
 
     const result = await query(`
-      UPDATE sotech.pat_tombamento 
-      SET ${fields.join(', ')}, version = version + 1 
-      WHERE pktombamento = $1 
+      UPDATE sotech.pat_tombamento
+      SET ${fields.join(', ')}, version = version + 1
+      WHERE pktombamento = $1
       RETURNING *
     `, [id, ...values]);
 
@@ -295,17 +296,20 @@ export class DatabaseStorage implements IStorage {
   // Alocacao methods
   async getAlocacoes(): Promise<Alocacao[]> {
     const result = await query(`
-      SELECT a.*, 
+      SELECT a.*,
              t.tombamento, t.serial,
              p.produto as produto_nome,
              u.unidadesaude as unidade_nome,
-             s.setor as setor_nome
+             s.setor as setor_nome,
+             ci.pkinterveniente,
+             ci.interveniente as profissional_nome
       FROM sotech.pat_alocacao a
       LEFT JOIN sotech.pat_tombamento t ON a.fktombamento = t.pktombamento
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
       LEFT JOIN sotech.cdg_unidadesaude u ON a.fkunidadesaude = u.pkunidadesaude
       LEFT JOIN sotech.cdg_setor s ON a.fksetor = s.pksetor
-      WHERE a.ativo = true 
+      LEFT JOIN sotech.cdg_interveniente ci ON a.fkprofissional = ci.pkinterveniente
+      WHERE a.ativo = true
       ORDER BY a.created_at DESC
     `);
 
@@ -318,20 +322,27 @@ export class DatabaseStorage implements IStorage {
         produto: row.produto_nome ? { nome: row.produto_nome } : undefined
       } : undefined,
       unidadesaude: row.unidade_nome ? { nome: row.unidade_nome } : undefined,
-      setor: row.setor_nome ? { nome: row.setor_nome } : undefined
+      setor: row.setor_nome ? { nome: row.setor_nome } : undefined,
+      fkprofissional: row.pkinterveniente,
+      responsavel: row.profissional_nome
     }));
   }
 
   async getAlocacao(id: number): Promise<Alocacao | undefined> {
-    const result = await query('SELECT * FROM sotech.pat_alocacao WHERE pkalocacao = $1', [id]);
+    const result = await query(`
+      SELECT a.*, ci.interveniente as profissional_nome
+      FROM sotech.pat_alocacao a
+      LEFT JOIN sotech.cdg_interveniente ci ON a.fkprofissional = ci.pkinterveniente
+      WHERE a.pkalocacao = $1
+    `, [id]);
     return result.rows[0] || undefined;
   }
 
   async createAlocacao(alocacao: InsertAlocacao): Promise<Alocacao> {
     const result = await query(`
-      INSERT INTO sotech.pat_alocacao 
-      (fktombamento, fkunidadesaude, fksetor, responsavel_unidade, dataalocacao, photos, termo, responsavel, fkuser) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+      INSERT INTO sotech.pat_alocacao
+      (fktombamento, fkunidadesaude, fksetor, responsavel_unidade, dataalocacao, photos, termo, responsavel, fkuser, fkprofissional)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING *
     `, [
       alocacao.fktombamento,
@@ -342,7 +353,8 @@ export class DatabaseStorage implements IStorage {
       alocacao.photos ? JSON.stringify(alocacao.photos) : null,
       alocacao.termo,
       alocacao.responsavel,
-      alocacao.fkuser || 0
+      alocacao.fkuser || 0,
+      alocacao.fkprofissional
     ]);
 
     // Update tombamento status to 'alocado'
@@ -364,9 +376,9 @@ export class DatabaseStorage implements IStorage {
     });
 
     const result = await query(`
-      UPDATE sotech.pat_alocacao 
-      SET ${fields.join(', ')}, version = version + 1 
-      WHERE pkalocacao = $1 
+      UPDATE sotech.pat_alocacao
+      SET ${fields.join(', ')}, version = version + 1
+      WHERE pkalocacao = $1
       RETURNING *
     `, [id, ...values]);
 
@@ -388,7 +400,7 @@ export class DatabaseStorage implements IStorage {
   // Transferencia methods
   async getTransferencias(): Promise<Transferencia[]> {
     const result = await query(`
-      SELECT tr.*, 
+      SELECT tr.*,
              t.tombamento,
              p.produto as produto_nome,
              uo.unidadesaude as unidade_origem_nome,
@@ -398,7 +410,7 @@ export class DatabaseStorage implements IStorage {
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
       LEFT JOIN sotech.cdg_unidadesaude uo ON tr.fkunidadesaude_origem = uo.pkunidadesaude
       LEFT JOIN sotech.cdg_unidadesaude ud ON tr.fkunidadesaude_destino = ud.pkunidadesaude
-      WHERE tr.ativo = true 
+      WHERE tr.ativo = true
       ORDER BY tr.created_at DESC
     `);
 
@@ -422,17 +434,17 @@ export class DatabaseStorage implements IStorage {
     // First, deactivate the current allocation
     if (transferencia.fkunidadesaude_origem) {
       await query(`
-        UPDATE sotech.pat_alocacao 
-        SET ativo = false 
+        UPDATE sotech.pat_alocacao
+        SET ativo = false
         WHERE fktombamento = $1 AND fkunidadesaude = $2 AND ativo = true
       `, [transferencia.fktombamento, transferencia.fkunidadesaude_origem]);
     }
 
     // Insert the transfer record
     const result = await query(`
-      INSERT INTO sotech.pat_transferencia 
-      (fktombamento, fkunidadesaude_origem, fkunidadesaude_destino, fksetor_origem, fksetor_destino, responsavel_destino, datatasnferencia, responsavel, fkuser) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+      INSERT INTO sotech.pat_transferencia
+      (fktombamento, fkunidadesaude_origem, fkunidadesaude_destino, fksetor_origem, fksetor_destino, responsavel_destino, datatasnferencia, responsavel, fkuser)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *
     `, [
       transferencia.fktombamento,
@@ -448,8 +460,8 @@ export class DatabaseStorage implements IStorage {
 
     // Create new allocation at destination
     await query(`
-      INSERT INTO sotech.pat_alocacao 
-      (fktombamento, fkunidadesaude, fksetor, responsavel_unidade, dataalocacao, responsavel, fkuser) 
+      INSERT INTO sotech.pat_alocacao
+      (fktombamento, fkunidadesaude, fksetor, responsavel_unidade, dataalocacao, responsavel, fkuser)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
     `, [
       transferencia.fktombamento,
@@ -477,9 +489,9 @@ export class DatabaseStorage implements IStorage {
     });
 
     const result = await query(`
-      UPDATE sotech.pat_transferencia 
-      SET ${fields.join(', ')}, version = version + 1 
-      WHERE pktransferencia = $1 
+      UPDATE sotech.pat_transferencia
+      SET ${fields.join(', ')}, version = version + 1
+      WHERE pktransferencia = $1
       RETURNING *
     `, [id, ...values]);
 
@@ -493,7 +505,7 @@ export class DatabaseStorage implements IStorage {
 
   async getHistoricoMovimentacao(fktombamento: number): Promise<any[]> {
     const result = await query(`
-      SELECT 
+      SELECT
         'alocacao' as tipo,
         a.dataalocacao as data,
         a.responsavel_unidade as responsavel,
@@ -508,14 +520,14 @@ export class DatabaseStorage implements IStorage {
 
       UNION ALL
 
-      SELECT 
+      SELECT
         'transferencia' as tipo,
         t.datatasnferencia as data,
         t.responsavel,
         CONCAT(uo.unidadesaude, ' → ', ud.unidadesaude) as unidade,
-        CASE 
+        CASE
           WHEN t.fksetor_destino IS NOT NULL THEN t.fksetor_destino
-          ELSE NULL 
+          ELSE NULL
         END as setor,
         NULL as termo,
         t.ativo
@@ -533,13 +545,13 @@ export class DatabaseStorage implements IStorage {
   // Manutencao methods
   async getManutencoes(): Promise<Manutencao[]> {
     const result = await query(`
-      SELECT m.*, 
+      SELECT m.*,
              t.tombamento,
              p.produto as produto_nome
       FROM sotech.pat_manutencao m
       LEFT JOIN sotech.pat_tombamento t ON m.fktombamento = t.pktombamento
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
-      WHERE m.ativo = true 
+      WHERE m.ativo = true
       ORDER BY m.created_at DESC
     `);
 
@@ -559,9 +571,9 @@ export class DatabaseStorage implements IStorage {
 
   async createManutencao(manutencao: InsertManutencao): Promise<Manutencao> {
     const result = await query(`
-      INSERT INTO sotech.pat_manutencao 
-      (fktombamento, dataretirada, motivo, responsavel, dataretorno, fkuser) 
-      VALUES ($1, $2, $3, $4, $5, $6) 
+      INSERT INTO sotech.pat_manutencao
+      (fktombamento, dataretirada, motivo, responsavel, dataretorno, fkuser)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
     `, [
       manutencao.fktombamento,
@@ -591,9 +603,9 @@ export class DatabaseStorage implements IStorage {
     });
 
     const result = await query(`
-      UPDATE sotech.pat_manutencao 
-      SET ${fields.join(', ')}, version = version + 1 
-      WHERE pkmanutencao = $1 
+      UPDATE sotech.pat_manutencao
+      SET ${fields.join(', ')}, version = version + 1
+      WHERE pkmanutencao = $1
       RETURNING *
     `, [id, ...values]);
 
@@ -623,10 +635,15 @@ export class DatabaseStorage implements IStorage {
     return result.rows;
   }
 
+  async getProfissionais(): Promise<any[]> {
+    const result = await query('SELECT * FROM sotech.cdg_interveniente ORDER BY interveniente');
+    return result.rows;
+  }
+
   // Product entries methods
   async getProdutoEntradas(fkproduto: number): Promise<any[]> {
     const result = await query(`
-      SELECT 
+      SELECT
         p.pkpedido,
         p.datapedido,
         tp.pktipopedido as tipo_pedido,
@@ -642,7 +659,7 @@ export class DatabaseStorage implements IStorage {
       INNER JOIN sotech.est_pedidoitem pi ON p.pkpedido = pi.fkpedido
       INNER JOIN sotech.est_tipopedido tp ON p.fktipopedido = tp.pktipopedido
       WHERE pi.fkproduto = $1
-        AND tp.tipo = 'E' 
+        AND tp.tipo = 'E'
         AND p.estado = 'F'
       ORDER BY p.datapedido DESC
     `, [fkproduto]);

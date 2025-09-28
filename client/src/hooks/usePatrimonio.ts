@@ -418,6 +418,16 @@ export function useSetores() {
   });
 }
 
+export function useProfissionais() {
+  return useQuery({
+    queryKey: ["/api/profissionais"],
+    queryFn: async () => {
+      const response = await api.getProfissionais();
+      return response.json();
+    },
+  });
+}
+
 export function useHistoricoMovimentacao(fktombamento: number) {
   return useQuery({
     queryKey: ["/api/tombamentos", fktombamento, "historico"],

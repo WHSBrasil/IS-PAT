@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useCreateAlocacao, useUpdateAlocacao, useTombamentos, useUnidadesSaude, useSetores } from "@/hooks/usePatrimonio";
+import { useCreateAlocacao, useUpdateAlocacao, useTombamentos, useUnidadesSaude, useSetores, useProfissionais } from "@/hooks/usePatrimonio";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
     fktombamento: "",
     fkunidadesaude: "",
     fksetor: "",
+    fkprofissional: "",
     responsavel_unidade: "",
     dataalocacao: "",
     termo: "",
@@ -31,11 +32,14 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
   const [searchTombamento, setSearchTombamento] = useState("");
   const [searchUnidade, setSearchUnidade] = useState("");
   const [searchSetor, setSearchSetor] = useState("");
+  const [searchProfissional, setSearchProfissional] = useState("");
 
   const { data: tombamentos = [] } = useTombamentos();
   const { data: unidadesSaude = [] } = useUnidadesSaude();
   const { data: setoresData } = useSetores();
   const setores = Array.isArray(setoresData) ? setoresData : [];
+  const { data: profissionaisData } = useProfissionais();
+  const profissionais = Array.isArray(profissionaisData) ? profissionaisData : [];
   const createAlocacao = useCreateAlocacao();
   const updateAlocacao = useUpdateAlocacao();
 
@@ -57,12 +61,17 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
     setor.setor?.toLowerCase().includes(searchSetor.toLowerCase())
   );
 
+  const filteredProfissionais = (Array.isArray(profissionais) ? profissionais : []).filter((profissional: any) =>
+    profissional.interveniente?.toLowerCase().includes(searchProfissional.toLowerCase())
+  );
+
   useEffect(() => {
     if (editingItem) {
       setFormData({
         fktombamento: editingItem.fktombamento?.toString() || "",
         fkunidadesaude: editingItem.fkunidadesaude?.toString() || "",
         fksetor: editingItem.fksetor?.toString() || "",
+        fkprofissional: editingItem.fkprofissional?.toString() || "",
         responsavel_unidade: editingItem.responsavel_unidade || "",
         dataalocacao: editingItem.dataalocacao ? new Date(editingItem.dataalocacao).toISOString().split('T')[0] : "",
         termo: editingItem.termo || "",
@@ -74,6 +83,7 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
         fktombamento: "",
         fkunidadesaude: "",
         fksetor: "",
+        fkprofissional: "",
         responsavel_unidade: "",
         dataalocacao: today,
         termo: "",
@@ -269,6 +279,44 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
             </div>
 
             <div>
+              <Label htmlFor="fkprofissional" className="text-sm font-medium text-foreground">
+                Responsável pelo Bem
+              </Label>
+              <Select
+                value={formData.fkprofissional}
+                onValueChange={(value) => setFormData({ ...formData, fkprofissional: value })}
+              >
+                <SelectTrigger data-testid="select-profissional">
+                  <SelectValue placeholder="Selecione um profissional" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[200px]">
+                  <div className="sticky top-0 bg-background p-2 border-b">
+                    <SearchInput
+                      value={searchProfissional}
+                      onChange={setSearchProfissional}
+                      placeholder="Pesquisar profissional..."
+                      data-testid="search-profissional"
+                      className="h-8"
+                    />
+                  </div>
+                  {filteredProfissionais.length > 0 ? (
+                    filteredProfissionais.map((profissional: any) => (
+                      <SelectItem key={profissional.pkinterveniente} value={profissional.pkinterveniente.toString()}>
+                        {profissional.interveniente}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="p-2 text-sm text-muted-foreground">
+                      {searchProfissional ? "Nenhum profissional encontrado" : "Carregando profissionais..."}
+                    </div>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
               <Label htmlFor="dataalocacao" className="text-sm font-medium text-foreground">
                 Data de Alocação *
               </Label>
@@ -281,7 +329,6 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
                 data-testid="input-data-alocacao"
               />
             </div>
-          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

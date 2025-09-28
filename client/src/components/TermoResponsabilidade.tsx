@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -95,11 +94,11 @@ CPF [cpf_do_responsavel_unidade]
 
   const handlePrint = () => {
     setIsGenerating(true);
-    
+
     try {
       const content = generateTermoContent();
       const printWindow = window.open('', '_blank');
-      
+
       if (printWindow) {
         printWindow.document.write(`
           <!DOCTYPE html>
@@ -115,7 +114,7 @@ CPF [cpf_do_responsavel_unidade]
                   color: #000;
                   background: white;
                 }
-                
+
                 .header {
                   display: flex;
                   justify-content: space-between;
@@ -124,7 +123,7 @@ CPF [cpf_do_responsavel_unidade]
                   padding: 10px 0;
                   border-bottom: 1px solid #ccc;
                 }
-                
+
                 .logo-left, .logo-right {
                   width: 120px;
                   height: 60px;
@@ -137,33 +136,33 @@ CPF [cpf_do_responsavel_unidade]
                   text-align: center;
                   color: #666;
                 }
-                
+
                 .title-section {
                   text-align: center;
                   flex-grow: 1;
                   margin: 0 20px;
                 }
-                
+
                 .title-section h1 {
                   font-size: 14px;
                   font-weight: bold;
                   margin: 0 0 5px 0;
                   letter-spacing: 0.5px;
                 }
-                
+
                 .title-section h2 {
                   font-size: 12px;
                   font-weight: normal;
                   margin: 0;
                   letter-spacing: 0.3px;
                 }
-                
+
                 .content {
                   text-align: justify;
                   margin-bottom: 15px;
                   line-height: 1.4;
                 }
-                
+
                 .equipment-info {
                   margin: 15px 0;
                   padding: 8px;
@@ -171,32 +170,32 @@ CPF [cpf_do_responsavel_unidade]
                   border: 1px solid #ddd;
                   font-size: 11px;
                 }
-                
+
                 .conditions {
                   margin: 15px 0;
                   text-align: justify;
                 }
-                
+
                 .conditions ol {
                   padding-left: 20px;
                   margin: 10px 0;
                 }
-                
+
                 .conditions li {
                   margin: 8px 0;
                   text-align: justify;
                   line-height: 1.4;
                 }
-                
+
                 .signatures {
                   margin-top: 40px;
                 }
-                
+
                 .signature-line {
                   margin: 25px 0;
                   text-align: center;
                 }
-                
+
                 .signature-line::before {
                   content: '';
                   display: block;
@@ -205,7 +204,7 @@ CPF [cpf_do_responsavel_unidade]
                   background: #000;
                   margin: 0 auto 5px auto;
                 }
-                
+
                 .footer {
                   margin-top: 40px;
                   text-align: center;
@@ -214,23 +213,23 @@ CPF [cpf_do_responsavel_unidade]
                   border-top: 1px solid #ccc;
                   padding-top: 15px;
                 }
-                
+
                 @media print {
                   body {
                     margin: 0;
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
                   }
-                  
+
                   .no-print {
                     display: none !important;
                   }
-                  
+
                   .page-break {
                     page-break-before: always;
                   }
                 }
-                
+
                 .print-button {
                   background: #007bff;
                   color: white;
@@ -240,7 +239,7 @@ CPF [cpf_do_responsavel_unidade]
                   cursor: pointer;
                   border-radius: 4px;
                 }
-                
+
                 .print-button:hover {
                   background: #0056b3;
                 }
@@ -251,7 +250,7 @@ CPF [cpf_do_responsavel_unidade]
                 <button class="print-button" onclick="window.print()">🖨️ Imprimir</button>
                 <button class="print-button" onclick="window.close()">❌ Fechar</button>
               </div>
-              
+
               <div class="header">
                 <div class="logo-left">
                   LOGO<br>CASCAVEL
@@ -264,48 +263,48 @@ CPF [cpf_do_responsavel_unidade]
                   LOGO<br>IGM
                 </div>
               </div>
-              
+
               <div class="content">
-                <p>Eu, <strong>${alocacao?.responsavel_unidade || '[nome_do_responsavel_unidade]'}</strong>, Portador do CPF <strong>[cpf_do_responsavel_unidade]</strong>, lotado na unidade de saúde <strong>${alocacao?.unidadesaude?.nome || '[unidade_de_saude]'}</strong> e exercendo a função de <strong>[cargo_do_responsavel]</strong>, declaro que recebi em <strong>${formatDate(alocacao?.dataalocacao) || '[data_alocacao]'}</strong> o equipamento <strong>${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'}</strong> CNPJ <strong>[cnpj_instituicao]</strong> a título de guarda, responsabilizando-me pelo uso adequado e os cuidados devidos, conforme Secretaria Municipal de Saúde, e o assumo conforme meu cargo abaixo descrito, o equipamento abaixo especificado neste termo:</p>
+                <p>Eu, <strong>${alocacao?.responsavel_unidade || '[sotech.cdg_interveniente.interveniente]'}</strong>, Portador do CNS <strong>[sotech.cdg_interveniente.cns]</strong>, lotado na unidade de saúde <strong>${alocacao?.unidadesaude?.nome || '[sotech.cdg_unidadesaude.unidadesaude]'}</strong>, CNES <strong>[sotech.cdg_unidadesaude.cnes]</strong>, declaro que recebi do <strong>${empresa?.mantenedora || '[sotech.cdg_mantenedora.mantenedora]'}</strong>, CNPJ <strong>${empresa?.cnpj || '[sotech.cdg_mantenedora.cnpj]'}</strong> a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:</p>
               </div>
-              
+
               <div class="equipment-info">
                 <p><strong>Equipamento:</strong> ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} [codigo_produto]</p>
                 <p><strong>IMEI:</strong> [imei_equipamento]</p>
                 <p><strong>Serial:</strong> ${alocacao?.tombamento?.serial || '[numero_serie]'}</p>
                 <p><strong>MAC:</strong> ${alocacao?.tombamento?.mac || '[endereco_mac]'}</p>
               </div>
-              
+
               <div class="conditions">
                 <p>Pelo qual declaro estar ciente de que:</p>
                 <ol>
                   <li>Se o equipamento for danificado ou inutilizado por emergência, manutenção, mau uso ou negligência, deverá comunicar o ocorrido ao responsável da Secretaria Municipal da Saúde, ficando sujeito às responsabilidades respectivas de cada conduta;</li>
-                  
+
                   <li>No caso de extravio, furto ou roubo deverá notificar crimes, deverá se apresentar boletim de ocorrência imediatamente;</li>
-                  
+
                   <li>Em caso de troca por dano, furto ou roubo, o novo equipamento acarretará custos não previstos para a Instituição, visto que a Instituição não tem obrigação de substituir equipamentos danificados nos casos acima citados;</li>
-                  
+
                   <li>Em caso de troca por dano, furto ou roubo, poderei vir a receber equipamentos de qualidade inferior, inclusive usados, resultados de outras marcas;</li>
-                  
+
                   <li>Em caso de troca por contrato entre a Instituição IGM e o município de Cascavel (PR) ou outros ente dos contratos firmados, deverá responsável pela devolução, sem direito a completo e em perfeito estado os equipamentos, constituindo-se o tempo de uso dos mesmo, no Instituto IGM/Empresa;</li>
-                  
+
                   <li>O equipamento em minha posse não é protegido, devendo ter apenas dados de trabalho nele, ou seja, todos os dados, programas e demais informações estão sendo salvos pelo usuário por sua conta e risco;</li>
-                  
+
                   <li>Estando os equipamentos em minha posse, estarei sujeito a inspeções sem prévio aviso;</li>
                 </ol>
               </div>
-              
+
               <div class="signatures">
                 <p>Cliente:</p>
                 <div class="signature-line"></div>
-                
+
                 <br><br>
                 <p><strong>Termo de responsabilidade instrumental:</strong></p>
                 <br>
                 <p><strong>${alocacao?.responsavel_unidade || '[nome_responsavel]'}</strong></p>
                 <p>CPF: [cpf_do_responsavel_unidade]</p>
               </div>
-              
+
               <div class="footer">
                 <p><strong>Grupo IS</strong></p>
                 <p>SWITCH ® SYSCOM</p>
@@ -313,7 +312,7 @@ CPF [cpf_do_responsavel_unidade]
             </body>
           </html>
         `);
-        
+
         printWindow.document.close();
         printWindow.focus();
       }
@@ -327,13 +326,13 @@ CPF [cpf_do_responsavel_unidade]
 
   const handleDownload = () => {
     setIsGenerating(true);
-    
+
     try {
       const content = generateTermoContent();
       const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      
+
       link.href = url;
       link.download = `termo-responsabilidade-${alocacao?.tombamento?.tombamento || 'alocacao'}-${formatDate(new Date()).replace(/\//g, '-')}.txt`;
       document.body.appendChild(link);
@@ -378,7 +377,7 @@ CPF [cpf_do_responsavel_unidade]
             <div className="text-xs leading-relaxed space-y-4">
               <div className="bg-gray-50 p-4 rounded text-xs">
                 <pre className="whitespace-pre-wrap font-sans text-xs leading-relaxed">
-{`Eu, ${alocacao?.responsavel_unidade || '[nome_do_responsavel_unidade]'}, Portador do CPF [cpf_do_responsavel_unidade], lotado na unidade de saúde ${alocacao?.unidadesaude?.nome || '[unidade_de_saude]'} e exercendo a função de [cargo_do_responsavel], declaro que recebi em ${formatDate(alocacao?.dataalocacao) || '[data_alocacao]'} o equipamento ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} CNPJ [cnpj_instituicao] a título de guarda, responsabilizando-me pelo uso adequado e os cuidados devidos, conforme Secretaria Municipal de Saúde, e o assumo conforme meu cargo abaixo descrito, o equipamento abaixo especificado neste termo:
+{`Eu, ${alocacao?.responsavel_unidade || '[sotech.cdg_interveniente.interveniente]'}, Portador do CNS ${alocacao?.interveniente?.cns || '[sotech.cdg_interveniente.cns]'}, lotado na unidade de saúde ${alocacao?.unidadesaude?.nome || '[sotech.cdg_unidadesaude.unidadesaude]'}, CNES ${alocacao?.unidadesaude?.cnes || '[sotech.cdg_unidadesaude.cnes]'}, declaro que recebi do ${empresa?.mantenedora || '[sotech.cdg_mantenedora.mantenedora]'}, CNPJ ${empresa?.cnpj || '[sotech.cdg_mantenedora.cnpj]'} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
 
 Equipamento: ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} [codigo_produto]
 IMEI: [imei_equipamento]
@@ -410,7 +409,7 @@ ${alocacao?.responsavel_unidade || '[nome_responsavel]'}
 CPF: [cpf_do_responsavel_unidade]`}
                 </pre>
               </div>
-              
+
               <div className="text-center text-xs text-gray-600 border-t pt-4 mt-6">
                 <p><strong>Grupo IS</strong></p>
                 <p>SWITCH ® SYSCOM</p>

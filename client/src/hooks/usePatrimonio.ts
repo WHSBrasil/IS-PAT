@@ -165,7 +165,7 @@ export function useCreateTombamento() {
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       // Invalidate all produto-entradas queries to update available quantities
       queryClient.invalidateQueries({ queryKey: ['produto-entradas'] });
-      
+
       // Check if it's a batch response
       if (data.count && data.count > 1) {
         toast({
@@ -430,11 +430,27 @@ export function useProfissionais() {
 
 export function useHistoricoMovimentacao(fktombamento: number) {
   return useQuery({
-    queryKey: ["/api/tombamentos", fktombamento, "historico"],
+    queryKey: ["historico-movimentacao", fktombamento],
     queryFn: async () => {
-      const response = await fetch(`/api/tombamentos/${fktombamento}/historico`);
+      const response = await api.getHistoricoMovimentacao(fktombamento);
+      if (!response.ok) {
+        throw new Error('Failed to fetch historico');
+      }
       return response.json();
     },
     enabled: !!fktombamento,
   });
 }
+
+export const useEmpresa = () => {
+  return useQuery({
+    queryKey: ["empresa"],
+    queryFn: async () => {
+      const response = await fetch("/api/empresa");
+      if (!response.ok) {
+        throw new Error('Failed to fetch empresa');
+      }
+      return response.json();
+    },
+  });
+};

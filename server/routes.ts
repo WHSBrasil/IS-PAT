@@ -46,12 +46,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const filename = req.params.filename;
       const filepath = path.join(process.cwd(), 'uploads', filename);
-      
+
       // Check if file exists
       if (!fs.existsSync(filepath)) {
         return res.status(404).json({ error: 'Imagem não encontrada' });
       }
-      
+
       // Set appropriate headers for image serving
       const ext = path.extname(filename).toLowerCase();
       const contentType = {
@@ -61,10 +61,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         '.webp': 'image/webp',
         '.gif': 'image/gif'
       }[ext] || 'application/octet-stream';
-      
+
       res.setHeader('Content-Type', contentType);
       res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
-      
+
       // Stream the file
       const fileStream = fs.createReadStream(filepath);
       fileStream.pipe(res);
@@ -81,6 +81,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stats);
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Empresa route
+  app.get("/api/empresa", async (req, res) => {
+    try {
+      const empresa = await storage.getEmpresa();
+      res.json(empresa);
+    } catch (error) {
+      console.error('Error fetching empresa:', error);
       res.status(500).json({ error: 'Erro interno do servidor' });
     }
   });
@@ -325,7 +336,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (tombamento.startsWith('$')) {
         const batchPattern = /^\$(\d+)-(\d+)$/;
         const match = tombamento.match(batchPattern);
-        
+
         if (!match) {
           return res.status(400).json({ error: 'Formato de lote inválido. Use $inicio-fim (ex: $11-15)' });
         }
@@ -609,17 +620,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(newManutencao);
     } catch (error) {
       console.error('Error creating manutencao:', error);
-      res.status(500).json({ error: 'Erro interno do servidor' });
-    }
-  });
-
-  // Empresa route
-  app.get("/api/empresa", async (req, res) => {
-    try {
-      const empresa = await storage.getEmpresa();
-      res.json(empresa);
-    } catch (error) {
-      console.error('Error fetching empresa:', error);
       res.status(500).json({ error: 'Erro interno do servidor' });
     }
   });

@@ -11,14 +11,17 @@ import { SearchInput } from "@/components/ui/search-input";
 import TransferenciaModal from "@/components/modals/TransferenciaModal";
 import HistoricoModal from "@/components/modals/HistoricoModal";
 import ImageGallery from "@/components/ImageGallery";
-import { Plus, Search, Eye, ArrowRightLeft, Pencil, Trash2, History, ArrowLeft, Upload, X } from "lucide-react";
+import TermoResponsabilidade from "@/components/TermoResponsabilidade";
+import { Plus, Search, Eye, ArrowRightLeft, Pencil, Trash2, History, ArrowLeft, Upload, X, FileText } from "lucide-react";
 
 export default function Alocacao() {
   const [viewMode, setViewMode] = useState<"list" | "form">("list");
   const [editingItem, setEditingItem] = useState<any>(null);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showHistoricoModal, setShowHistoricoModal] = useState(false);
+  const [showTermoModal, setShowTermoModal] = useState(false);
   const [selectedTombamento, setSelectedTombamento] = useState<any>(null);
+  const [selectedAlocacao, setSelectedAlocacao] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [unidadeFilter, setUnidadeFilter] = useState("all");
 
@@ -44,6 +47,7 @@ export default function Alocacao() {
   const { data: alocacoes = [], isLoading } = useAlocacoes();
   const { data: tombamentos = [] } = useTombamentos();
   const { data: unidadesSaude = [] } = useUnidadesSaude();
+  const { data: empresaData } = useEmpresa();
   const { data: setoresData } = useSetores();
   const setores = Array.isArray(setoresData) ? setoresData : [];
   const { data: profissionaisData } = useProfissionais();
@@ -168,6 +172,16 @@ export default function Alocacao() {
   const handleShowHistory = (item: any) => {
     setSelectedTombamento(item);
     setShowHistoricoModal(true);
+  };
+
+  const handleShowTermo = (item: any) => {
+    setSelectedAlocacao(item);
+    setShowTermoModal(true);
+  };
+
+  const handleCloseTermoModal = () => {
+    setShowTermoModal(false);
+    setSelectedAlocacao(null);
   };
 
   const handleDelete = async (item: any) => {
@@ -728,6 +742,16 @@ export default function Alocacao() {
                             <Button
                               variant="ghost"
                               size="sm"
+                              onClick={() => handleShowTermo(item)}
+                              className="text-green-600 hover:text-green-800"
+                              title="Termo de Responsabilidade"
+                              data-testid={`button-termo-${item.pkalocacao}`}
+                            >
+                              <FileText className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               title="Ver detalhes"
                               data-testid={`button-view-${item.pkalocacao}`}
                             >
@@ -802,6 +826,15 @@ export default function Alocacao() {
           onClose={handleCloseHistoricoModal}
           fktombamento={selectedTombamento.fktombamento}
           tombamento={selectedTombamento.tombamento?.tombamento}
+        />
+      )}
+
+      {showTermoModal && selectedAlocacao && (
+        <TermoResponsabilidade
+          isOpen={showTermoModal}
+          onClose={handleCloseTermoModal}
+          alocacao={selectedAlocacao}
+          empresa={empresaData}
         />
       )}
     </div>

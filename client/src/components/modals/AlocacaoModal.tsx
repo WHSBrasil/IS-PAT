@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Upload, X } from "lucide-react";
 import { SearchInput } from "@/components/ui/search-input";
+import ImageGallery from "@/components/ImageGallery";
 
 interface AlocacaoModalProps {
   isOpen: boolean;
@@ -379,6 +380,17 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
             <Label className="text-sm font-medium text-foreground mb-2 block">
               Fotos da Alocação
             </Label>
+
+            {/* Show existing photos when editing */}
+            {editingItem?.photos && (
+              <div className="mb-4">
+                <ImageGallery 
+                  photos={editingItem.photos} 
+                  title="Fotos Existentes"
+                  className="space-y-2"
+                />
+              </div>
+            )}
             <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
               <input
                 type="file"

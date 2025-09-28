@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ImageGallery from "@/components/ImageGallery";
 
 interface TransferenciaModalProps {
   isOpen: boolean;
@@ -157,6 +158,14 @@ export default function TransferenciaModal({ isOpen, onClose, editingItem }: Tra
                   <span className="text-foreground">{origemSetor?.setor || origemSetor?.nome || "Não informado"}</span>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Image Gallery for the item being transferred */}
+          {formData.fktombamento && (
+            <div className="mt-4">
+              <Label className="text-sm font-medium text-foreground mb-2">Imagens do Item</Label>
+              <ImageGallery itemId={parseInt(formData.fktombamento)} />
             </div>
           )}
 

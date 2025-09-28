@@ -4,6 +4,8 @@ import { storage } from "./storage";
 import { query } from "./db";
 import multer from "multer";
 import path from "path";
+import fs from "fs";
+import { fileURLToPath } from 'url';
 
 /**
  * API Routes with menu parameter support
@@ -38,6 +40,39 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+
+  // Serve uploaded images
+  app.get("/api/uploads/:filename", (req, res) => {
+    try {
+      const filename = req.params.filename;
+      const filepath = path.join(process.cwd(), 'uploads', filename);
+      
+      // Check if file exists
+      if (!fs.existsSync(filepath)) {
+        return res.status(404).json({ error: 'Imagem não encontrada' });
+      }
+      
+      // Set appropriate headers for image serving
+      const ext = path.extname(filename).toLowerCase();
+      const contentType = {
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.webp': 'image/webp',
+        '.gif': 'image/gif'
+      }[ext] || 'application/octet-stream';
+      
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+      
+      // Stream the file
+      const fileStream = fs.createReadStream(filepath);
+      fileStream.pipe(res);
+    } catch (error) {
+      console.error('Error serving image:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
 
   // Dashboard routes
   app.get("/api/dashboard/stats", async (req, res) => {

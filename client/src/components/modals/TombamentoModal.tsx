@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SearchInput } from "@/components/ui/search-input";
 import { Upload, X } from "lucide-react";
+import ImageGallery from "@/components/ImageGallery";
 
 interface TombamentoModalProps {
   isOpen: boolean;
@@ -241,6 +242,17 @@ export default function TombamentoModal({ isOpen, onClose, editingItem }: Tombam
             <Label className="text-sm font-medium text-foreground mb-2 block">
               Fotos do Item
             </Label>
+
+            {/* Show existing photos when editing */}
+            {editingItem?.photos && (
+              <div className="mb-4">
+                <ImageGallery 
+                  photos={editingItem.photos} 
+                  title="Fotos Existentes"
+                  className="space-y-2"
+                />
+              </div>
+            )}
             <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
               <input
                 type="file"

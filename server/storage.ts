@@ -211,7 +211,10 @@ export class DatabaseStorage implements IStorage {
   // Tombamento methods
   async getTombamentos(): Promise<Tombamento[]> {
     const result = await query(`
-      SELECT t.*, p.produto as produto_nome, p.produto as produto_descricao
+      SELECT t.pktombamento, t.fkproduto, t.fkpedidoitem, t.tombamento, t.serial, 
+             t.imei, t.mac, t.observacao, t.photos, t.responsavel, t.status, 
+             t.ativo, t.fkuser, t.created_at, t.version,
+             p.produto as produto_nome, p.produto as produto_descricao
       FROM sotech.pat_tombamento t
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
       WHERE t.ativo = true
@@ -305,7 +308,9 @@ export class DatabaseStorage implements IStorage {
   // Alocacao methods
   async getAlocacoes(): Promise<Alocacao[]> {
     const result = await query(`
-      SELECT a.*,
+      SELECT a.pkalocacao, a.fktombamento, a.fkunidadesaude, a.fksetor, a.fkprofissional,
+             a.responsavel_unidade, a.dataalocacao, a.photos, a.termo, a.responsavel, 
+             a.observacao, a.ativo, a.fkuser, a.created_at, a.version,
              t.tombamento, t.serial,
              p.produto as produto_nome,
              u.unidadesaude as unidade_nome,

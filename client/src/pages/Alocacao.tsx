@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { SearchInput } from "@/components/ui/search-input";
 import TransferenciaModal from "@/components/modals/TransferenciaModal";
 import HistoricoModal from "@/components/modals/HistoricoModal";
+import ImageGallery from "@/components/ImageGallery";
 import { Plus, Search, Eye, ArrowRightLeft, Pencil, Trash2, History, ArrowLeft, Upload, X } from "lucide-react";
 
 export default function Alocacao() {
@@ -706,6 +707,17 @@ export default function Alocacao() {
                             </div>
                           )}
                         </div>
+                        
+                        {/* Images */}
+                        {item.photos && (
+                          <div className="pt-2">
+                            <ImageGallery 
+                              photos={item.photos} 
+                              title="Fotos da Alocação"
+                              className="space-y-2"
+                            />
+                          </div>
+                        )}
                         
                         {/* Responsible and actions */}
                         <div className="flex items-center justify-between pt-2 border-t border-border">

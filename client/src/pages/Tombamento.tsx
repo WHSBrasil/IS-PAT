@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus, Search, Eye, Pencil, Trash2, Image, ArrowLeft, Upload, X, QrCode } from "lucide-react";
 import EtiquetaImpressao from "@/components/EtiquetaImpressao";
 import EtiquetaLoteModal from "@/components/EtiquetaLoteModal";
+import ImageGallery from "@/components/ImageGallery";
 
 export default function Tombamento() {
   const [viewMode, setViewMode] = useState<"list" | "form">("list");
@@ -798,6 +799,17 @@ export default function Tombamento() {
                             <span>{item.photos ? (typeof item.photos === 'string' ? JSON.parse(item.photos).length : Array.isArray(item.photos) ? item.photos.length : 0) : 0} fotos</span>
                           </div>
                         </div>
+
+                        {/* Images */}
+                        {item.photos && (
+                          <div className="pt-2">
+                            <ImageGallery 
+                              photos={item.photos} 
+                              title="Fotos do Item"
+                              className="space-y-2"
+                            />
+                          </div>
+                        )}
 
                         {/* Responsible and actions */}
                         <div className="flex items-center justify-between pt-2 border-t border-border">

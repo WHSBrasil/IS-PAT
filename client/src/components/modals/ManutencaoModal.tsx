@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import ImageGallery from "@/components/ImageGallery";
 
 interface ManutencaoModalProps {
   isOpen: boolean;
@@ -27,7 +28,7 @@ export default function ManutencaoModal({ isOpen, onClose, editingItem }: Manute
   const createManutencao = useCreateManutencao();
 
   // Filter tombamentos - only alocado or disponivel items can go to maintenance
-  const availableTombamentos = tombamentos.filter((t: any) => 
+  const availableTombamentos = tombamentos.filter((t: any) =>
     t.status === "disponivel" || t.status === "alocado"
   );
 
@@ -56,7 +57,7 @@ export default function ManutencaoModal({ isOpen, onClose, editingItem }: Manute
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.fktombamento || !formData.dataretirada || !formData.motivo) {
       return;
     }
@@ -88,7 +89,7 @@ export default function ManutencaoModal({ isOpen, onClose, editingItem }: Manute
             {editingItem ? "Editar Manutenção" : "Nova Manutenção"}
           </DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="fktombamento" className="text-sm font-medium text-foreground">
@@ -105,7 +106,7 @@ export default function ManutencaoModal({ isOpen, onClose, editingItem }: Manute
               <SelectContent>
                 {availableTombamentos.map((tombamento: any) => (
                   <SelectItem key={tombamento.pktombamento} value={tombamento.pktombamento.toString()}>
-                    {tombamento.tombamento} - {tombamento.produto?.nome || "Produto"} 
+                    {tombamento.tombamento} - {tombamento.produto?.nome || "Produto"}
                     ({tombamento.status})
                   </SelectItem>
                 ))}
@@ -185,6 +186,14 @@ export default function ManutencaoModal({ isOpen, onClose, editingItem }: Manute
               data-testid="textarea-observacao-manutencao"
             />
           </div>
+
+          {/* Display images if editingItem has associated images */}
+          {editingItem && editingItem.imagens && editingItem.imagens.length > 0 && (
+            <div className="mt-4">
+              <Label className="text-sm font-medium text-foreground">Imagens Associadas</Label>
+              <ImageGallery images={editingItem.imagens} />
+            </div>
+          )}
 
           {/* Information about maintenance status */}
           <div className="bg-muted p-4 rounded-lg">

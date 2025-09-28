@@ -25,73 +25,72 @@ export default function TermoResponsabilidade({ isOpen, onClose, alocacao, empre
   };
 
   const generateTermoContent = () => {
-    const empresaNome = empresa?.mantenedora || '[NOME DA EMPRESA]';
-    const tombamento = alocacao?.tombamento?.tombamento || '[TOMBAMENTO]';
-    const produto = alocacao?.tombamento?.produto?.nome || '[PRODUTO]';
-    const serial = alocacao?.tombamento?.serial || '[SERIAL]';
-    const unidade = alocacao?.unidadesaude?.nome || '[UNIDADE DE SAÚDE]';
+    const empresaNome = empresa?.mantenedora || '[NOME_DA_EMPRESA]';
+    const tombamento = alocacao?.tombamento?.tombamento || '[CODIGO_TOMBAMENTO]';
+    const produto = alocacao?.tombamento?.produto?.nome || '[DESCRICAO_PRODUTO]';
+    const serial = alocacao?.tombamento?.serial || '[NUMERO_SERIE]';
+    const mac = alocacao?.tombamento?.mac || '[endereco_mac_tombamento_mac]';
+    const unidade = alocacao?.unidadesaude?.nome || '[UNIDADE_DE_SAUDE]';
     const setor = alocacao?.setor?.nome || '[SETOR]';
-    const responsavelUnidade = alocacao?.responsavel_unidade || '[RESPONSÁVEL NA UNIDADE]';
-    const responsavelAlocacao = alocacao?.responsavel || '[RESPONSÁVEL PELA ALOCAÇÃO]';
-    const dataAlocacao = formatDate(alocacao?.dataalocacao) || '[DATA DA ALOCAÇÃO]';
-    const profissional = alocacao?.profissional?.nome || '[PROFISSIONAL RESPONSÁVEL]';
+    const responsavelUnidade = alocacao?.responsavel_unidade || '[RESPONSAVEL_UNIDADE]';
+    const profissional = alocacao?.profissional?.nome || '[PROFISSIONAL_RESPONSAVEL]';
+    const dataAlocacao = formatDate(alocacao?.dataalocacao) || '[DATA_ALOCACAO]';
     const dataAtual = formatDate(new Date());
 
     return `
-TERMO DE RESPONSABILIDADE DE PATRIMÔNIO
+                                    TERMO DE RESPONSABILIDADE
+                                  GUARDA E USO DE EQUIPAMENTOS
 
-${empresaNome}
+Eu, [${responsavelUnidade}], Portador do CPF [cpf_do_responsavel_unidade], 
+lotado na unidade de saúde [${unidade}] e exercendo a função de 
+[cargo_do_responsavel], declaro que recebi em [${dataAlocacao}] o equipamento 
+[${produto}] CNPJ [${serial}] a título de 
+guarda, responsabilizando-me pelo uso adequado e os cuidados devidos, conforme 
+Secretaria Municipal de Saúde, e o assumo conforme meu cargo abaixo descrito, o equipamento 
+abaixo especificado neste termo:
 
-Por meio deste termo, declaro que recebi em perfeito estado de conservação e funcionamento o(s) bem(ns) patrimonial(is) relacionado(s) abaixo, comprometendo-me a:
+Equipamento: [${produto}] [${produto}]
+IMEI: [imei_do_equipamento]
+Serial: [${serial}]
+MAC: [${mac}]
 
-1. Utilizar o bem exclusivamente para atividades relacionadas ao serviço;
-2. Manter o bem em perfeito estado de conservação;
-3. Comunicar imediatamente qualquer defeito, dano ou extravio;
-4. Não emprestar, ceder ou transferir o bem sem autorização prévia;
-5. Devolver o bem quando solicitado ou ao término do vínculo;
-6. Ressarcir eventuais danos causados por uso inadequado ou negligência.
+Pelo qual declaro estar ciente de que:
 
-DADOS DO BEM:
-Tombamento: ${tombamento}
-Descrição: ${produto}
-Número de Série: ${serial}
+1. Se o equipamento for danificado ou inutilizado por emergência manutencão, mau uso ou 
+   negligência, deverá comunicar o ocorrido ao responsável da Secretaria Municipal da 
+   Saúde, ficando sujeito às responsabilidades respectivas de cada conduta;
 
-LOCALIZAÇÃO:
-Unidade: ${unidade}
-Setor: ${setor}
+2. No caso de extravio, furto ou roubo deverá notificar crimes, deverá se apresentar 
+   boletim de ocorrência imediatamente;
 
-RESPONSÁVEIS:
-Responsável na Unidade: ${responsavelUnidade}
-Responsável pelo Bem: ${profissional}
-Responsável pela Alocação: ${responsavelAlocacao}
+3. Em caso de troca por dano, furto ou roubo, o nome equipamento acarretará custos não 
+   previstos para a instituição, visto que a Instituição não tem obrigação de substituir 
+   equipamentos danificados nos casos acima citados;
 
-Data da Alocação: ${dataAlocacao}
+4. Em caso de troca por dano, furto ou roubo, poderei vir a receber equipamentos de 
+   qualidade inferior, inclusive usados, resultados de outras marcas;
 
-Declaro estar ciente das responsabilidades assumidas e concordo com todos os termos estabelecidos.
+5. Em caso de troca por contrato entre a Instituição IGM e o município de Cascavel (PR) ou 
+   outros ente dos contratos firmados, deverá responsável pela devolução, sem direito a 
+   completo e em perfeito estado os equipamentos, constituindo-se o tempo de uso dos 
+   mesmo, no Instituto IGM/Empresa;
 
-Local e Data: ________________________, ${dataAtual}
+6. O equipamento em minha posse não é protegido, devendo-ter apenas dados de trabalho 
+   nele, ou seja, todos os dados, programas e demais informações estão sendo 
+   salvos pelo usuário por sua conta e risco;
 
+7. Estando os equipamentos em minha posse, estarei sujeito a inspeções sem prévio aviso;
 
-_____________________________________________
-Assinatura do Responsável na Unidade
-${responsavelUnidade}
-
-
-_____________________________________________
-Assinatura do Responsável pelo Bem
-${profissional}
-
-
-_____________________________________________
-Assinatura do Responsável pela Alocação
-${responsavelAlocacao}
+Cliente: _____________________________________
 
 
-_____________________________________________
-Testemunha
-Nome: _________________________________
-RG: ___________________________________
-    `.trim();
+Termo de responsabilidade instrumental:
+
+[${responsavelUnidade}]
+CPF [cpf_do_responsavel_unidade]
+
+                                            Grupo IS
+                                       SWITCH ® SYSCOM`;
   };
 
   const handlePrint = () => {
@@ -110,61 +109,125 @@ RG: ___________________________________
               <style>
                 body {
                   font-family: Arial, sans-serif;
-                  font-size: 12px;
-                  line-height: 1.4;
+                  font-size: 11px;
+                  line-height: 1.3;
                   margin: 20px;
                   color: #000;
                   background: white;
                 }
                 
-                h1 {
-                  text-align: center;
-                  font-size: 16px;
-                  font-weight: bold;
-                  margin-bottom: 10px;
+                .header {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 20px;
+                  padding: 10px 0;
+                  border-bottom: 1px solid #ccc;
                 }
                 
-                .empresa {
+                .logo-left, .logo-right {
+                  width: 120px;
+                  height: 60px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  border: 1px solid #ddd;
+                  background: #f9f9f9;
+                  font-size: 10px;
                   text-align: center;
+                  color: #666;
+                }
+                
+                .title-section {
+                  text-align: center;
+                  flex-grow: 1;
+                  margin: 0 20px;
+                }
+                
+                .title-section h1 {
                   font-size: 14px;
                   font-weight: bold;
-                  margin-bottom: 20px;
+                  margin: 0 0 5px 0;
+                  letter-spacing: 0.5px;
+                }
+                
+                .title-section h2 {
+                  font-size: 12px;
+                  font-weight: normal;
+                  margin: 0;
+                  letter-spacing: 0.3px;
                 }
                 
                 .content {
                   text-align: justify;
-                  margin-bottom: 20px;
+                  margin-bottom: 15px;
+                  line-height: 1.4;
                 }
                 
-                .dados {
+                .equipment-info {
                   margin: 15px 0;
-                  padding: 10px;
-                  border: 1px solid #ccc;
-                  background-color: #f9f9f9;
+                  padding: 8px;
+                  background-color: #f8f8f8;
+                  border: 1px solid #ddd;
+                  font-size: 11px;
                 }
                 
-                .assinaturas {
+                .conditions {
+                  margin: 15px 0;
+                  text-align: justify;
+                }
+                
+                .conditions ol {
+                  padding-left: 20px;
+                  margin: 10px 0;
+                }
+                
+                .conditions li {
+                  margin: 8px 0;
+                  text-align: justify;
+                  line-height: 1.4;
+                }
+                
+                .signatures {
                   margin-top: 40px;
                 }
                 
-                .assinatura {
-                  margin: 30px 0;
+                .signature-line {
+                  margin: 25px 0;
+                  text-align: center;
                 }
                 
-                .linha-assinatura {
-                  border-top: 1px solid #000;
-                  margin-top: 20px;
-                  padding-top: 5px;
+                .signature-line::before {
+                  content: '';
+                  display: block;
+                  width: 300px;
+                  height: 1px;
+                  background: #000;
+                  margin: 0 auto 5px auto;
+                }
+                
+                .footer {
+                  margin-top: 40px;
+                  text-align: center;
+                  font-size: 10px;
+                  color: #666;
+                  border-top: 1px solid #ccc;
+                  padding-top: 15px;
                 }
                 
                 @media print {
                   body {
                     margin: 0;
                     -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
                   }
                   
                   .no-print {
-                    display: none;
+                    display: none !important;
+                  }
+                  
+                  .page-break {
+                    page-break-before: always;
                   }
                 }
                 
@@ -189,7 +252,64 @@ RG: ___________________________________
                 <button class="print-button" onclick="window.close()">❌ Fechar</button>
               </div>
               
-              <pre style="white-space: pre-wrap; font-family: Arial, sans-serif;">${content}</pre>
+              <div class="header">
+                <div class="logo-left">
+                  LOGO<br>CASCAVEL
+                </div>
+                <div class="title-section">
+                  <h1>TERMO DE RESPONSABILIDADE</h1>
+                  <h2>GUARDA E USO DE EQUIPAMENTOS</h2>
+                </div>
+                <div class="logo-right">
+                  LOGO<br>IGM
+                </div>
+              </div>
+              
+              <div class="content">
+                <p>Eu, <strong>${alocacao?.responsavel_unidade || '[nome_do_responsavel_unidade]'}</strong>, Portador do CPF <strong>[cpf_do_responsavel_unidade]</strong>, lotado na unidade de saúde <strong>${alocacao?.unidadesaude?.nome || '[unidade_de_saude]'}</strong> e exercendo a função de <strong>[cargo_do_responsavel]</strong>, declaro que recebi em <strong>${formatDate(alocacao?.dataalocacao) || '[data_alocacao]'}</strong> o equipamento <strong>${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'}</strong> CNPJ <strong>[cnpj_instituicao]</strong> a título de guarda, responsabilizando-me pelo uso adequado e os cuidados devidos, conforme Secretaria Municipal de Saúde, e o assumo conforme meu cargo abaixo descrito, o equipamento abaixo especificado neste termo:</p>
+              </div>
+              
+              <div class="equipment-info">
+                <p><strong>Equipamento:</strong> ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} [codigo_produto]</p>
+                <p><strong>IMEI:</strong> [imei_equipamento]</p>
+                <p><strong>Serial:</strong> ${alocacao?.tombamento?.serial || '[numero_serie]'}</p>
+                <p><strong>MAC:</strong> ${alocacao?.tombamento?.mac || '[endereco_mac]'}</p>
+              </div>
+              
+              <div class="conditions">
+                <p>Pelo qual declaro estar ciente de que:</p>
+                <ol>
+                  <li>Se o equipamento for danificado ou inutilizado por emergência, manutenção, mau uso ou negligência, deverá comunicar o ocorrido ao responsável da Secretaria Municipal da Saúde, ficando sujeito às responsabilidades respectivas de cada conduta;</li>
+                  
+                  <li>No caso de extravio, furto ou roubo deverá notificar crimes, deverá se apresentar boletim de ocorrência imediatamente;</li>
+                  
+                  <li>Em caso de troca por dano, furto ou roubo, o novo equipamento acarretará custos não previstos para a Instituição, visto que a Instituição não tem obrigação de substituir equipamentos danificados nos casos acima citados;</li>
+                  
+                  <li>Em caso de troca por dano, furto ou roubo, poderei vir a receber equipamentos de qualidade inferior, inclusive usados, resultados de outras marcas;</li>
+                  
+                  <li>Em caso de troca por contrato entre a Instituição IGM e o município de Cascavel (PR) ou outros ente dos contratos firmados, deverá responsável pela devolução, sem direito a completo e em perfeito estado os equipamentos, constituindo-se o tempo de uso dos mesmo, no Instituto IGM/Empresa;</li>
+                  
+                  <li>O equipamento em minha posse não é protegido, devendo ter apenas dados de trabalho nele, ou seja, todos os dados, programas e demais informações estão sendo salvos pelo usuário por sua conta e risco;</li>
+                  
+                  <li>Estando os equipamentos em minha posse, estarei sujeito a inspeções sem prévio aviso;</li>
+                </ol>
+              </div>
+              
+              <div class="signatures">
+                <p>Cliente:</p>
+                <div class="signature-line"></div>
+                
+                <br><br>
+                <p><strong>Termo de responsabilidade instrumental:</strong></p>
+                <br>
+                <p><strong>${alocacao?.responsavel_unidade || '[nome_responsavel]'}</strong></p>
+                <p>CPF: [cpf_do_responsavel_unidade]</p>
+              </div>
+              
+              <div class="footer">
+                <p><strong>Grupo IS</strong></p>
+                <p>SWITCH ® SYSCOM</p>
+              </div>
             </body>
           </html>
         `);
@@ -230,7 +350,7 @@ RG: ___________________________________
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-5xl max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             Termo de Responsabilidade - {alocacao?.tombamento?.tombamento}
@@ -238,10 +358,64 @@ RG: ___________________________________
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="bg-gray-50 p-4 rounded border text-sm">
-            <pre className="whitespace-pre-wrap font-sans">
-              {generateTermoContent()}
-            </pre>
+          {/* Preview do termo */}
+          <div className="bg-white border rounded-lg p-6 shadow-sm" style={{ minHeight: '600px' }}>
+            {/* Cabeçalho com logos */}
+            <div className="flex justify-between items-center mb-6 pb-4 border-b">
+              <div className="w-24 h-12 bg-blue-100 border border-blue-200 rounded flex items-center justify-center text-xs text-blue-600">
+                LOGO<br/>CASCAVEL
+              </div>
+              <div className="text-center flex-grow mx-4">
+                <h1 className="text-sm font-bold mb-1">TERMO DE RESPONSABILIDADE</h1>
+                <h2 className="text-xs">GUARDA E USO DE EQUIPAMENTOS</h2>
+              </div>
+              <div className="w-24 h-12 bg-green-100 border border-green-200 rounded flex items-center justify-center text-xs text-green-600">
+                LOGO<br/>IGM
+              </div>
+            </div>
+
+            {/* Conteúdo do termo */}
+            <div className="text-xs leading-relaxed space-y-4">
+              <div className="bg-gray-50 p-4 rounded text-xs">
+                <pre className="whitespace-pre-wrap font-sans text-xs leading-relaxed">
+{`Eu, ${alocacao?.responsavel_unidade || '[nome_do_responsavel_unidade]'}, Portador do CPF [cpf_do_responsavel_unidade], lotado na unidade de saúde ${alocacao?.unidadesaude?.nome || '[unidade_de_saude]'} e exercendo a função de [cargo_do_responsavel], declaro que recebi em ${formatDate(alocacao?.dataalocacao) || '[data_alocacao]'} o equipamento ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} CNPJ [cnpj_instituicao] a título de guarda, responsabilizando-me pelo uso adequado e os cuidados devidos, conforme Secretaria Municipal de Saúde, e o assumo conforme meu cargo abaixo descrito, o equipamento abaixo especificado neste termo:
+
+Equipamento: ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} [codigo_produto]
+IMEI: [imei_equipamento]
+Serial: ${alocacao?.tombamento?.serial || '[numero_serie]'}
+MAC: ${alocacao?.tombamento?.mac || '[endereco_mac]'}
+
+Pelo qual declaro estar ciente de que:
+
+1. Se o equipamento for danificado ou inutilizado por emergência, manutenção, mau uso ou negligência, deverá comunicar o ocorrido ao responsável da Secretaria Municipal da Saúde, ficando sujeito às responsabilidades respectivas de cada conduta;
+
+2. No caso de extravio, furto ou roubo deverá notificar crimes, deverá se apresentar boletim de ocorrência imediatamente;
+
+3. Em caso de troca por dano, furto ou roubo, o novo equipamento acarretará custos não previstos para a Instituição, visto que a Instituição não tem obrigação de substituir equipamentos danificados nos casos acima citados;
+
+4. Em caso de troca por dano, furto ou roubo, poderei vir a receber equipamentos de qualidade inferior, inclusive usados, resultados de outras marcas;
+
+5. Em caso de troca por contrato entre a Instituição IGM e o município de Cascavel (PR) ou outros ente dos contratos firmados, deverá responsável pela devolução, sem direito a completo e em perfeito estado os equipamentos, constituindo-se o tempo de uso dos mesmo, no Instituto IGM/Empresa;
+
+6. O equipamento em minha posse não é protegido, devendo ter apenas dados de trabalho nele, ou seja, todos os dados, programas e demais informações estão sendo salvos pelo usuário por sua conta e risco;
+
+7. Estando os equipamentos em minha posse, estarei sujeito a inspeções sem prévio aviso;
+
+Cliente: _____________________________________
+
+
+Termo de responsabilidade instrumental:
+
+${alocacao?.responsavel_unidade || '[nome_responsavel]'}
+CPF: [cpf_do_responsavel_unidade]`}
+                </pre>
+              </div>
+              
+              <div className="text-center text-xs text-gray-600 border-t pt-4 mt-6">
+                <p><strong>Grupo IS</strong></p>
+                <p>SWITCH ® SYSCOM</p>
+              </div>
+            </div>
           </div>
 
           <div className="flex justify-end space-x-2">

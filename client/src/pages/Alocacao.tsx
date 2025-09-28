@@ -663,7 +663,7 @@ export default function Alocacao() {
                   <Card key={item.pkalocacao} data-testid={`alocacao-row-${item.pkalocacao}`} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-4">
                       <div className="space-y-3">
-                        {/* First line: Tombamento and Unit */}
+                        {/* First line: Tombamento and Date */}
                         <div className="flex items-center justify-between">
                           <div className="text-sm font-semibold text-foreground">
                             {item.tombamento?.tombamento || "-"}

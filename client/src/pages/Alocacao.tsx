@@ -1,6 +1,6 @@
 
 import { useState, useMemo } from "react";
-import { useAlocacoes, useCreateAlocacao, useUpdateAlocacao, useDeleteAlocacao, useTombamentos, useUnidadesSaude, useSetores, useProfissionais } from "@/hooks/usePatrimonio";
+import { useAlocacoes, useCreateAlocacao, useUpdateAlocacao, useDeleteAlocacao, useTombamentos, useUnidadesSaude, useSetores, useProfissionais, useEmpresa } from "@/hooks/usePatrimonio";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";

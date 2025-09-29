@@ -47,11 +47,11 @@ export default function TermoResponsabilidade({ isOpen, onClose, alocacao, empre
                                     TERMO DE RESPONSABILIDADE
                                   GUARDA E USO DE EQUIPAMENTOS
 
-Eu, [${intervenienteNome || responsavelUnidade}], Portador do CNS [${intervenienteCns}], 
-lotado na unidade de saúde [${unidade}] CNES [${unidadeCnes}], declaro que recebi do 
-[${mantenedoraNome}], CNPJ [${mantenedoraCnpj}] a título de 
-guarda, responsabilizando-me pelo uso adequado e os cuidados devidos, conforme 
-Secretaria Municipal de Saúde, e o assumo conforme meu cargo abaixo descrito, o equipamento 
+Eu, [${intervenienteNome || responsavelUnidade}], Portador do CNS [${intervenienteCns}],
+lotado na unidade de saúde [${unidade}] CNES [${unidadeCnes}], declaro que recebi do
+[${mantenedoraNome}], CNPJ [${mantenedoraCnpj}] a título de
+guarda, responsabilizando-me pelo uso adequado e os cuidados devidos, conforme
+Secretaria Municipal de Saúde, e o assumo conforme meu cargo abaixo descrito, o equipamento
 abaixo especificado neste termo:
 
 Equipamento: [${produto}] [${produtoCodigo}]
@@ -61,27 +61,27 @@ MAC: [${mac}]
 
 Pelo qual declaro estar ciente de que:
 
-1. Se o equipamento for danificado ou inutilizado por emergência manutencão, mau uso ou 
-   negligência, deverá comunicar o ocorrido ao responsável da Secretaria Municipal da 
+1. Se o equipamento for danificado ou inutilizado por emergência manutencão, mau uso ou
+   negligência, deverá comunicar o ocorrido ao responsável da Secretaria Municipal da
    Saúde, ficando sujeito às responsabilidades respectivas de cada conduta;
 
-2. No caso de extravio, furto ou roubo deverá notificar crimes, deverá se apresentar 
+2. No caso de extravio, furto ou roubo deverá notificar crimes, deverá se apresentar
    boletim de ocorrência imediatamente;
 
-3. Em caso de troca por dano, furto ou roubo, o nome equipamento acarretará custos não 
-   previstos para a Instituição, visto que a Instituição não tem obrigação de substituir 
+3. Em caso de troca por dano, furto ou roubo, o nome equipamento acarretará custos não
+   previstos para a Instituição, visto que a Instituição não tem obrigação de substituir
    equipamentos danificados nos casos acima citados;
 
-4. Em caso de troca por dano, furto ou roubo, poderei vir a receber equipamentos de 
+4. Em caso de troca por dano, furto ou roubo, poderei vir a receber equipamentos de
    qualidade inferior, inclusive usados, resultados de outras marcas;
 
-5. Em caso de troca por contrato entre a Instituição IGM e o município de Cascavel (PR) ou 
-   outros ente dos contratos firmados, deverá responsável pela devolução, sem direito a 
-   completo e em perfeito estado os equipamentos, constituindo-se o tempo de uso dos 
+5. Em caso de troca por contrato entre a Instituição IGM e o município de Cascavel (PR) ou
+   outros ente dos contratos firmados, deverá responsável pela devolução, sem direito a
+   completo e em perfeito estado os equipamentos, constituindo-se o tempo de uso dos
    mesmo, no Instituto IGM/Empresa;
 
-6. O equipamento em minha posse não é protegido, devendo-ter apenas dados de trabalho 
-   nele, ou seja, todos os dados, programas e demais informações estão sendo 
+6. O equipamento em minha posse não é protegido, devendo-ter apenas dados de trabalho
+   nele, ou seja, todos os dados, programas e demais informações estão sendo
    salvos pelo usuário por sua conta e risco;
 
 7. Estando os equipamentos em minha posse, estarei sujeito a inspeções sem prévio aviso;
@@ -152,10 +152,10 @@ CPF [cpf_do_responsavel_unidade]
                   height: 100%;
                   z-index: -1;
                   background-color: #f8f9fa;
-                  background-image: 
-                    linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
-                    linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
-                    linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
+                  background-image:
+                    linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+                    linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+                    linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
                     linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
                   background-size: 20px 20px;
                   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
@@ -330,7 +330,8 @@ CPF [cpf_do_responsavel_unidade]
                 </div>
 
                 <div class="main-text">
-                  <p>Eu, <strong>${intervenienteNome || '________________'}</strong>${intervenienteCns ? `, Portador do CNS <strong>${intervenienteCns}</strong>` : ''}, lotado na unidade de saúde <strong>${unidadeNome || '________________'}</strong>${unidadeCnes ? `, CNES <strong>${unidadeCnes}</strong>` : ''}, declaro que recebi do <strong>${mantenedoraNome || '________________'}</strong>${mantenedoraCnpj ? `, CNPJ <strong>${mantenedoraCnpj}</strong>` : ''} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:</p>
+                  <p>
+                    Eu, <strong>${String(intervenienteNome || '________________')}</strong>${intervenienteCns ? `, Portador do CNS <strong>${String(intervenienteCns)}</strong>` : ''}, lotado na unidade de saúde <strong>${String(unidadeNome || '________________')}</strong>${unidadeCnes ? `, CNES <strong>${String(unidadeCnes)}</strong>` : ''}, declaro que recebi do <strong>${String(mantenedoraNome || '________________')}</strong>${mantenedoraCnpj ? `, CNPJ <strong>${String(mantenedoraCnpj)}</strong>` : ''} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:</p>
                 </div>
 
                 ${(produtoNome || produtoCodigo || equipamentoImei || equipamentoSerial || equipamentoMac) ? `
@@ -360,7 +361,7 @@ CPF [cpf_do_responsavel_unidade]
                     <p>Cliente:</p>
                     <div class="signature-line"></div>
                   </div>
-                  
+
                   <div class="signature-section">
                     <p><strong>Termo de responsabilidade instrumental:</strong></p>
                     <div style="margin-top: 30px;">

@@ -13,6 +13,13 @@ interface TermoResponsabilidadeProps {
 export default function TermoResponsabilidade({ isOpen, onClose, alocacao, empresa }: TermoResponsabilidadeProps) {
   const [isGenerating, setIsGenerating] = useState(false);
 
+  // Auto print when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      handlePrint();
+    }
+  }, [isOpen]);
+
   const formatDate = (date: string | Date) => {
     if (!date) return '';
     const d = new Date(date);
@@ -146,7 +153,7 @@ CPF [cpf_do_responsavel_unidade]
                 }
 
                 .background-container {
-                  position: fixed;
+                  position: absolute;
                   top: 0;
                   left: 0;
                   width: 210mm;
@@ -160,7 +167,7 @@ CPF [cpf_do_responsavel_unidade]
                   height: 297mm;
                   border: none;
                   pointer-events: none;
-                  opacity: 0.8;
+                  opacity: 0.3;
                   transform: scale(1);
                   transform-origin: top left;
                   display: block;
@@ -288,6 +295,11 @@ CPF [cpf_do_responsavel_unidade]
                 }
 
                 @media print {
+                  @page {
+                    size: A4;
+                    margin: 0;
+                  }
+
                   body {
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
@@ -298,7 +310,7 @@ CPF [cpf_do_responsavel_unidade]
                   }
 
                   .background-container {
-                    position: fixed !important;
+                    position: absolute !important;
                     top: 0 !important;
                     left: 0 !important;
                     width: 210mm !important;
@@ -310,7 +322,7 @@ CPF [cpf_do_responsavel_unidade]
                     width: 210mm !important;
                     height: 297mm !important;
                     transform: scale(1) !important;
-                    opacity: 0.8 !important;
+                    opacity: 0.3 !important;
                   }
 
                   .content-wrapper {
@@ -416,6 +428,17 @@ CPF [cpf_do_responsavel_unidade]
 
         printWindow.document.close();
         printWindow.focus();
+        
+        // Auto print when window loads
+        printWindow.onload = () => {
+          setTimeout(() => {
+            printWindow.print();
+            setTimeout(() => {
+              printWindow.close();
+              onClose(); // Close the modal after printing
+            }, 1000);
+          }, 500);
+        };
       }
     } catch (error) {
       console.error('Erro ao gerar termo:', error);
@@ -463,98 +486,26 @@ CPF [cpf_do_responsavel_unidade]
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-5xl max-h-[95vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            Termo de Responsabilidade - {alocacao?.tombamento?.tombamento}
+            Preparando Termo de Responsabilidade
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Preview do termo */}
-          <div className="bg-gray-50 border rounded-lg p-6 shadow-sm" style={{ minHeight: '600px' }}>
-            {/* Cabeçalho do termo */}
-            <div className="text-center mb-6 border-b pb-4">
-              <h2 className="text-lg font-bold uppercase">TERMO DE RESPONSABILIDADE</h2>
-              <h3 className="text-md font-semibold uppercase">GUARDA E USO DE EQUIPAMENTOS</h3>
-            </div>
-
-            {/* Conteúdo do termo */}
-            <div className="text-sm leading-relaxed space-y-4">
-              {/* Texto principal do termo */}
-              <div className="text-justify mb-4">
-                <p>
-                  Eu, <strong>{String(alocacao?.interveniente_nome || alocacao?.responsavel_unidade || '________________')}</strong>{alocacao?.interveniente_cns ? `, Portador do CNS ${String(alocacao.interveniente_cns)}` : ''}, lotado na unidade de saúde <strong>{String(alocacao?.unidade_nome || '________________')}</strong>{alocacao?.cnes ? `, CNES ${String(alocacao.cnes)}` : ''}, declaro que recebi do <strong>{String(alocacao?.mantenedora || '________________')}</strong>{alocacao?.cnpj ? `, CNPJ ${String(alocacao.cnpj)}` : ''} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
-                </p>
-              </div>
-
-              {/* Informações do equipamento - só exibe se houver pelo menos um dado */}
-              {(alocacao?.produto_nome || alocacao?.produto_codigo || alocacao?.imei || alocacao?.serial || alocacao?.mac) && (
-                <div className="border p-3 rounded mb-4 bg-blue-50">
-                  <h4 className="font-semibold mb-2">Informações do Equipamento:</h4>
-                  {alocacao?.produto_nome && <p><strong>Equipamento:</strong> {String(alocacao.produto_nome)}{alocacao?.produto_codigo ? ` - ${String(alocacao.produto_codigo)}` : ''}</p>}
-                  {alocacao?.imei && <p><strong>IMEI:</strong> {String(alocacao.imei)}</p>}
-                  {alocacao?.serial && <p><strong>Serial:</strong> {String(alocacao.serial)}</p>}
-                  {alocacao?.mac && <p><strong>MAC:</strong> {String(alocacao.mac)}</p>}
-                </div>
-              )}
-
-              {/* Condições - sempre exibe */}
-              <div className="border p-3 rounded mb-4">
-                <p className="mb-2 font-semibold">Pelo qual declaro estar ciente de que:</p>
-                <ol className="list-decimal list-inside space-y-2 text-sm">
-                  <li>Se o equipamento for danificado ou inutilizado por emergência, manutenção, mau uso ou negligência, deverá comunicar o ocorrido ao responsável da Secretaria Municipal da Saúde, ficando sujeito às responsabilidades respectivas de cada conduta;</li>
-                  <li>No caso de extravio, furto ou roubo deverá notificar crimes, deverá se apresentar boletim de ocorrência imediatamente;</li>
-                  <li>Em caso de troca por dano, furto ou roubo, o novo equipamento acarretará custos não previstos para a Instituição, visto que a Instituição não tem obrigação de substituir equipamentos danificados nos casos acima citados;</li>
-                  <li>Em caso de troca por dano, furto ou roubo, poderei vir a receber equipamentos de qualidade inferior, inclusive usados, resultados de outras marcas;</li>
-                  <li>Em caso de troca por contrato entre a Instituição IGM e o município de Cascavel (PR) ou outros ente dos contratos firmados, deverá responsável pela devolução, sem direito a completo e em perfeito estado os equipamentos, constituindo-se o tempo de uso dos mesmo, no Instituto IGM/Empresa;</li>
-                  <li>O equipamento em minha posse não é protegido, devendo ter apenas dados de trabalho nele, ou seja, todos os dados, programas e demais informações estão sendo salvos pelo usuário por sua conta e risco;</li>
-                  <li>Estando os equipamentos em minha posse, estarei sujeito a inspeções sem prévio aviso;</li>
-                </ol>
-              </div>
-
-              {/* Assinaturas */}
-              <div className="border p-3 rounded space-y-4">
-                <p>Cliente: _____________________________________</p>
-                <div className="pt-4">
-                  <p className="mb-2 font-semibold">Termo de responsabilidade instrumental:</p>
-                  {(alocacao?.interveniente_nome || alocacao?.responsavel_unidade) && (
-                    <p><strong>{String(alocacao.interveniente_nome || alocacao.responsavel_unidade)}</strong></p>
-                  )}
-                  {alocacao?.interveniente_cpf && (
-                    <p>CPF: {String(alocacao.interveniente_cpf)}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end space-x-2">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              disabled={isGenerating}
-            >
-              Fechar
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleDownload}
-              disabled={isGenerating}
-              className="flex items-center space-x-2"
-            >
-              <Download className="w-4 h-4" />
-              <span>Baixar</span>
-            </Button>
-            <Button
-              onClick={handlePrint}
-              disabled={isGenerating}
-              className="flex items-center space-x-2"
-            >
-              <Printer className="w-4 h-4" />
-              <span>{isGenerating ? 'Gerando...' : 'Imprimir'}</span>
-            </Button>
-          </div>
+        <div className="space-y-4 text-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground">
+            {isGenerating ? 'Gerando documento para impressão...' : 'Preparando impressão...'}
+          </p>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={isGenerating}
+            className="mt-4"
+          >
+            Cancelar
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

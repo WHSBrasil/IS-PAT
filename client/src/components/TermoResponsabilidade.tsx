@@ -428,7 +428,7 @@ CPF [cpf_do_responsavel_unidade]
               {/* Texto principal do termo */}
               <div className="text-justify mb-4">
                 <p>
-                  Eu, <strong>{alocacao?.interveniente_nome || alocacao?.responsavel_unidade || '________________'}</strong>{alocacao?.interveniente_cns ? `, Portador do CNS ${alocacao.interveniente_cns}` : ''}, lotado na unidade de saúde <strong>{alocacao?.unidade_nome || '________________'}</strong>{alocacao?.cnes ? `, CNES ${alocacao.cnes}` : ''}, declaro que recebi do <strong>{alocacao?.mantenedora || '________________'}</strong>{alocacao?.cnpj ? `, CNPJ ${alocacao.cnpj}` : ''} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
+                  Eu, <strong>{String(alocacao?.interveniente_nome || alocacao?.responsavel_unidade || '________________')}</strong>{alocacao?.interveniente_cns ? `, Portador do CNS ${String(alocacao.interveniente_cns)}` : ''}, lotado na unidade de saúde <strong>{String(alocacao?.unidade_nome || '________________')}</strong>{alocacao?.cnes ? `, CNES ${String(alocacao.cnes)}` : ''}, declaro que recebi do <strong>{String(alocacao?.mantenedora || '________________')}</strong>{alocacao?.cnpj ? `, CNPJ ${String(alocacao.cnpj)}` : ''} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
                 </p>
               </div>
 
@@ -436,10 +436,10 @@ CPF [cpf_do_responsavel_unidade]
               {(alocacao?.produto_nome || alocacao?.produto_codigo || alocacao?.imei || alocacao?.serial || alocacao?.mac) && (
                 <div className="border p-3 rounded mb-4 bg-blue-50">
                   <h4 className="font-semibold mb-2">Informações do Equipamento:</h4>
-                  {alocacao?.produto_nome && <p><strong>Equipamento:</strong> {alocacao.produto_nome}{alocacao?.produto_codigo ? ` - ${alocacao.produto_codigo}` : ''}</p>}
-                  {alocacao?.imei && <p><strong>IMEI:</strong> {alocacao.imei}</p>}
-                  {alocacao?.serial && <p><strong>Serial:</strong> {alocacao.serial}</p>}
-                  {alocacao?.mac && <p><strong>MAC:</strong> {alocacao.mac}</p>}
+                  {alocacao?.produto_nome && <p><strong>Equipamento:</strong> {String(alocacao.produto_nome)}{alocacao?.produto_codigo ? ` - ${String(alocacao.produto_codigo)}` : ''}</p>}
+                  {alocacao?.imei && <p><strong>IMEI:</strong> {String(alocacao.imei)}</p>}
+                  {alocacao?.serial && <p><strong>Serial:</strong> {String(alocacao.serial)}</p>}
+                  {alocacao?.mac && <p><strong>MAC:</strong> {String(alocacao.mac)}</p>}
                 </div>
               )}
 
@@ -463,10 +463,10 @@ CPF [cpf_do_responsavel_unidade]
                 <div className="pt-4">
                   <p className="mb-2 font-semibold">Termo de responsabilidade instrumental:</p>
                   {(alocacao?.interveniente_nome || alocacao?.responsavel_unidade) && (
-                    <p><strong>{alocacao.interveniente_nome || alocacao.responsavel_unidade}</strong></p>
+                    <p><strong>{String(alocacao.interveniente_nome || alocacao.responsavel_unidade)}</strong></p>
                   )}
                   {alocacao?.interveniente_cpf && (
-                    <p>CPF: {alocacao.interveniente_cpf}</p>
+                    <p>CPF: {String(alocacao.interveniente_cpf)}</p>
                   )}
                 </div>
               </div>

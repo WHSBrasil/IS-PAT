@@ -142,6 +142,10 @@ CPF [cpf_do_responsavel_unidade]
                   height: 297mm;
                   position: relative;
                   background-color: #ffffff;
+                  background-image: url('/Timbre.pdf');
+                  background-size: cover;
+                  background-repeat: no-repeat;
+                  background-position: center;
                 }
 
                 .background-container {
@@ -151,22 +155,17 @@ CPF [cpf_do_responsavel_unidade]
                   width: 100%;
                   height: 100%;
                   z-index: -1;
-                  background-color: #f8f9fa;
-                  background-image:
-                    linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
-                    linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
-                    linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
-                    linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
-                  background-size: 20px 20px;
-                  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-                  opacity: 0.1;
+                  background-image: url('/Timbre.pdf');
+                  background-size: cover;
+                  background-repeat: no-repeat;
+                  background-position: center;
                 }
 
                 .content-wrapper {
-                  padding: 40px 60px 60px 60px;
+                  padding: 120px 60px 80px 60px;
                   position: relative;
                   z-index: 1;
-                  min-height: calc(100vh - 100px);
+                  min-height: calc(100vh - 200px);
                 }
 
                 .header-section {
@@ -306,23 +305,7 @@ CPF [cpf_do_responsavel_unidade]
               <div class="background-container"></div>
 
               <div class="content-wrapper">
-                <div class="header-section">
-                  <div class="logos-section">
-                    <div class="logo-left">
-                      <p style="font-size: 10px; font-weight: bold; margin: 0;">PREFEITURA MUNICIPAL</p>
-                      <p style="font-size: 10px; font-weight: bold; margin: 0;">DE CASCAVEL</p>
-                    </div>
-                    <div class="logo-center">
-                      <p style="font-size: 10px; font-weight: bold; margin: 0;">SECRETARIA MUNICIPAL</p>
-                      <p style="font-size: 10px; font-weight: bold; margin: 0;">DE SAÚDE</p>
-                    </div>
-                    <div class="logo-right">
-                      <p style="font-size: 10px; font-weight: bold; margin: 0;">IGM</p>
-                      <p style="font-size: 8px; margin: 0;">Instituto de Gestão Municipal</p>
-                    </div>
-                  </div>
-                  <hr style="border: 1px solid #000; margin: 20px 0;">
-                </div>
+                
 
                 <div class="title-section">
                   <h1>TERMO DE RESPONSABILIDADE</h1>

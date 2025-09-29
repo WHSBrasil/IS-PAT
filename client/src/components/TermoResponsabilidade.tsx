@@ -27,16 +27,17 @@ export default function TermoResponsabilidade({ isOpen, onClose, alocacao, empre
     const empresaNome = empresa?.mantenedora || '[NOME_DA_EMPRESA]';
     const tombamento = alocacao?.tombamento?.tombamento || '[CODIGO_TOMBAMENTO]';
     const produto = alocacao?.tombamento?.produto?.nome || '[DESCRICAO_PRODUTO]';
-    const produtoCodigo = alocacao?.tombamento?.produto?.codigo || '[CODIGO_PRODUTO]';
+    const produtoCodigo = alocacao?.tombamento?.observacao || '[CODIGO_PRODUTO]';
     const serial = alocacao?.tombamento?.serial || '[NUMERO_SERIE]';
     const imei = alocacao?.tombamento?.imei || '[IMEI_EQUIPAMENTO]';
-    const mac = alocacao?.tombamento?.mac || '[endereco_mac_tombamento_mac]';
+    const mac = alocacao?.tombamento?.mac || '[ENDERECO_MAC]';
     const unidade = alocacao?.unidadesaude?.nome || '[UNIDADE_DE_SAUDE]';
     const unidadeCnes = alocacao?.unidadesaude?.cnes || '[CNES_UNIDADE]';
     const setor = alocacao?.setor?.nome || '[SETOR]';
     const responsavelUnidade = alocacao?.responsavel_unidade || '[RESPONSAVEL_UNIDADE]';
     const intervenienteNome = alocacao?.interveniente?.nome || '[NOME_INTERVENIENTE]';
-    const intervenienteCns = alocacao?.interveniente?.cns || '[CNS_INTERVENIENTE]';
+    const intervenienteCns = alocacao?.interveniente?.cnscnes || '[CNS_INTERVENIENTE]';
+    const intervenienteCpf = alocacao?.interveniente?.cpfcnpj || '[CPF_INTERVENIENTE]';
     const mantenedoraNome = alocacao?.mantenedora?.nome || empresa?.mantenedora || '[NOME_MANTENEDORA]';
     const mantenedoraCnpj = alocacao?.mantenedora?.cnpj || empresa?.cnpj || '[CNPJ_MANTENEDORA]';
     const dataAlocacao = formatDate(alocacao?.dataalocacao) || '[DATA_ALOCACAO]';
@@ -270,14 +271,14 @@ CPF [cpf_do_responsavel_unidade]
               </div>
 
               <div class="content">
-                <p>Eu, <strong>${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[sotech.cdg_interveniente.interveniente]'}</strong>, Portador do CNS <strong>${alocacao?.interveniente?.cns || '[sotech.cdg_interveniente.cns]'}</strong>, lotado na unidade de saúde <strong>${alocacao?.unidadesaude?.nome || '[sotech.cdg_unidadesaude.unidadesaude]'}</strong>, CNES <strong>${alocacao?.unidadesaude?.cnes || '[sotech.cdg_unidadesaude.cnes]'}</strong>, declaro que recebi do <strong>${alocacao?.mantenedora?.nome || empresa?.mantenedora || '[sotech.cdg_mantenedora.mantenedora]'}</strong>, CNPJ <strong>${alocacao?.mantenedora?.cnpj || empresa?.cnpj || '[sotech.cdg_mantenedora.cnpj]'}</strong> a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:</p>
+                <p>Eu, <strong>${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[sotech.cdg_interveniente.interveniente]'}</strong>, Portador do CNS <strong>${alocacao?.interveniente?.cnscnes || '[sotech.cdg_interveniente.cnscnes]'}</strong>, lotado na unidade de saúde <strong>${alocacao?.unidadesaude?.nome || '[sotech.cdg_unidadesaude.unidadesaude]'}</strong>, CNES <strong>${alocacao?.unidadesaude?.cnes || '[sotech.cdx_unidadesaude.cnes]'}</strong>, declaro que recebi do <strong>${alocacao?.mantenedora?.nome || empresa?.mantenedora || '[sotech.cdg_mantenedora.mantenedora]'}</strong>, CNPJ <strong>${alocacao?.mantenedora?.cnpj || empresa?.cnpj || '[sotech.cdg_mantenedora.cnpj]'}</strong> a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:</p>
               </div>
 
               <div class="equipment-info">
-                <p><strong>Equipamento:</strong> ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} ${alocacao?.tombamento?.produto?.codigo || '[codigo_produto]'}</p>
-                <p><strong>IMEI:</strong> ${alocacao?.tombamento?.imei || '[imei_equipamento]'}</p>
+                <p><strong>Equipamento:</strong> ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} ${alocacao?.tombamento?.observacao || '[codigo_produto]'}</p>
+                <p><strong>IMEI:</strong> ${alocacao?.tombamento?.imei || '[sotech.pat_tombamento.imei]'}</p>
                 <p><strong>Serial:</strong> ${alocacao?.tombamento?.serial || '[numero_serie]'}</p>
-                <p><strong>MAC:</strong> ${alocacao?.tombamento?.mac || '[endereco_mac]'}</p>
+                <p><strong>MAC:</strong> ${alocacao?.tombamento?.mac || '[sotech.pat_tombamento.mac]'}</p>
               </div>
 
               <div class="conditions">
@@ -307,7 +308,7 @@ CPF [cpf_do_responsavel_unidade]
                 <p><strong>Termo de responsabilidade instrumental:</strong></p>
                 <br>
                 <p><strong>${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[nome_responsavel]'}</strong></p>
-                <p>CPF: [cpf_do_responsavel_unidade]</p>
+                <p>CPF: ${alocacao?.interveniente?.cpfcnpj || '[sotech.cdg_interveniente.cpfcnpj]'}</p>
               </div>
 
               <div class="footer">
@@ -382,12 +383,12 @@ CPF [cpf_do_responsavel_unidade]
             <div className="text-xs leading-relaxed space-y-4">
               <div className="bg-gray-50 p-4 rounded text-xs">
                 <pre className="whitespace-pre-wrap font-sans text-xs leading-relaxed">
-{`Eu, ${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[sotech.cdg_interveniente.interveniente]'}, Portador do CNS ${alocacao?.interveniente?.cns || '[sotech.cdg_interveniente.cns]'}, lotado na unidade de saúde ${alocacao?.unidadesaude?.nome || '[sotech.cdg_unidadesaude.unidadesaude]'}, CNES ${alocacao?.unidadesaude?.cnes || '[sotech.cdg_unidadesaude.cnes]'}, declaro que recebi do ${alocacao?.mantenedora?.nome || empresa?.mantenedora || '[sotech.cdg_mantenedora.mantenedora]'}, CNPJ ${alocacao?.mantenedora?.cnpj || empresa?.cnpj || '[sotech.cdg_mantenedora.cnpj]'} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
+{`Eu, ${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[sotech.cdg_interveniente.interveniente]'}, Portador do CNS ${alocacao?.interveniente?.cnscnes || '[sotech.cdg_interveniente.cnscnes]'}, lotado na unidade de saúde ${alocacao?.unidadesaude?.nome || '[sotech.cdg_unidadesaude.unidadesaude]'}, CNES ${alocacao?.unidadesaude?.cnes || '[sotech.cdx_unidadesaude.cnes]'}, declaro que recebi do ${alocacao?.mantenedora?.nome || empresa?.mantenedora || '[sotech.cdg_mantenedora.mantenedora]'}, CNPJ ${alocacao?.mantenedora?.cnpj || empresa?.cnpj || '[sotech.cdg_mantenedora.cnpj]'} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
 
-Equipamento: ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} ${alocacao?.tombamento?.produto?.codigo || '[codigo_produto]'}
-IMEI: ${alocacao?.tombamento?.imei || '[imei_equipamento]'}
+Equipamento: ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} ${alocacao?.tombamento?.observacao || '[codigo_produto]'}
+IMEI: ${alocacao?.tombamento?.imei || '[sotech.pat_tombamento.imei]'}
 Serial: ${alocacao?.tombamento?.serial || '[numero_serie]'}
-MAC: ${alocacao?.tombamento?.mac || '[endereco_mac]'}
+MAC: ${alocacao?.tombamento?.mac || '[sotech.pat_tombamento.mac]'}
 
 Pelo qual declaro estar ciente de que:
 
@@ -411,7 +412,7 @@ Cliente: _____________________________________
 Termo de responsabilidade instrumental:
 
 ${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[nome_responsavel]'}
-CPF: [cpf_do_responsavel_unidade]`}
+CPF: ${alocacao?.interveniente?.cpfcnpj || '[sotech.cdg_interveniente.cpfcnpj]'}`}
                 </pre>
               </div>
 

@@ -142,10 +142,11 @@ CPF [cpf_do_responsavel_unidade]
                   height: 297mm;
                   position: relative;
                   background-color: #ffffff;
+                  overflow: hidden;
                 }
 
                 .background-container {
-                  position: absolute;
+                  position: fixed;
                   top: 0;
                   left: 0;
                   width: 210mm;
@@ -159,17 +160,19 @@ CPF [cpf_do_responsavel_unidade]
                   height: 297mm;
                   border: none;
                   pointer-events: none;
-                  opacity: 1;
+                  opacity: 0.8;
                   transform: scale(1);
                   transform-origin: top left;
+                  display: block;
                 }
 
                 .content-wrapper {
-                  padding: 150px 40px 60px 40px;
+                  padding: 140px 35px 50px 35px;
                   position: relative;
                   z-index: 2;
-                  min-height: calc(297mm - 210px);
+                  min-height: calc(297mm - 190px);
                   background: transparent;
+                  page-break-inside: avoid;
                 }
 
                 .header-section {
@@ -288,6 +291,32 @@ CPF [cpf_do_responsavel_unidade]
                   body {
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
+                    width: 210mm !important;
+                    height: 297mm !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                  }
+
+                  .background-container {
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    width: 210mm !important;
+                    height: 297mm !important;
+                    z-index: 0 !important;
+                  }
+
+                  .background-container iframe {
+                    width: 210mm !important;
+                    height: 297mm !important;
+                    transform: scale(1) !important;
+                    opacity: 0.8 !important;
+                  }
+
+                  .content-wrapper {
+                    position: relative !important;
+                    z-index: 2 !important;
+                    padding: 140px 35px 50px 35px !important;
                   }
 
                   .no-print {

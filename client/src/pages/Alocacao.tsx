@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { useAlocacoes, useCreateAlocacao, useUpdateAlocacao, useDeleteAlocacao, useTombamentos, useUnidadesSaude, useSetores, useProfissionais, useEmpresa } from "@/hooks/usePatrimonio";
 import { Button } from "@/components/ui/button";
@@ -244,7 +243,7 @@ export default function Alocacao() {
       } else {
         await createAlocacao.mutateAsync(submitFormData);
       }
-      
+
       handleBackToList();
     } catch (error) {
       console.error("Error saving alocacao:", error);
@@ -705,7 +704,7 @@ export default function Alocacao() {
                             {new Date(item.dataalocacao).toLocaleDateString('pt-BR')}
                           </div>
                         </div>
-                        
+
                         {/* Second line: Product and Unit info */}
                         <div className="space-y-1">
                           <div className="text-sm font-medium text-foreground">
@@ -721,7 +720,7 @@ export default function Alocacao() {
                             </div>
                           )}
                         </div>
-                        
+
                         {/* Images */}
                         {item.photos && (
                           <div className="pt-2">
@@ -732,7 +731,7 @@ export default function Alocacao() {
                             />
                           </div>
                         )}
-                        
+
                         {/* Responsible and actions */}
                         <div className="flex items-center justify-between pt-2 border-t border-border">
                           <div className="text-xs text-muted-foreground">

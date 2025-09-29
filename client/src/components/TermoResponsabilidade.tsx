@@ -353,6 +353,19 @@ CPF [cpf_do_responsavel_unidade]
     }
   };
 
+  // Extracting data for conditional rendering in the preview
+  const intervenienteNome = alocacao?.interveniente?.nome;
+  const intervenienteCns = alocacao?.interveniente?.cnscnes;
+  const unidade = alocacao?.unidadesaude?.nome;
+  const unidadeCnes = alocacao?.unidadesaude?.cnes;
+  const mantenedoraNome = alocacao?.mantenedora?.nome || empresa?.mantenedora;
+  const mantenedoraCnpj = alocacao?.mantenedora?.cnpj || empresa?.cnpj;
+  const produto = alocacao?.tombamento?.produto?.nome;
+  const produtoCodigo = alocacao?.tombamento?.observacao;
+  const imei = alocacao?.tombamento?.imei;
+  const serial = alocacao?.tombamento?.serial;
+  const mac = alocacao?.tombamento?.mac;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-5xl max-h-[95vh] overflow-y-auto">
@@ -383,12 +396,12 @@ CPF [cpf_do_responsavel_unidade]
             <div className="text-xs leading-relaxed space-y-4">
               <div className="bg-gray-50 p-4 rounded text-xs">
                 <pre className="whitespace-pre-wrap font-sans text-xs leading-relaxed">
-{`Eu, ${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[sotech.cdg_interveniente.interveniente]'}, Portador do CNS ${alocacao?.interveniente?.cnscnes || '[sotech.cdg_interveniente.cnscnes]'}, lotado na unidade de saúde ${alocacao?.unidadesaude?.nome || '[sotech.cdg_unidadesaude.unidadesaude]'}, CNES ${alocacao?.unidadesaude?.cnes || '[sotech.cdx_unidadesaude.cnes]'}, declaro que recebi do ${alocacao?.mantenedora?.nome || empresa?.mantenedora || '[sotech.cdg_mantenedora.mantenedora]'}, CNPJ ${alocacao?.mantenedora?.cnpj || empresa?.cnpj || '[sotech.cdg_mantenedora.cnpj]'} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
+{`Eu, ${intervenienteNome || '________________'}${intervenienteCns ? `, Portador do CNS ${intervenienteCns}` : ''}, lotado na unidade de saúde ${unidade || '________________'}${unidadeCnes ? `, CNES ${unidadeCnes}` : ''}, declaro que recebi do ${mantenedoraNome || '________________'}${mantenedoraCnpj ? `, CNPJ ${mantenedoraCnpj}` : ''} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
 
-Equipamento: ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} ${alocacao?.tombamento?.observacao || '[codigo_produto]'}
-IMEI: ${alocacao?.tombamento?.imei || '[sotech.pat_tombamento.imei]'}
-Serial: ${alocacao?.tombamento?.serial || '[numero_serie]'}
-MAC: ${alocacao?.tombamento?.mac || '[sotech.pat_tombamento.mac]'}
+${produto || produtoCodigo ? `Equipamento: ${produto || ''} ${produtoCodigo || ''}` : ''}
+${imei ? `IMEI: ${imei}` : ''}
+${serial ? `Serial: ${serial}` : ''}
+${mac ? `MAC: ${mac}` : ''}
 
 Pelo qual declaro estar ciente de que:
 

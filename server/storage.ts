@@ -95,6 +95,7 @@ export interface IStorage {
   // Alocacao methods
   getAlocacoes(): Promise<Alocacao[]>;
   getAlocacao(id: number): Promise<Alocacao | undefined>;
+  getAlocacaoById(id: number): Promise<Alocacao | null>;
   createAlocacao(alocacao: InsertAlocacao): Promise<Alocacao>;
   updateAlocacao(id: number, alocacao: Partial<InsertAlocacao>): Promise<Alocacao>;
   deleteAlocacao(id: number): Promise<boolean>;
@@ -319,28 +320,28 @@ export class DatabaseStorage implements IStorage {
         a.responsavel,
         a.observacao,
         a.photos,
-        
+
         -- Dados do tombamento
         t.tombamento,
         t.serial,
         t.imei,
         t.mac,
-        
+
         -- Dados do produto
         p.produto as produto_nome,
         p.codigo as produto_codigo,
-        
+
         -- Dados da unidade de saúde
         us.unidadesaude as unidade_nome,
         ux.cnes,
-        
+
         -- Dados do setor
         s.setor as setor_nome,
-        
+
         -- Dados da empresa/mantenedora
         m.mantenedora,
         m.cnpj,
-        
+
         -- Dados do interveniente (se existir)
         i.interveniente as interveniente_nome,
         i.cnscnes as interveniente_cns,
@@ -395,6 +396,93 @@ export class DatabaseStorage implements IStorage {
       WHERE a.pkalocacao = $1
     `, [id]);
     return result.rows[0] || undefined;
+  }
+
+  async getAlocacaoById(id: number): Promise<Alocacao | null> {
+    const result = await query(`
+      SELECT 
+        a.pkalocacao,
+        a.responsavel_unidade,
+        a.dataalocacao,
+        a.observacao,
+        a.fkprofissional,
+
+        -- Dados do tombamento
+        t.tombamento,
+        t.serial,
+        t.imei,
+        t.mac,
+        t.observacao as tombamento_observacao,
+
+        -- Dados do produto
+        p.produto as produto_nome,
+        p.codigo as produto_codigo,
+
+        -- Dados da unidade de saúde
+        us.unidadesaude as unidade_nome,
+        ux.cnes,
+
+        -- Dados do setor
+        s.setor as setor_nome,
+
+        -- Dados da empresa/mantenedora
+        m.mantenedora,
+        m.cnpj,
+
+        -- Dados do interveniente (se existir)
+        i.interveniente as interveniente_nome,
+        i.cnscnes as interveniente_cns,
+        i.cpfcnpj as interveniente_cpf
+
+      FROM sotech.pat_alocacao a
+      LEFT JOIN sotech.pat_tombamento t ON a.fktombamento = t.pktombamento
+      LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
+      LEFT JOIN sotech.cdg_unidadesaude us ON a.fkunidadesaude = us.pkunidadesaude
+      LEFT JOIN sotech.cdg_setor s ON a.fksetor = s.pksetor
+      LEFT JOIN sotech.cdx_unidadesaude ux on us.pkunidadesaude = ux.fkunidadesaude
+      LEFT JOIN sotech.cdg_mantenedora m on m.pkmantenedora = ux.fkmantenedora
+      LEFT JOIN sotech.cdg_interveniente i ON a.fkprofissional = i.pkinterveniente
+      WHERE a.pkalocacao = $1
+    `, [id]);
+
+    if (result.rows.length === 0) return null;
+
+    const row = result.rows[0];
+    return {
+      pkalocacao: row.pkalocacao,
+      fktombamento: row.fktombamento,
+      fkunidadesaude: row.fkunidadesaude,
+      fksetor: row.fksetor,
+      fkprofissional: row.fkprofissional,
+      responsavel_unidade: row.responsavel_unidade,
+      dataalocacao: row.dataalocacao,
+      observacao: row.observacao,
+      tombamento: {
+        tombamento: row.tombamento,
+        serial: row.serial,
+        imei: row.imei,
+        mac: row.mac,
+        observacao: row.tombamento_observacao,
+        produto: row.produto_nome ? { 
+          nome: row.produto_nome,
+          codigo: row.produto_codigo 
+        } : undefined
+      },
+      unidadesaude: row.unidade_nome ? { 
+        nome: row.unidade_nome,
+        cnes: row.cnes
+      } : undefined,
+      setor: row.setor_nome ? { nome: row.setor_nome } : undefined,
+      interveniente: row.interveniente_nome ? {
+        nome: row.interveniente_nome,
+        cnscnes: row.interveniente_cns,
+        cpfcnpj: row.interveniente_cpf
+      } : undefined,
+      mantenedora: row.mantenedora ? {
+        nome: row.mantenedora,
+        cnpj: row.cnpj
+      } : undefined
+    };
   }
 
   async createAlocacao(alocacao: InsertAlocacao): Promise<Alocacao> {

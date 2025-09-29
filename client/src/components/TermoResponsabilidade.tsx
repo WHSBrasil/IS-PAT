@@ -401,28 +401,12 @@ CPF [cpf_do_responsavel_unidade]
 
             {/* Conteúdo do termo */}
             <div className="text-sm leading-relaxed space-y-4">
-              {/* Texto principal - só exibe se todos os dados necessários estiverem disponíveis */}
-              {alocacao?.interveniente_nome && alocacao?.interveniente_cns && alocacao?.unidade_nome && alocacao?.cnes && alocacao?.mantenedora && alocacao?.cnpj && (
-                <div className="text-justify mb-4">
-                  <p>
-                    Eu, <strong>{alocacao.interveniente_nome}</strong>, Portador do CNS <strong>{alocacao.interveniente_cns}</strong>, lotado na unidade de saúde <strong>{alocacao.unidade_nome}</strong>, CNES <strong>{alocacao.cnes}</strong>, declaro que recebi do <strong>{alocacao.mantenedora}</strong>, CNPJ <strong>{alocacao.cnpj}</strong> a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
-                  </p>
-                </div>
-              )}
-
-              {/* Se não tiver todos os dados, exibe campos disponíveis individualmente */}
-              {!(alocacao?.interveniente_nome && alocacao?.interveniente_cns && alocacao?.unidade_nome && alocacao?.cnes && alocacao?.mantenedora && alocacao?.cnpj) && (
-                <div className="space-y-2 mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                  <p className="text-sm font-semibold text-yellow-800">Dados disponíveis:</p>
-                  {alocacao?.interveniente_nome && <p><strong>Nome:</strong> {alocacao.interveniente_nome}</p>}
-                  {alocacao?.responsavel_unidade && <p><strong>Responsável Unidade:</strong> {alocacao.responsavel_unidade}</p>}
-                  {alocacao?.interveniente_cns && <p><strong>CNS:</strong> {alocacao.interveniente_cns}</p>}
-                  {alocacao?.unidade_nome && <p><strong>Unidade:</strong> {alocacao.unidade_nome}</p>}
-                  {alocacao?.cnes && <p><strong>CNES:</strong> {alocacao.cnes}</p>}
-                  {alocacao?.mantenedora && <p><strong>Mantenedora:</strong> {alocacao.mantenedora}</p>}
-                  {alocacao?.cnpj && <p><strong>CNPJ:</strong> {alocacao.cnpj}</p>}
-                </div>
-              )}
+              {/* Texto principal do termo */}
+              <div className="text-justify mb-4">
+                <p>
+                  Eu, <strong>{alocacao?.interveniente_nome || alocacao?.responsavel_unidade || '________________'}</strong>{alocacao?.interveniente_cns ? `, Portador do CNS ${alocacao.interveniente_cns}` : ''}, lotado na unidade de saúde <strong>{alocacao?.unidade_nome || '________________'}</strong>{alocacao?.cnes ? `, CNES ${alocacao.cnes}` : ''}, declaro que recebi do <strong>{alocacao?.mantenedora || '________________'}</strong>{alocacao?.cnpj ? `, CNPJ ${alocacao.cnpj}` : ''} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
+                </p>
+              </div>
 
               {/* Informações do equipamento - só exibe se houver pelo menos um dado */}
               {(alocacao?.produto_nome || alocacao?.produto_codigo || alocacao?.imei || alocacao?.serial || alocacao?.mac) && (

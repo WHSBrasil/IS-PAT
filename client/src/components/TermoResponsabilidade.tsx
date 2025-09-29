@@ -142,10 +142,6 @@ CPF [cpf_do_responsavel_unidade]
                   height: 297mm;
                   position: relative;
                   background-color: #ffffff;
-                  background-image: url('/Timbre.pdf');
-                  background-size: cover;
-                  background-repeat: no-repeat;
-                  background-position: center;
                 }
 
                 .background-container {
@@ -155,10 +151,13 @@ CPF [cpf_do_responsavel_unidade]
                   width: 100%;
                   height: 100%;
                   z-index: -1;
-                  background-image: url('/Timbre.pdf');
-                  background-size: cover;
-                  background-repeat: no-repeat;
-                  background-position: center;
+                }
+
+                .background-container iframe {
+                  width: 100%;
+                  height: 100%;
+                  border: none;
+                  pointer-events: none;
                 }
 
                 .content-wrapper {
@@ -302,7 +301,9 @@ CPF [cpf_do_responsavel_unidade]
                 <button class="print-button" onclick="window.close()">❌ Fechar</button>
               </div>
 
-              <div class="background-container"></div>
+              <div class="background-container">
+                <iframe src="/Timbre.pdf" style="opacity: 0.3;"></iframe>
+              </div>
 
               <div class="content-wrapper">
                 

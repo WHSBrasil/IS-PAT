@@ -138,39 +138,37 @@ CPF [cpf_do_responsavel_unidade]
                   margin: 0;
                   padding: 0;
                   color: #000;
-                  width: 100%;
-                  height: 100vh;
+                  width: 210mm;
+                  height: 297mm;
                   position: relative;
                   background-color: #ffffff;
-                  max-width: 210mm;
-                  max-height: 297mm;
                 }
 
                 .background-container {
                   position: absolute;
                   top: 0;
                   left: 0;
-                  width: 100%;
-                  height: 100%;
+                  width: 210mm;
+                  height: 297mm;
                   z-index: 0;
                   overflow: hidden;
                 }
 
                 .background-container iframe {
-                  width: 100%;
-                  height: 100%;
+                  width: 210mm;
+                  height: 297mm;
                   border: none;
                   pointer-events: none;
                   opacity: 1;
-                  transform: scale(0.8);
+                  transform: scale(1);
                   transform-origin: top left;
                 }
 
                 .content-wrapper {
-                  padding: 120px 30px 40px 30px;
+                  padding: 150px 40px 60px 40px;
                   position: relative;
                   z-index: 2;
-                  min-height: calc(100vh - 160px);
+                  min-height: calc(297mm - 210px);
                   background: transparent;
                 }
 

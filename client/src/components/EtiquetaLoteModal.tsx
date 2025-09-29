@@ -172,20 +172,20 @@ export default function EtiquetaLoteModal({ isOpen, onClose, empresa }: Etiqueta
 
 ^FX Comentário - Descrição do equipamento
 ^CF0,30
-^FO15,15^FD${descricaoLinhas[0].toUpperCase()}^FS
-^FO15,50^FD${descricaoLinhas[1].toUpperCase()}^FS
+^FO20,20^FD${descricaoLinhas[0].toUpperCase()}^FS
+^FO20,55^FD${descricaoLinhas[1].toUpperCase()}^FS
 
 ^FX QR Code para página do tombamento
-^FO15,80^BQ,2,2^FD${qrUrl}^FS
+^FO20,90^BQN,2,2^FDMA,${qrUrl}^FS
 
 ^FX Código do tombamento
 ^CF0,50
-^FO130,100^FD${tombamentoNum.toUpperCase()}^FS
+^FO120,100^FD${tombamentoNum.toUpperCase()}^FS
 
 ^FX Informações da mantenedora
 ^CFA,15
-^FO130,150^FD${empresaLinhas[0].toUpperCase()}^FS
-^FO130,175^FD${empresaLinhas[1].toUpperCase()}^FS
+^FO120,150^FD${empresaLinhas[0].toUpperCase()}^FS
+^FO120,175^FD${empresaLinhas[1].toUpperCase()}^FS
 
 ^XZ
         `.trim();

@@ -432,7 +432,7 @@ CPF [cpf_do_responsavel_unidade]
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            Preparando Termo de Responsabilidade
+            {isGenerating ? 'Gerando Termo de Responsabilidade...' : 'Preparando Termo de Responsabilidade'}
           </DialogTitle>
         </DialogHeader>
 

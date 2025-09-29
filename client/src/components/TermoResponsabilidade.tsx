@@ -118,52 +118,36 @@ CPF [cpf_do_responsavel_unidade]
                   line-height: 1.3;
                   margin: 20px;
                   color: #000;
-                  background: white;
+                  background-image: url('/path/to/your/background.pdf'); /* Substitua pelo caminho do seu PDF */
+                  background-size: cover;
+                  background-repeat: no-repeat;
+                  background-position: center;
                 }
 
-                .header {
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  margin-bottom: 20px;
-                  padding: 10px 0;
-                  border-bottom: 1px solid #ccc;
-                }
-
-                .logo-left, .logo-right {
-                  width: 120px;
-                  height: 60px;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  border: 1px solid #ddd;
-                  background: #f9f9f9;
-                  font-size: 10px;
-                  text-align: center;
-                  color: #666;
+                .content-wrapper {
+                  padding: 100px 50px 50px 50px; /* Ajuste conforme o layout do seu PDF */
+                  background: rgba(255, 255, 255, 0.8); /* Fundo semi-transparente para o texto */
+                  box-shadow: 0 0 20px rgba(0,0,0,0.1);
                 }
 
                 .title-section {
                   text-align: center;
-                  flex-grow: 1;
-                  margin: 0 20px;
+                  margin-bottom: 20px;
                 }
 
                 .title-section h1 {
-                  font-size: 14px;
+                  font-size: 18px;
                   font-weight: bold;
                   margin: 0 0 5px 0;
-                  letter-spacing: 0.5px;
                 }
 
                 .title-section h2 {
-                  font-size: 12px;
+                  font-size: 14px;
                   font-weight: normal;
                   margin: 0;
-                  letter-spacing: 0.3px;
                 }
 
-                .content {
+                .main-text {
                   text-align: justify;
                   margin-bottom: 15px;
                   line-height: 1.4;
@@ -171,8 +155,8 @@ CPF [cpf_do_responsavel_unidade]
 
                 .equipment-info {
                   margin: 15px 0;
-                  padding: 8px;
-                  background-color: #f8f8f8;
+                  padding: 10px;
+                  background-color: rgba(255, 255, 255, 0.7);
                   border: 1px solid #ddd;
                   font-size: 11px;
                 }
@@ -211,24 +195,22 @@ CPF [cpf_do_responsavel_unidade]
                   margin: 0 auto 5px auto;
                 }
 
-                .footer {
-                  margin-top: 40px;
-                  text-align: center;
-                  font-size: 10px;
-                  color: #666;
-                  border-top: 1px solid #ccc;
-                  padding-top: 15px;
-                }
-
                 @media print {
                   body {
                     margin: 0;
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
+                    background-image: url('/path/to/your/background.pdf'); /* Certifique-se que o caminho está correto para impressão */
                   }
 
                   .no-print {
                     display: none !important;
+                  }
+
+                  .content-wrapper {
+                    padding: 100px 50px 50px 50px; /* Ajuste conforme o layout do seu PDF */
+                    background: transparent; /* Remove o fundo semi-transparente para impressão */
+                    box-shadow: none;
                   }
 
                   .page-break {
@@ -257,63 +239,45 @@ CPF [cpf_do_responsavel_unidade]
                 <button class="print-button" onclick="window.close()">❌ Fechar</button>
               </div>
 
-              <div class="header">
-                <div class="logo-left">
-                  LOGO<br>CASCAVEL
-                </div>
+              <div class="content-wrapper">
                 <div class="title-section">
                   <h1>TERMO DE RESPONSABILIDADE</h1>
                   <h2>GUARDA E USO DE EQUIPAMENTOS</h2>
                 </div>
-                <div class="logo-right">
-                  LOGO<br>IGM
+
+                <div class="main-text">
+                  <p>Eu, <strong>${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[sotech.cdg_interveniente.interveniente]'}</strong>, Portador do CNS <strong>${alocacao?.interveniente?.cnscnes || '[sotech.cdg_interveniente.cnscnes]'}</strong>, lotado na unidade de saúde <strong>${alocacao?.unidadesaude?.nome || '[sotech.cdg_unidadesaude.unidadesaude]'}</strong>, CNES <strong>${alocacao?.unidadesaude?.cnes || '[sotech.cdx_unidadesaude.cnes]'}</strong>, declaro que recebi do <strong>${alocacao?.mantenedora?.nome || empresa?.mantenedora || '[sotech.cdg_mantenedora.mantenedora]'}</strong>, CNPJ <strong>${alocacao?.mantenedora?.cnpj || empresa?.cnpj || '[sotech.cdg_mantenedora.cnpj]'}</strong> a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:</p>
                 </div>
-              </div>
 
-              <div class="content">
-                <p>Eu, <strong>${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[sotech.cdg_interveniente.interveniente]'}</strong>, Portador do CNS <strong>${alocacao?.interveniente?.cnscnes || '[sotech.cdg_interveniente.cnscnes]'}</strong>, lotado na unidade de saúde <strong>${alocacao?.unidadesaude?.nome || '[sotech.cdg_unidadesaude.unidadesaude]'}</strong>, CNES <strong>${alocacao?.unidadesaude?.cnes || '[sotech.cdx_unidadesaude.cnes]'}</strong>, declaro que recebi do <strong>${alocacao?.mantenedora?.nome || empresa?.mantenedora || '[sotech.cdg_mantenedora.mantenedora]'}</strong>, CNPJ <strong>${alocacao?.mantenedora?.cnpj || empresa?.cnpj || '[sotech.cdg_mantenedora.cnpj]'}</strong> a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:</p>
-              </div>
+                <div class="equipment-info">
+                  <p><strong>Equipamento:</strong> ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} ${alocacao?.tombamento?.observacao || '[codigo_produto]'}</p>
+                  <p><strong>IMEI:</strong> ${alocacao?.tombamento?.imei || '[sotech.pat_tombamento.imei]'}</p>
+                  <p><strong>Serial:</strong> ${alocacao?.tombamento?.serial || '[numero_serie]'}</p>
+                  <p><strong>MAC:</strong> ${alocacao?.tombamento?.mac || '[sotech.pat_tombamento.mac]'}</p>
+                </div>
 
-              <div class="equipment-info">
-                <p><strong>Equipamento:</strong> ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} ${alocacao?.tombamento?.observacao || '[codigo_produto]'}</p>
-                <p><strong>IMEI:</strong> ${alocacao?.tombamento?.imei || '[sotech.pat_tombamento.imei]'}</p>
-                <p><strong>Serial:</strong> ${alocacao?.tombamento?.serial || '[numero_serie]'}</p>
-                <p><strong>MAC:</strong> ${alocacao?.tombamento?.mac || '[sotech.pat_tombamento.mac]'}</p>
-              </div>
+                <div class="conditions">
+                  <p>Pelo qual declaro estar ciente de que:</p>
+                  <ol>
+                    <li>Se o equipamento for danificado ou inutilizado por emergência, manutenção, mau uso ou negligência, deverá comunicar o ocorrido ao responsável da Secretaria Municipal da Saúde, ficando sujeito às responsabilidades respectivas de cada conduta;</li>
+                    <li>No caso de extravio, furto ou roubo deverá notificar crimes, deverá se apresentar boletim de ocorrência imediatamente;</li>
+                    <li>Em caso de troca por dano, furto ou roubo, o novo equipamento acarretará custos não previstos para a Instituição, visto que a Instituição não tem obrigação de substituir equipamentos danificados nos casos acima citados;</li>
+                    <li>Em caso de troca por dano, furto ou roubo, poderei vir a receber equipamentos de qualidade inferior, inclusive usados, resultados de outras marcas;</li>
+                    <li>Em caso de troca por contrato entre a Instituição IGM e o município de Cascavel (PR) ou outros ente dos contratos firmados, deverá responsável pela devolução, sem direito a completo e em perfeito estado os equipamentos, constituindo-se o tempo de uso dos mesmo, no Instituto IGM/Empresa;</li>
+                    <li>O equipamento em minha posse não é protegido, devendo ter apenas dados de trabalho nele, ou seja, todos os dados, programas e demais informações estão sendo salvos pelo usuário por sua conta e risco;</li>
+                    <li>Estando os equipamentos em minha posse, estarei sujeito a inspeções sem prévio aviso;</li>
+                  </ol>
+                </div>
 
-              <div class="conditions">
-                <p>Pelo qual declaro estar ciente de que:</p>
-                <ol>
-                  <li>Se o equipamento for danificado ou inutilizado por emergência, manutenção, mau uso ou negligência, deverá comunicar o ocorrido ao responsável da Secretaria Municipal da Saúde, ficando sujeito às responsabilidades respectivas de cada conduta;</li>
-
-                  <li>No caso de extravio, furto ou roubo deverá notificar crimes, deverá se apresentar boletim de ocorrência imediatamente;</li>
-
-                  <li>Em caso de troca por dano, furto ou roubo, o novo equipamento acarretará custos não previstos para a Instituição, visto que a Instituição não tem obrigação de substituir equipamentos danificados nos casos acima citados;</li>
-
-                  <li>Em caso de troca por dano, furto ou roubo, poderei vir a receber equipamentos de qualidade inferior, inclusive usados, resultados de outras marcas;</li>
-
-                  <li>Em caso de troca por contrato entre a Instituição IGM e o município de Cascavel (PR) ou outros ente dos contratos firmados, deverá responsável pela devolução, sem direito a completo e em perfeito estado os equipamentos, constituindo-se o tempo de uso dos mesmo, no Instituto IGM/Empresa;</li>
-
-                  <li>O equipamento em minha posse não é protegido, devendo ter apenas dados de trabalho nele, ou seja, todos os dados, programas e demais informações estão sendo salvos pelo usuário por sua conta e risco;</li>
-
-                  <li>Estando os equipamentos em minha posse, estarei sujeito a inspeções sem prévio aviso;</li>
-                </ol>
-              </div>
-
-              <div class="signatures">
-                <p>Cliente:</p>
-                <div class="signature-line"></div>
-
-                <br><br>
-                <p><strong>Termo de responsabilidade instrumental:</strong></p>
-                <br>
-                <p><strong>${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[nome_responsavel]'}</strong></p>
-                <p>CPF: ${alocacao?.interveniente?.cpfcnpj || '[sotech.cdg_interveniente.cpfcnpj]'}</p>
-              </div>
-
-              <div class="footer">
-                <p><strong>Grupo IS</strong></p>
-                <p>SWITCH ® SYSCOM</p>
+                <div class="signatures">
+                  <p>Cliente:</p>
+                  <div class="signature-line"></div>
+                  <br><br>
+                  <p><strong>Termo de responsabilidade instrumental:</strong></p>
+                  <br>
+                  <p><strong>${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[nome_responsavel]'}</strong></p>
+                  <p>CPF: ${alocacao?.interveniente?.cpfcnpj || '[sotech.cdg_interveniente.cpfcnpj]'}</p>
+                </div>
               </div>
             </body>
           </html>
@@ -377,61 +341,57 @@ CPF [cpf_do_responsavel_unidade]
 
         <div className="space-y-4">
           {/* Preview do termo */}
-          <div className="bg-white border rounded-lg p-6 shadow-sm" style={{ minHeight: '600px' }}>
-            {/* Cabeçalho com logos */}
-            <div className="flex justify-between items-center mb-6 pb-4 border-b">
-              <div className="w-24 h-12 bg-blue-100 border border-blue-200 rounded flex items-center justify-center text-xs text-blue-600">
-                LOGO<br/>CASCAVEL
-              </div>
-              <div className="text-center flex-grow mx-4">
-                <h1 className="text-sm font-bold mb-1">TERMO DE RESPONSABILIDADE</h1>
-                <h2 className="text-xs">GUARDA E USO DE EQUIPAMENTOS</h2>
-              </div>
-              <div className="w-24 h-12 bg-green-100 border border-green-200 rounded flex items-center justify-center text-xs text-green-600">
-                LOGO<br/>IGM
-              </div>
-            </div>
-
+          <div className="bg-white border rounded-lg p-6 shadow-sm" style={{ minHeight: '600px', backgroundImage: 'url("/path/to/your/background.pdf")', backgroundSize: 'cover', backgroundPosition: 'center' }}>
             {/* Conteúdo do termo */}
             <div className="text-xs leading-relaxed space-y-4">
-              <div className="bg-gray-50 p-4 rounded text-xs">
-                <pre className="whitespace-pre-wrap font-sans text-xs leading-relaxed">
-{`Eu, ${intervenienteNome || '________________'}${intervenienteCns ? `, Portador do CNS ${intervenienteCns}` : ''}, lotado na unidade de saúde ${unidade || '________________'}${unidadeCnes ? `, CNES ${unidadeCnes}` : ''}, declaro que recebi do ${mantenedoraNome || '________________'}${mantenedoraCnpj ? `, CNPJ ${mantenedoraCnpj}` : ''} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
+              {/* Texto principal */}
+              {(intervenienteNome || alocacao?.responsavel_unidade) &&
+               (intervenienteCns) &&
+               (unidade) &&
+               (unidadeCnes) &&
+               (mantenedoraNome) &&
+               (mantenedoraCnpj) && (
+                <div className="bg-white bg-opacity-90 p-3 rounded mb-4">
+                  <p className="text-justify leading-relaxed">
+                    Eu, <strong>{intervenienteNome || alocacao?.responsavel_unidade}</strong>, Portador do CNS <strong>{intervenienteCns}</strong>, lotado na unidade de saúde <strong>{unidade}</strong>, CNES <strong>{unidadeCnes}</strong>, declaro que recebi do <strong>{mantenedoraNome}</strong>, CNPJ <strong>{mantenedoraCnpj}</strong> a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
+                  </p>
+                </div>
+              )}
 
-${produto || produtoCodigo ? `Equipamento: ${produto || ''} ${produtoCodigo || ''}` : ''}
-${imei ? `IMEI: ${imei}` : ''}
-${serial ? `Serial: ${serial}` : ''}
-${mac ? `MAC: ${mac}` : ''}
+              {/* Informações do equipamento */}
+              {(produto || produtoCodigo || imei || serial || mac) && (
+                <div className="bg-white bg-opacity-90 p-3 rounded mb-4">
+                  {produto && <p><strong>Equipamento:</strong> {produto}{produtoCodigo ? ' ' + produtoCodigo : ''}</p>}
+                  {imei && <p><strong>IMEI:</strong> {imei}</p>}
+                  {serial && <p><strong>Serial:</strong> {serial}</p>}
+                  {mac && <p><strong>MAC:</strong> {mac}</p>}
+                </div>
+              )}
 
-Pelo qual declaro estar ciente de que:
-
-1. Se o equipamento for danificado ou inutilizado por emergência, manutenção, mau uso ou negligência, deverá comunicar o ocorrido ao responsável da Secretaria Municipal da Saúde, ficando sujeito às responsabilidades respectivas de cada conduta;
-
-2. No caso de extravio, furto ou roubo deverá notificar crimes, deverá se apresentar boletim de ocorrência imediatamente;
-
-3. Em caso de troca por dano, furto ou roubo, o novo equipamento acarretará custos não previstos para a Instituição, visto que a Instituição não tem obrigação de substituir equipamentos danificados nos casos acima citados;
-
-4. Em caso de troca por dano, furto ou roubo, poderei vir a receber equipamentos de qualidade inferior, inclusive usados, resultados de outras marcas;
-
-5. Em caso de troca por contrato entre a Instituição IGM e o município de Cascavel (PR) ou outros ente dos contratos firmados, deverá responsável pela devolução, sem direito a completo e em perfeito estado os equipamentos, constituindo-se o tempo de uso dos mesmo, no Instituto IGM/Empresa;
-
-6. O equipamento em minha posse não é protegido, devendo ter apenas dados de trabalho nele, ou seja, todos os dados, programas e demais informações estão sendo salvos pelo usuário por sua conta e risco;
-
-7. Estando os equipamentos em minha posse, estarei sujeito a inspeções sem prévio aviso;
-
-Cliente: _____________________________________
-
-
-Termo de responsabilidade instrumental:
-
-${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[nome_responsavel]'}
-CPF: ${alocacao?.interveniente?.cpfcnpj || '[sotech.cdg_interveniente.cpfcnpj]'}`}
-                </pre>
+              {/* Condições */}
+              <div className="bg-white bg-opacity-90 p-3 rounded mb-4">
+                <p className="mb-2 font-semibold">Pelo qual declaro estar ciente de que:</p>
+                <ol className="list-decimal list-inside space-y-2 text-xs">
+                  <li>Se o equipamento for danificado ou inutilizado por emergência, manutenção, mau uso ou negligência, deverá comunicar o ocorrido ao responsável da Secretaria Municipal da Saúde, ficando sujeito às responsabilidades respectivas de cada conduta;</li>
+                  <li>No caso de extravio, furto ou roubo deverá notificar crimes, deverá se apresentar boletim de ocorrência imediatamente;</li>
+                  <li>Em caso de troca por dano, furto ou roubo, o novo equipamento acarretará custos não previstos para a Instituição, visto que a Instituição não tem obrigação de substituir equipamentos danificados nos casos acima citados;</li>
+                  <li>Em caso de troca por dano, furto ou roubo, poderei vir a receber equipamentos de qualidade inferior, inclusive usados, resultados de outras marcas;</li>
+                  <li>Em caso de troca por contrato entre a Instituição IGM e o município de Cascavel (PR) ou outros ente dos contratos firmados, deverá responsável pela devolução, sem direito a completo e em perfeito estado os equipamentos, constituindo-se o tempo de uso dos mesmo, no Instituto IGM/Empresa;</li>
+                  <li>O equipamento em minha posse não é protegido, devendo ter apenas dados de trabalho nele, ou seja, todos os dados, programas e demais informações estão sendo salvos pelo usuário por sua conta e risco;</li>
+                  <li>Estando os equipamentos em minha posse, estarei sujeito a inspeções sem prévio aviso;</li>
+                </ol>
               </div>
 
-              <div className="text-center text-xs text-gray-600 border-t pt-4 mt-6">
-                <p><strong>Grupo IS</strong></p>
-                <p>SWITCH ® SYSCOM</p>
+              {/* Assinaturas */}
+              <div className="bg-white bg-opacity-90 p-3 rounded">
+                <p className="mb-4">Cliente: _____________________________________</p>
+                <p className="mb-2"><strong>Termo de responsabilidade instrumental:</strong></p>
+                {(alocacao?.interveniente?.nome || alocacao?.responsavel_unidade) && (
+                  <p><strong>{alocacao?.interveniente?.nome || alocacao?.responsavel_unidade}</strong></p>
+                )}
+                {alocacao?.interveniente?.cpfcnpj && (
+                  <p>CPF: {alocacao?.interveniente?.cpfcnpj}</p>
+                )}
               </div>
             </div>
           </div>

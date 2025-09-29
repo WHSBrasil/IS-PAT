@@ -102,7 +102,20 @@ CPF [cpf_do_responsavel_unidade]
     setIsGenerating(true);
 
     try {
-      const content = generateTermoContent();
+      // Coletando dados reais
+      const intervenienteNome = alocacao?.interveniente_nome || alocacao?.responsavel_unidade;
+      const intervenienteCns = alocacao?.interveniente_cns;
+      const intervenienteCpf = alocacao?.interveniente_cpf;
+      const unidadeNome = alocacao?.unidade_nome;
+      const unidadeCnes = alocacao?.cnes;
+      const mantenedoraNome = alocacao?.mantenedora;
+      const mantenedoraCnpj = alocacao?.cnpj;
+      const produtoNome = alocacao?.produto_nome;
+      const produtoCodigo = alocacao?.produto_codigo;
+      const equipamentoImei = alocacao?.imei;
+      const equipamentoSerial = alocacao?.serial;
+      const equipamentoMac = alocacao?.mac;
+
       const printWindow = window.open('', '_blank');
 
       if (printWindow) {
@@ -110,111 +123,127 @@ CPF [cpf_do_responsavel_unidade]
           <!DOCTYPE html>
           <html>
             <head>
-              <title>Termo de Responsabilidade - ${alocacao?.tombamento?.tombamento}</title>
+              <title>Termo de Responsabilidade - ${alocacao?.tombamento}</title>
+              <meta charset="utf-8">
               <style>
+                @page {
+                  size: A4;
+                  margin: 0;
+                }
+
                 body {
                   font-family: Arial, sans-serif;
-                  font-size: 11px;
-                  line-height: 1.3;
-                  margin: 20px;
+                  font-size: 12px;
+                  line-height: 1.4;
+                  margin: 0;
+                  padding: 0;
                   color: #000;
-                  background-image: url('/path/to/your/background.pdf'); /* Substitua pelo caminho do seu PDF */
-                  background-size: cover;
-                  background-repeat: no-repeat;
-                  background-position: center;
+                  width: 210mm;
+                  height: 297mm;
+                  position: relative;
+                }
+
+                .background-container {
+                  position: fixed;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  z-index: -1;
+                  background: url('data:application/pdf;base64,${btoa('PDF_PLACEHOLDER')}') no-repeat center center;
+                  background-size: 100% 100%;
                 }
 
                 .content-wrapper {
-                  padding: 100px 50px 50px 50px; /* Ajuste conforme o layout do seu PDF */
-                  background: rgba(255, 255, 255, 0.8); /* Fundo semi-transparente para o texto */
-                  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+                  padding: 120px 60px 60px 60px;
+                  position: relative;
+                  z-index: 1;
+                  min-height: calc(100vh - 180px);
                 }
 
                 .title-section {
                   text-align: center;
-                  margin-bottom: 20px;
+                  margin-bottom: 30px;
                 }
 
                 .title-section h1 {
-                  font-size: 18px;
+                  font-size: 16px;
                   font-weight: bold;
-                  margin: 0 0 5px 0;
+                  margin: 0 0 8px 0;
+                  text-transform: uppercase;
                 }
 
                 .title-section h2 {
                   font-size: 14px;
-                  font-weight: normal;
+                  font-weight: bold;
                   margin: 0;
+                  text-transform: uppercase;
                 }
 
                 .main-text {
                   text-align: justify;
-                  margin-bottom: 15px;
-                  line-height: 1.4;
+                  margin-bottom: 20px;
+                  line-height: 1.5;
                 }
 
                 .equipment-info {
-                  margin: 15px 0;
-                  padding: 10px;
-                  background-color: rgba(255, 255, 255, 0.7);
-                  border: 1px solid #ddd;
-                  font-size: 11px;
+                  margin: 20px 0;
+                  line-height: 1.6;
+                }
+
+                .equipment-info p {
+                  margin: 5px 0;
                 }
 
                 .conditions {
-                  margin: 15px 0;
+                  margin: 20px 0;
                   text-align: justify;
+                }
+
+                .conditions p {
+                  margin-bottom: 10px;
+                  font-weight: bold;
                 }
 
                 .conditions ol {
-                  padding-left: 20px;
-                  margin: 10px 0;
+                  padding-left: 25px;
+                  margin: 15px 0;
                 }
 
                 .conditions li {
-                  margin: 8px 0;
+                  margin: 10px 0;
                   text-align: justify;
-                  line-height: 1.4;
+                  line-height: 1.5;
                 }
 
                 .signatures {
-                  margin-top: 40px;
+                  margin-top: 50px;
+                }
+
+                .signature-section {
+                  margin: 30px 0;
                 }
 
                 .signature-line {
-                  margin: 25px 0;
-                  text-align: center;
-                }
-
-                .signature-line::before {
-                  content: '';
-                  display: block;
-                  width: 300px;
+                  width: 400px;
                   height: 1px;
                   background: #000;
-                  margin: 0 auto 5px auto;
+                  margin: 40px auto 10px auto;
+                }
+
+                .signature-text {
+                  text-align: center;
+                  margin-top: 10px;
                 }
 
                 @media print {
                   body {
-                    margin: 0;
                     -webkit-print-color-adjust: exact;
                     print-color-adjust: exact;
-                    background-image: url('/path/to/your/background.pdf'); /* Certifique-se que o caminho está correto para impressão */
                   }
 
                   .no-print {
                     display: none !important;
-                  }
-
-                  .content-wrapper {
-                    padding: 100px 50px 50px 50px; /* Ajuste conforme o layout do seu PDF */
-                    background: transparent; /* Remove o fundo semi-transparente para impressão */
-                    box-shadow: none;
-                  }
-
-                  .page-break {
-                    page-break-before: always;
                   }
                 }
 
@@ -226,10 +255,21 @@ CPF [cpf_do_responsavel_unidade]
                   margin: 10px;
                   cursor: pointer;
                   border-radius: 4px;
+                  position: fixed;
+                  top: 10px;
+                  z-index: 1000;
                 }
 
                 .print-button:hover {
                   background: #0056b3;
+                }
+
+                .print-button:first-child {
+                  left: 10px;
+                }
+
+                .print-button:last-child {
+                  left: 150px;
                 }
               </style>
             </head>
@@ -239,6 +279,8 @@ CPF [cpf_do_responsavel_unidade]
                 <button class="print-button" onclick="window.close()">❌ Fechar</button>
               </div>
 
+              <div class="background-container"></div>
+
               <div class="content-wrapper">
                 <div class="title-section">
                   <h1>TERMO DE RESPONSABILIDADE</h1>
@@ -246,15 +288,19 @@ CPF [cpf_do_responsavel_unidade]
                 </div>
 
                 <div class="main-text">
-                  <p>Eu, <strong>${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[sotech.cdg_interveniente.interveniente]'}</strong>, Portador do CNS <strong>${alocacao?.interveniente?.cnscnes || '[sotech.cdg_interveniente.cnscnes]'}</strong>, lotado na unidade de saúde <strong>${alocacao?.unidadesaude?.nome || '[sotech.cdg_unidadesaude.unidadesaude]'}</strong>, CNES <strong>${alocacao?.unidadesaude?.cnes || '[sotech.cdx_unidadesaude.cnes]'}</strong>, declaro que recebi do <strong>${alocacao?.mantenedora?.nome || empresa?.mantenedora || '[sotech.cdg_mantenedora.mantenedora]'}</strong>, CNPJ <strong>${alocacao?.mantenedora?.cnpj || empresa?.cnpj || '[sotech.cdg_mantenedora.cnpj]'}</strong> a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:</p>
+                  ${intervenienteNome && intervenienteCns && unidadeNome && unidadeCnes && mantenedoraNome && mantenedoraCnpj ? `
+                    <p>Eu, <strong>${intervenienteNome}</strong>, Portador do CNS <strong>${intervenienteCns}</strong>, lotado na unidade de saúde <strong>${unidadeNome}</strong>, CNES <strong>${unidadeCnes}</strong>, declaro que recebi do <strong>${mantenedoraNome}</strong>, CNPJ <strong>${mantenedoraCnpj}</strong> a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:</p>
+                  ` : ''}
                 </div>
 
+                ${(produtoNome || produtoCodigo || equipamentoImei || equipamentoSerial || equipamentoMac) ? `
                 <div class="equipment-info">
-                  <p><strong>Equipamento:</strong> ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} ${alocacao?.tombamento?.observacao || '[codigo_produto]'}</p>
-                  <p><strong>IMEI:</strong> ${alocacao?.tombamento?.imei || '[sotech.pat_tombamento.imei]'}</p>
-                  <p><strong>Serial:</strong> ${alocacao?.tombamento?.serial || '[numero_serie]'}</p>
-                  <p><strong>MAC:</strong> ${alocacao?.tombamento?.mac || '[sotech.pat_tombamento.mac]'}</p>
+                  ${produtoNome ? `<p><strong>Equipamento:</strong> ${produtoNome}${produtoCodigo ? ' - ' + produtoCodigo : ''}</p>` : ''}
+                  ${equipamentoImei ? `<p><strong>IMEI:</strong> ${equipamentoImei}</p>` : ''}
+                  ${equipamentoSerial ? `<p><strong>Serial:</strong> ${equipamentoSerial}</p>` : ''}
+                  ${equipamentoMac ? `<p><strong>MAC:</strong> ${equipamentoMac}</p>` : ''}
                 </div>
+                ` : ''}
 
                 <div class="conditions">
                   <p>Pelo qual declaro estar ciente de que:</p>
@@ -270,13 +316,18 @@ CPF [cpf_do_responsavel_unidade]
                 </div>
 
                 <div class="signatures">
-                  <p>Cliente:</p>
-                  <div class="signature-line"></div>
-                  <br><br>
-                  <p><strong>Termo de responsabilidade instrumental:</strong></p>
-                  <br>
-                  <p><strong>${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[nome_responsavel]'}</strong></p>
-                  <p>CPF: ${alocacao?.interveniente?.cpfcnpj || '[sotech.cdg_interveniente.cpfcnpj]'}</p>
+                  <div class="signature-section">
+                    <p>Cliente:</p>
+                    <div class="signature-line"></div>
+                  </div>
+                  
+                  <div class="signature-section">
+                    <p><strong>Termo de responsabilidade instrumental:</strong></p>
+                    <div style="margin-top: 30px;">
+                      ${intervenienteNome ? `<p><strong>${intervenienteNome}</strong></p>` : ''}
+                      ${intervenienteCpf ? `<p>CPF: ${intervenienteCpf}</p>` : ''}
+                    </div>
+                  </div>
                 </div>
               </div>
             </body>
@@ -341,37 +392,53 @@ CPF [cpf_do_responsavel_unidade]
 
         <div className="space-y-4">
           {/* Preview do termo */}
-          <div className="bg-white border rounded-lg p-6 shadow-sm" style={{ minHeight: '600px', backgroundImage: 'url("/path/to/your/background.pdf")', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+          <div className="bg-gray-50 border rounded-lg p-6 shadow-sm" style={{ minHeight: '600px' }}>
+            {/* Cabeçalho do termo */}
+            <div className="text-center mb-6 border-b pb-4">
+              <h2 className="text-lg font-bold uppercase">TERMO DE RESPONSABILIDADE</h2>
+              <h3 className="text-md font-semibold uppercase">GUARDA E USO DE EQUIPAMENTOS</h3>
+            </div>
+
             {/* Conteúdo do termo */}
-            <div className="text-xs leading-relaxed space-y-4">
-              {/* Texto principal */}
-              {(intervenienteNome || alocacao?.responsavel_unidade) &&
-               (intervenienteCns) &&
-               (unidade) &&
-               (unidadeCnes) &&
-               (mantenedoraNome) &&
-               (mantenedoraCnpj) && (
-                <div className="bg-white bg-opacity-90 p-3 rounded mb-4">
-                  <p className="text-justify leading-relaxed">
-                    Eu, <strong>{intervenienteNome || alocacao?.responsavel_unidade}</strong>, Portador do CNS <strong>{intervenienteCns}</strong>, lotado na unidade de saúde <strong>{unidade}</strong>, CNES <strong>{unidadeCnes}</strong>, declaro que recebi do <strong>{mantenedoraNome}</strong>, CNPJ <strong>{mantenedoraCnpj}</strong> a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
+            <div className="text-sm leading-relaxed space-y-4">
+              {/* Texto principal - só exibe se todos os dados necessários estiverem disponíveis */}
+              {alocacao?.interveniente_nome && alocacao?.interveniente_cns && alocacao?.unidade_nome && alocacao?.cnes && alocacao?.mantenedora && alocacao?.cnpj && (
+                <div className="text-justify mb-4">
+                  <p>
+                    Eu, <strong>{alocacao.interveniente_nome}</strong>, Portador do CNS <strong>{alocacao.interveniente_cns}</strong>, lotado na unidade de saúde <strong>{alocacao.unidade_nome}</strong>, CNES <strong>{alocacao.cnes}</strong>, declaro que recebi do <strong>{alocacao.mantenedora}</strong>, CNPJ <strong>{alocacao.cnpj}</strong> a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
                   </p>
                 </div>
               )}
 
-              {/* Informações do equipamento */}
-              {(produto || produtoCodigo || imei || serial || mac) && (
-                <div className="bg-white bg-opacity-90 p-3 rounded mb-4">
-                  {produto && <p><strong>Equipamento:</strong> {produto}{produtoCodigo ? ' ' + produtoCodigo : ''}</p>}
-                  {imei && <p><strong>IMEI:</strong> {imei}</p>}
-                  {serial && <p><strong>Serial:</strong> {serial}</p>}
-                  {mac && <p><strong>MAC:</strong> {mac}</p>}
+              {/* Se não tiver todos os dados, exibe campos disponíveis individualmente */}
+              {!(alocacao?.interveniente_nome && alocacao?.interveniente_cns && alocacao?.unidade_nome && alocacao?.cnes && alocacao?.mantenedora && alocacao?.cnpj) && (
+                <div className="space-y-2 mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                  <p className="text-sm font-semibold text-yellow-800">Dados disponíveis:</p>
+                  {alocacao?.interveniente_nome && <p><strong>Nome:</strong> {alocacao.interveniente_nome}</p>}
+                  {alocacao?.responsavel_unidade && <p><strong>Responsável Unidade:</strong> {alocacao.responsavel_unidade}</p>}
+                  {alocacao?.interveniente_cns && <p><strong>CNS:</strong> {alocacao.interveniente_cns}</p>}
+                  {alocacao?.unidade_nome && <p><strong>Unidade:</strong> {alocacao.unidade_nome}</p>}
+                  {alocacao?.cnes && <p><strong>CNES:</strong> {alocacao.cnes}</p>}
+                  {alocacao?.mantenedora && <p><strong>Mantenedora:</strong> {alocacao.mantenedora}</p>}
+                  {alocacao?.cnpj && <p><strong>CNPJ:</strong> {alocacao.cnpj}</p>}
                 </div>
               )}
 
-              {/* Condições */}
-              <div className="bg-white bg-opacity-90 p-3 rounded mb-4">
+              {/* Informações do equipamento - só exibe se houver pelo menos um dado */}
+              {(alocacao?.produto_nome || alocacao?.produto_codigo || alocacao?.imei || alocacao?.serial || alocacao?.mac) && (
+                <div className="border p-3 rounded mb-4 bg-blue-50">
+                  <h4 className="font-semibold mb-2">Informações do Equipamento:</h4>
+                  {alocacao?.produto_nome && <p><strong>Equipamento:</strong> {alocacao.produto_nome}{alocacao?.produto_codigo ? ` - ${alocacao.produto_codigo}` : ''}</p>}
+                  {alocacao?.imei && <p><strong>IMEI:</strong> {alocacao.imei}</p>}
+                  {alocacao?.serial && <p><strong>Serial:</strong> {alocacao.serial}</p>}
+                  {alocacao?.mac && <p><strong>MAC:</strong> {alocacao.mac}</p>}
+                </div>
+              )}
+
+              {/* Condições - sempre exibe */}
+              <div className="border p-3 rounded mb-4">
                 <p className="mb-2 font-semibold">Pelo qual declaro estar ciente de que:</p>
-                <ol className="list-decimal list-inside space-y-2 text-xs">
+                <ol className="list-decimal list-inside space-y-2 text-sm">
                   <li>Se o equipamento for danificado ou inutilizado por emergência, manutenção, mau uso ou negligência, deverá comunicar o ocorrido ao responsável da Secretaria Municipal da Saúde, ficando sujeito às responsabilidades respectivas de cada conduta;</li>
                   <li>No caso de extravio, furto ou roubo deverá notificar crimes, deverá se apresentar boletim de ocorrência imediatamente;</li>
                   <li>Em caso de troca por dano, furto ou roubo, o novo equipamento acarretará custos não previstos para a Instituição, visto que a Instituição não tem obrigação de substituir equipamentos danificados nos casos acima citados;</li>
@@ -383,15 +450,17 @@ CPF [cpf_do_responsavel_unidade]
               </div>
 
               {/* Assinaturas */}
-              <div className="bg-white bg-opacity-90 p-3 rounded">
-                <p className="mb-4">Cliente: _____________________________________</p>
-                <p className="mb-2"><strong>Termo de responsabilidade instrumental:</strong></p>
-                {(alocacao?.interveniente?.nome || alocacao?.responsavel_unidade) && (
-                  <p><strong>{alocacao?.interveniente?.nome || alocacao?.responsavel_unidade}</strong></p>
-                )}
-                {alocacao?.interveniente?.cpfcnpj && (
-                  <p>CPF: {alocacao?.interveniente?.cpfcnpj}</p>
-                )}
+              <div className="border p-3 rounded space-y-4">
+                <p>Cliente: _____________________________________</p>
+                <div className="pt-4">
+                  <p className="mb-2 font-semibold">Termo de responsabilidade instrumental:</p>
+                  {(alocacao?.interveniente_nome || alocacao?.responsavel_unidade) && (
+                    <p><strong>{alocacao.interveniente_nome || alocacao.responsavel_unidade}</strong></p>
+                  )}
+                  {alocacao?.interveniente_cpf && (
+                    <p>CPF: {alocacao.interveniente_cpf}</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>

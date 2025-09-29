@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useAlocacoes, useCreateAlocacao, useUpdateAlocacao, useDeleteAlocacao, useTombamentos, useUnidadesSaude, useSetores, useProfissionais, useEmpresa } from "@/hooks/usePatrimonio";
+import { useAlocacoes, useCreateAlocacao, useUpdateAlocacao, useDeleteAlocacao, useTombamentos, useUnidadesSaude, useSetores, useProfissionais } from "@/hooks/usePatrimonio";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -46,7 +46,6 @@ export default function Alocacao() {
   const { data: alocacoes = [], isLoading } = useAlocacoes();
   const { data: tombamentos = [] } = useTombamentos();
   const { data: unidadesSaude = [] } = useUnidadesSaude();
-  const { data: empresaData } = useEmpresa();
   const { data: setoresData } = useSetores();
   const setores = Array.isArray(setoresData) ? setoresData : [];
   const { data: profissionaisData } = useProfissionais();
@@ -833,7 +832,7 @@ export default function Alocacao() {
           isOpen={showTermoModal}
           onClose={handleCloseTermoModal}
           alocacao={selectedAlocacao}
-          empresa={empresaData}
+          empresa={null}
         />
       )}
     </div>

@@ -27,12 +27,18 @@ export default function TermoResponsabilidade({ isOpen, onClose, alocacao, empre
     const empresaNome = empresa?.mantenedora || '[NOME_DA_EMPRESA]';
     const tombamento = alocacao?.tombamento?.tombamento || '[CODIGO_TOMBAMENTO]';
     const produto = alocacao?.tombamento?.produto?.nome || '[DESCRICAO_PRODUTO]';
+    const produtoCodigo = alocacao?.tombamento?.produto?.codigo || '[CODIGO_PRODUTO]';
     const serial = alocacao?.tombamento?.serial || '[NUMERO_SERIE]';
+    const imei = alocacao?.tombamento?.imei || '[IMEI_EQUIPAMENTO]';
     const mac = alocacao?.tombamento?.mac || '[endereco_mac_tombamento_mac]';
     const unidade = alocacao?.unidadesaude?.nome || '[UNIDADE_DE_SAUDE]';
+    const unidadeCnes = alocacao?.unidadesaude?.cnes || '[CNES_UNIDADE]';
     const setor = alocacao?.setor?.nome || '[SETOR]';
     const responsavelUnidade = alocacao?.responsavel_unidade || '[RESPONSAVEL_UNIDADE]';
-    const profissional = alocacao?.profissional?.nome || '[PROFISSIONAL_RESPONSAVEL]';
+    const intervenienteNome = alocacao?.interveniente?.nome || '[NOME_INTERVENIENTE]';
+    const intervenienteCns = alocacao?.interveniente?.cns || '[CNS_INTERVENIENTE]';
+    const mantenedoraNome = alocacao?.mantenedora?.nome || empresa?.mantenedora || '[NOME_MANTENEDORA]';
+    const mantenedoraCnpj = alocacao?.mantenedora?.cnpj || empresa?.cnpj || '[CNPJ_MANTENEDORA]';
     const dataAlocacao = formatDate(alocacao?.dataalocacao) || '[DATA_ALOCACAO]';
     const dataAtual = formatDate(new Date());
 
@@ -40,16 +46,15 @@ export default function TermoResponsabilidade({ isOpen, onClose, alocacao, empre
                                     TERMO DE RESPONSABILIDADE
                                   GUARDA E USO DE EQUIPAMENTOS
 
-Eu, [${responsavelUnidade}], Portador do CPF [cpf_do_responsavel_unidade], 
-lotado na unidade de saúde [${unidade}] e exercendo a função de 
-[cargo_do_responsavel], declaro que recebi em [${dataAlocacao}] o equipamento 
-[${produto}] CNPJ [${serial}] a título de 
+Eu, [${intervenienteNome || responsavelUnidade}], Portador do CNS [${intervenienteCns}], 
+lotado na unidade de saúde [${unidade}] CNES [${unidadeCnes}], declaro que recebi do 
+[${mantenedoraNome}], CNPJ [${mantenedoraCnpj}] a título de 
 guarda, responsabilizando-me pelo uso adequado e os cuidados devidos, conforme 
 Secretaria Municipal de Saúde, e o assumo conforme meu cargo abaixo descrito, o equipamento 
 abaixo especificado neste termo:
 
-Equipamento: [${produto}] [${produto}]
-IMEI: [imei_do_equipamento]
+Equipamento: [${produto}] [${produtoCodigo}]
+IMEI: [${imei}]
 Serial: [${serial}]
 MAC: [${mac}]
 
@@ -63,7 +68,7 @@ Pelo qual declaro estar ciente de que:
    boletim de ocorrência imediatamente;
 
 3. Em caso de troca por dano, furto ou roubo, o nome equipamento acarretará custos não 
-   previstos para a instituição, visto que a Instituição não tem obrigação de substituir 
+   previstos para a Instituição, visto que a Instituição não tem obrigação de substituir 
    equipamentos danificados nos casos acima citados;
 
 4. Em caso de troca por dano, furto ou roubo, poderei vir a receber equipamentos de 
@@ -85,7 +90,7 @@ Cliente: _____________________________________
 
 Termo de responsabilidade instrumental:
 
-[${responsavelUnidade}]
+[${intervenienteNome || responsavelUnidade}]
 CPF [cpf_do_responsavel_unidade]
 
                                             Grupo IS
@@ -265,12 +270,12 @@ CPF [cpf_do_responsavel_unidade]
               </div>
 
               <div class="content">
-                <p>Eu, <strong>${alocacao?.responsavel_unidade || '[sotech.cdg_interveniente.interveniente]'}</strong>, Portador do CNS <strong>[sotech.cdg_interveniente.cns]</strong>, lotado na unidade de saúde <strong>${alocacao?.unidadesaude?.nome || '[sotech.cdg_unidadesaude.unidadesaude]'}</strong>, CNES <strong>[sotech.cdg_unidadesaude.cnes]</strong>, declaro que recebi do <strong>${empresa?.mantenedora || '[sotech.cdg_mantenedora.mantenedora]'}</strong>, CNPJ <strong>${empresa?.cnpj || '[sotech.cdg_mantenedora.cnpj]'}</strong> a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:</p>
+                <p>Eu, <strong>${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[sotech.cdg_interveniente.interveniente]'}</strong>, Portador do CNS <strong>${alocacao?.interveniente?.cns || '[sotech.cdg_interveniente.cns]'}</strong>, lotado na unidade de saúde <strong>${alocacao?.unidadesaude?.nome || '[sotech.cdg_unidadesaude.unidadesaude]'}</strong>, CNES <strong>${alocacao?.unidadesaude?.cnes || '[sotech.cdg_unidadesaude.cnes]'}</strong>, declaro que recebi do <strong>${alocacao?.mantenedora?.nome || empresa?.mantenedora || '[sotech.cdg_mantenedora.mantenedora]'}</strong>, CNPJ <strong>${alocacao?.mantenedora?.cnpj || empresa?.cnpj || '[sotech.cdg_mantenedora.cnpj]'}</strong> a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:</p>
               </div>
 
               <div class="equipment-info">
-                <p><strong>Equipamento:</strong> ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} [codigo_produto]</p>
-                <p><strong>IMEI:</strong> [imei_equipamento]</p>
+                <p><strong>Equipamento:</strong> ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} ${alocacao?.tombamento?.produto?.codigo || '[codigo_produto]'}</p>
+                <p><strong>IMEI:</strong> ${alocacao?.tombamento?.imei || '[imei_equipamento]'}</p>
                 <p><strong>Serial:</strong> ${alocacao?.tombamento?.serial || '[numero_serie]'}</p>
                 <p><strong>MAC:</strong> ${alocacao?.tombamento?.mac || '[endereco_mac]'}</p>
               </div>
@@ -301,7 +306,7 @@ CPF [cpf_do_responsavel_unidade]
                 <br><br>
                 <p><strong>Termo de responsabilidade instrumental:</strong></p>
                 <br>
-                <p><strong>${alocacao?.responsavel_unidade || '[nome_responsavel]'}</strong></p>
+                <p><strong>${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[nome_responsavel]'}</strong></p>
                 <p>CPF: [cpf_do_responsavel_unidade]</p>
               </div>
 
@@ -377,10 +382,10 @@ CPF [cpf_do_responsavel_unidade]
             <div className="text-xs leading-relaxed space-y-4">
               <div className="bg-gray-50 p-4 rounded text-xs">
                 <pre className="whitespace-pre-wrap font-sans text-xs leading-relaxed">
-{`Eu, ${alocacao?.responsavel_unidade || '[sotech.cdg_interveniente.interveniente]'}, Portador do CNS ${alocacao?.interveniente?.cns || '[sotech.cdg_interveniente.cns]'}, lotado na unidade de saúde ${alocacao?.unidadesaude?.nome || '[sotech.cdg_unidadesaude.unidadesaude]'}, CNES ${alocacao?.unidadesaude?.cnes || '[sotech.cdg_unidadesaude.cnes]'}, declaro que recebi do ${empresa?.mantenedora || '[sotech.cdg_mantenedora.mantenedora]'}, CNPJ ${empresa?.cnpj || '[sotech.cdg_mantenedora.cnpj]'} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
+{`Eu, ${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[sotech.cdg_interveniente.interveniente]'}, Portador do CNS ${alocacao?.interveniente?.cns || '[sotech.cdg_interveniente.cns]'}, lotado na unidade de saúde ${alocacao?.unidadesaude?.nome || '[sotech.cdg_unidadesaude.unidadesaude]'}, CNES ${alocacao?.unidadesaude?.cnes || '[sotech.cdg_unidadesaude.cnes]'}, declaro que recebi do ${alocacao?.mantenedora?.nome || empresa?.mantenedora || '[sotech.cdg_mantenedora.mantenedora]'}, CNPJ ${alocacao?.mantenedora?.cnpj || empresa?.cnpj || '[sotech.cdg_mantenedora.cnpj]'} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
 
-Equipamento: ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} [codigo_produto]
-IMEI: [imei_equipamento]
+Equipamento: ${alocacao?.tombamento?.produto?.nome || '[descricao_produto]'} ${alocacao?.tombamento?.produto?.codigo || '[codigo_produto]'}
+IMEI: ${alocacao?.tombamento?.imei || '[imei_equipamento]'}
 Serial: ${alocacao?.tombamento?.serial || '[numero_serie]'}
 MAC: ${alocacao?.tombamento?.mac || '[endereco_mac]'}
 
@@ -405,7 +410,7 @@ Cliente: _____________________________________
 
 Termo de responsabilidade instrumental:
 
-${alocacao?.responsavel_unidade || '[nome_responsavel]'}
+${alocacao?.interveniente?.nome || alocacao?.responsavel_unidade || '[nome_responsavel]'}
 CPF: [cpf_do_responsavel_unidade]`}
                 </pre>
               </div>

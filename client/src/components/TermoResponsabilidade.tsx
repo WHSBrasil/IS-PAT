@@ -254,10 +254,10 @@ export default function TermoResponsabilidade({ isOpen, onClose, alocacao, empre
 
                 ${(produtoNome || produtoCodigo || equipamentoImei || equipamentoSerial || equipamentoMac) ? `
                 <div class="equipment-info">
-                  ${produtoNome ? `<p><strong>Equipamento:</strong> ${produtoNome}${produtoCodigo ? ' - ' + produtoCodigo : ''}</p>` : ''}
-                  ${equipamentoImei ? `<p><strong>IMEI:</strong> ${equipamentoImei}</p>` : ''}
-                  ${equipamentoSerial ? `<p><strong>Serial:</strong> ${equipamentoSerial}</p>` : ''}
-                  ${equipamentoMac ? `<p><strong>MAC:</strong> ${equipamentoMac}</p>` : ''}
+                  ${produtoNome ? `<p><strong>Equipamento:</strong> ${String(produtoNome)}${produtoCodigo ? ' - ' + String(produtoCodigo) : ''}</p>` : ''}
+                  ${equipamentoImei ? `<p><strong>IMEI:</strong> ${String(equipamentoImei)}</p>` : ''}
+                  ${equipamentoSerial ? `<p><strong>Serial:</strong> ${String(equipamentoSerial)}</p>` : ''}
+                  ${equipamentoMac ? `<p><strong>MAC:</strong> ${String(equipamentoMac)}</p>` : ''}
                 </div>
                 ` : ''}
 
@@ -283,8 +283,8 @@ export default function TermoResponsabilidade({ isOpen, onClose, alocacao, empre
                   <div class="signature-section">
                     <p><strong>Termo de responsabilidade instrumental:</strong></p>
                     <div style="margin-top: 20px;">
-                      ${intervenienteNome ? `<p><strong>${intervenienteNome}</strong></p>` : ''}
-                      ${intervenienteCpf ? `<p>CPF: ${intervenienteCpf}</p>` : ''}
+                      ${intervenienteNome ? `<p><strong>${String(intervenienteNome)}</strong></p>` : ''}
+                      ${intervenienteCpf ? `<p>CPF: ${String(intervenienteCpf)}</p>` : ''}
                     </div>
                   </div>
                 </div>
@@ -333,12 +333,12 @@ export default function TermoResponsabilidade({ isOpen, onClose, alocacao, empre
 TERMO DE RESPONSABILIDADE
 GUARDA E USO DE EQUIPAMENTOS
 
-Eu, ${intervenienteNome || '________________'}${intervenienteCns ? `, Portador do CNS ${intervenienteCns}` : ''}, lotado na unidade de saúde ${unidadeNome || '________________'}${unidadeCnes ? `, CNES ${unidadeCnes}` : ''}, declaro que recebi do ${mantenedoraNome || '________________'}${mantenedoraCnpj ? `, CNPJ ${mantenedoraCnpj}` : ''} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
+Eu, ${String(intervenienteNome || '________________')}${intervenienteCns ? `, Portador do CNS ${String(intervenienteCns)}` : ''}, lotado na unidade de saúde ${String(unidadeNome || '________________')}${unidadeCnes ? `, CNES ${String(unidadeCnes)}` : ''}, declaro que recebi do ${String(mantenedoraNome || '________________')}${mantenedoraCnpj ? `, CNPJ ${String(mantenedoraCnpj)}` : ''} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
 
-${produtoNome ? `Equipamento: ${produtoNome}${produtoCodigo ? ' - ' + produtoCodigo : ''}` : ''}
-${equipamentoImei ? `IMEI: ${equipamentoImei}` : ''}
-${equipamentoSerial ? `Serial: ${equipamentoSerial}` : ''}
-${equipamentoMac ? `MAC: ${equipamentoMac}` : ''}
+${produtoNome ? `Equipamento: ${String(produtoNome)}${produtoCodigo ? ' - ' + String(produtoCodigo) : ''}` : ''}
+${equipamentoImei ? `IMEI: ${String(equipamentoImei)}` : ''}
+${equipamentoSerial ? `Serial: ${String(equipamentoSerial)}` : ''}
+${equipamentoMac ? `MAC: ${String(equipamentoMac)}` : ''}
 
 Pelo qual declaro estar ciente de que:
 
@@ -360,8 +360,8 @@ Cliente: _____________________________________
 
 Termo de responsabilidade instrumental:
 
-${intervenienteNome || '________________'}
-${intervenienteCpf ? `CPF: ${intervenienteCpf}` : 'CPF: ________________'}
+${String(intervenienteNome || '________________')}
+${intervenienteCpf ? `CPF: ${String(intervenienteCpf)}` : 'CPF: ________________'}
 `;
 
       const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });

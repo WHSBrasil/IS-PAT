@@ -308,23 +308,32 @@ export class DatabaseStorage implements IStorage {
   // Alocacao methods
   async getAlocacoes(): Promise<Alocacao[]> {
     const result = await query(`
-      SELECT a.pkalocacao, a.fktombamento, a.fkunidadesaude, a.fksetor, a.fkprofissional,
-             a.responsavel_unidade, a.dataalocacao, a.photos, a.termo, a.responsavel, 
-             a.observacao, a.ativo, a.fkuser, a.created_at, a.version,
-             t.tombamento, t.serial,
-             p.produto as produto_nome,
-             u.unidadesaude as unidade_nome,
-             s.setor as setor_nome,
-             ci.pkinterveniente,
-             ci.interveniente as profissional_nome
+      SELECT 
+        a.pkalocacao,
+        a.fktombamento,
+        a.fkunidadesaude,
+        a.fksetor,
+        a.responsavel_unidade,
+        a.dataalocacao,
+        a.termo,
+        a.responsavel,
+        a.observacao,
+        a.photos,
+        t.tombamento,
+        t.serial,
+        t.imei,
+        t.mac,
+        p.produto as produto_nome,
+        us.unidadesaude as unidade_nome,
+        ux.cnes,
+        s.setor as setor_nome
       FROM sotech.pat_alocacao a
       LEFT JOIN sotech.pat_tombamento t ON a.fktombamento = t.pktombamento
       LEFT JOIN sotech.est_produto p ON t.fkproduto = p.pkproduto
-      LEFT JOIN sotech.cdg_unidadesaude u ON a.fkunidadesaude = u.pkunidadesaude
+      LEFT JOIN sotech.cdg_unidadesaude us ON a.fkunidadesaude = us.pkunidadesaude
+      LEFT JOIN sotech.cdx_unidadesaude ux on us.pkunidadesaude = ux.fkunidadesaude
       LEFT JOIN sotech.cdg_setor s ON a.fksetor = s.pksetor
-      LEFT JOIN sotech.cdg_interveniente ci ON a.fkprofissional = ci.pkinterveniente
-      WHERE a.ativo = true
-      ORDER BY a.created_at DESC
+      ORDER BY a.dataalocacao DESC
     `);
 
     return result.rows.map(row => ({
@@ -333,12 +342,15 @@ export class DatabaseStorage implements IStorage {
         pktombamento: row.fktombamento,
         tombamento: row.tombamento,
         serial: row.serial,
+        imei: row.imei,
+        mac: row.mac,
         produto: row.produto_nome ? { nome: row.produto_nome } : undefined
       } : undefined,
-      unidadesaude: row.unidade_nome ? { nome: row.unidade_nome } : undefined,
-      setor: row.setor_nome ? { nome: row.setor_nome } : undefined,
-      fkprofissional: row.pkinterveniente,
-      responsavel: row.profissional_nome
+      unidadesaude: row.unidade_nome ? { 
+        nome: row.unidade_nome,
+        cnes: row.cnes
+      } : undefined,
+      setor: row.setor_nome ? { nome: row.setor_nome } : undefined
     }));
   }
 

@@ -145,26 +145,31 @@ CPF [cpf_do_responsavel_unidade]
                 }
 
                 .background-container {
-                  position: fixed;
+                  position: absolute;
                   top: 0;
                   left: 0;
-                  width: 100%;
-                  height: 100%;
-                  z-index: -1;
+                  width: 210mm;
+                  height: 297mm;
+                  z-index: 0;
+                  overflow: hidden;
                 }
 
                 .background-container iframe {
-                  width: 100%;
-                  height: 100%;
+                  width: 210mm;
+                  height: 297mm;
                   border: none;
                   pointer-events: none;
+                  opacity: 1;
+                  transform: scale(1);
+                  transform-origin: top left;
                 }
 
                 .content-wrapper {
-                  padding: 120px 60px 80px 60px;
+                  padding: 150px 40px 60px 40px;
                   position: relative;
-                  z-index: 1;
-                  min-height: calc(100vh - 200px);
+                  z-index: 2;
+                  min-height: calc(297mm - 210px);
+                  background: transparent;
                 }
 
                 .header-section {
@@ -186,6 +191,9 @@ CPF [cpf_do_responsavel_unidade]
                 .title-section {
                   text-align: center;
                   margin-bottom: 30px;
+                  background: rgba(255, 255, 255, 0.9);
+                  padding: 10px;
+                  border-radius: 4px;
                 }
 
                 .title-section h1 {
@@ -193,6 +201,7 @@ CPF [cpf_do_responsavel_unidade]
                   font-weight: bold;
                   margin: 0 0 8px 0;
                   text-transform: uppercase;
+                  color: #000;
                 }
 
                 .title-section h2 {
@@ -200,17 +209,26 @@ CPF [cpf_do_responsavel_unidade]
                   font-weight: bold;
                   margin: 0;
                   text-transform: uppercase;
+                  color: #000;
                 }
 
                 .main-text {
                   text-align: justify;
                   margin-bottom: 20px;
                   line-height: 1.5;
+                  background: rgba(255, 255, 255, 0.95);
+                  padding: 15px;
+                  border-radius: 4px;
+                  color: #000;
                 }
 
                 .equipment-info {
                   margin: 20px 0;
                   line-height: 1.6;
+                  background: rgba(255, 255, 255, 0.95);
+                  padding: 15px;
+                  border-radius: 4px;
+                  color: #000;
                 }
 
                 .equipment-info p {
@@ -220,6 +238,10 @@ CPF [cpf_do_responsavel_unidade]
                 .conditions {
                   margin: 20px 0;
                   text-align: justify;
+                  background: rgba(255, 255, 255, 0.95);
+                  padding: 15px;
+                  border-radius: 4px;
+                  color: #000;
                 }
 
                 .conditions p {
@@ -240,6 +262,10 @@ CPF [cpf_do_responsavel_unidade]
 
                 .signatures {
                   margin-top: 50px;
+                  background: rgba(255, 255, 255, 0.95);
+                  padding: 15px;
+                  border-radius: 4px;
+                  color: #000;
                 }
 
                 .signature-section {
@@ -302,7 +328,7 @@ CPF [cpf_do_responsavel_unidade]
               </div>
 
               <div class="background-container">
-                <iframe src="/Timbre.pdf" style="opacity: 0.3;"></iframe>
+                <iframe src="/Timbre.pdf"></iframe>
               </div>
 
               <div class="content-wrapper">

@@ -249,7 +249,7 @@ export default function TermoResponsabilidade({ isOpen, onClose, alocacao, empre
 
                 <div class="main-text">
                   <p>
-                    Eu, <strong>${String(intervenienteNome || '________________')}</strong>${intervenienteCns ? `, Portador do CNS <strong>${String(intervenienteCns)}</strong>` : ''}, lotado na unidade de saúde <strong>${String(unidadeNome || '________________')}</strong>${unidadeCnes ? `, CNES <strong>${String(unidadeCnes)}</strong>` : ''}, declaro que recebi do <strong>${String(mantenedoraNome || '________________')}</strong>${mantenedoraCnpj ? `, CNPJ <strong>${String(mantenedoraCnpj)}</strong>` : ''} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:</p>
+                    Eu, <strong>${intervenienteNome ? String(intervenienteNome) : '________________'}</strong>${intervenienteCns ? `, Portador do CNS <strong>${String(intervenienteCns)}</strong>` : ''}, lotado na unidade de saúde <strong>${unidadeNome ? String(unidadeNome) : '________________'}</strong>${unidadeCnes ? `, CNES <strong>${String(unidadeCnes)}</strong>` : ''}, declaro que recebi do <strong>${mantenedoraNome ? String(mantenedoraNome) : '________________'}</strong>${mantenedoraCnpj ? `, CNPJ <strong>${String(mantenedoraCnpj)}</strong>` : ''} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:</p>
                 </div>
 
                 ${(produtoNome || produtoCodigo || equipamentoImei || equipamentoSerial || equipamentoMac) ? `
@@ -283,8 +283,8 @@ export default function TermoResponsabilidade({ isOpen, onClose, alocacao, empre
                   <div class="signature-section">
                     <p><strong>Termo de responsabilidade instrumental:</strong></p>
                     <div style="margin-top: 20px;">
-                      ${intervenienteNome ? `<p><strong>${String(intervenienteNome)}</strong></p>` : ''}
-                      ${intervenienteCpf ? `<p>CPF: ${String(intervenienteCpf)}</p>` : ''}
+                      ${intervenienteNome ? `<p><strong>${String(intervenienteNome)}</strong></p>` : '<p><strong>________________</strong></p>'}
+                      ${intervenienteCpf ? `<p>CPF: ${String(intervenienteCpf)}</p>` : '<p>CPF: ________________</p>'}
                     </div>
                   </div>
                 </div>
@@ -333,7 +333,7 @@ export default function TermoResponsabilidade({ isOpen, onClose, alocacao, empre
 TERMO DE RESPONSABILIDADE
 GUARDA E USO DE EQUIPAMENTOS
 
-Eu, ${String(intervenienteNome || '________________')}${intervenienteCns ? `, Portador do CNS ${String(intervenienteCns)}` : ''}, lotado na unidade de saúde ${String(unidadeNome || '________________')}${unidadeCnes ? `, CNES ${String(unidadeCnes)}` : ''}, declaro que recebi do ${String(mantenedoraNome || '________________')}${mantenedoraCnpj ? `, CNPJ ${String(mantenedoraCnpj)}` : ''} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
+Eu, ${intervenienteNome ? String(intervenienteNome) : '________________'}${intervenienteCns ? `, Portador do CNS ${String(intervenienteCns)}` : ''}, lotado na unidade de saúde ${unidadeNome ? String(unidadeNome) : '________________'}${unidadeCnes ? `, CNES ${String(unidadeCnes)}` : ''}, declaro que recebi do ${mantenedoraNome ? String(mantenedoraNome) : '________________'}${mantenedoraCnpj ? `, CNPJ ${String(mantenedoraCnpj)}` : ''} a título de guarda, transporte e conservação, para uso exclusivo nos sistemas determinados pela SMS – Secretaria Municipal de Saúde, e a trabalho conforme meu cargo acima declarado, o equipamento abaixo especificado neste termo:
 
 ${produtoNome ? `Equipamento: ${String(produtoNome)}${produtoCodigo ? ' - ' + String(produtoCodigo) : ''}` : ''}
 ${equipamentoImei ? `IMEI: ${String(equipamentoImei)}` : ''}
@@ -360,7 +360,7 @@ Cliente: _____________________________________
 
 Termo de responsabilidade instrumental:
 
-${String(intervenienteNome || '________________')}
+${intervenienteNome ? String(intervenienteNome) : '________________'}
 ${intervenienteCpf ? `CPF: ${String(intervenienteCpf)}` : 'CPF: ________________'}
 `;
 

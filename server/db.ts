@@ -1,16 +1,17 @@
 
 import { Pool } from 'pg';
 
+// Carregando configurações do banco de dados das variáveis de ambiente
 const connectionConfig = {
-  host: 'db.redeis.com.br',
-  port: 5555,
-  user: 'sotech',
-  password: 'SthNox@2022',
-  database: 'dbapr',
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '5432', 10),
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'postgres',
   ssl: {
-    rejectUnauthorized: false
+    rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED === 'true'
   },
-  schema: 'sotech'
+  schema: process.env.DB_SCHEMA || 'public'
 };
 
 export const pool = new Pool(connectionConfig);

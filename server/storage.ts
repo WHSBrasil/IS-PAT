@@ -193,7 +193,7 @@ export class DatabaseStorage implements IStorage {
       LEFT JOIN sotech.est_grupo g ON sg.fkgrupo = g.pkgrupo
       LEFT JOIN sotech.est_subtipo st ON g.fksubtipo = st.pksubtipo
       LEFT JOIN sotech.est_tipo t ON st.fktipo = t.pktipo
-      WHERE p.ativo = true AND t.pktipo = 2
+      WHERE p.ativo = true AND t.pktipo = 1
       ORDER BY p.produto
     `);
     return result.rows.map(row => ({
